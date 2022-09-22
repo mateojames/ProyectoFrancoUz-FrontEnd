@@ -8,7 +8,8 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   sendPasswordResetEmail,
-  updatePassword 
+  updatePassword,
+  sendEmailVerification
 } from "firebase/auth";
 
 const AuthContext = React.createContext()
@@ -21,8 +22,11 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState()
   const [loading, setLoading] = useState(true)
 
-  function signup(email, password) {
-    return createUserWithEmailAndPassword(auth, email, password)
+  async function signup(email, password) {
+    await createUserWithEmailAndPassword(auth, email, password);
+
+    await sendEmailVerification(auth.currentUser);
+    
   }
 
   function login(email, password) {

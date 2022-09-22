@@ -31,13 +31,21 @@ function DrawerAppBar(props) {
       </Typography>
       <Divider />
       <List>
-        {navItems.map((item) => (
-          <ListItem key={item} disablePadding>
-            <ListItemButton sx={{ textAlign: 'center' }}>
-              <ListItemText primary={item} />
+          <ListItem key={1} disablePadding>
+            <ListItemButton sx={{ textAlign: 'center' }}  onClick={props.onLoginClicked}>
+              <ListItemText>Ingresar</ListItemText>
             </ListItemButton>
           </ListItem>
-        ))}
+          <ListItem key={2} disablePadding>
+            <ListItemButton sx={{ textAlign: 'center' }}>
+              <ListItemText>Conozcanos</ListItemText>
+            </ListItemButton>
+          </ListItem>
+          <ListItem key={3} disablePadding>
+            <ListItemButton sx={{ textAlign: 'center' }}>
+              <ListItemText>Historia</ListItemText>
+            </ListItemButton>
+          </ListItem>
       </List>
     </Box>
   );

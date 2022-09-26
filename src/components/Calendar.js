@@ -168,8 +168,6 @@ const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
 
 
 
-
-
 export default class Demo extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -196,6 +194,7 @@ export default class Demo extends React.PureComponent {
       if (deleted !== undefined) {
         data = data.filter(appointment => appointment.id !== deleted);
       }
+      console.log(this.state);
       return { data };
     });
   }
@@ -223,7 +222,7 @@ export default class Demo extends React.PureComponent {
       <Paper>
         <Scheduler
           data={data}
-          height={660}
+          height={870}
         >
           <ViewState
             currentDate={currentDate}
@@ -232,8 +231,7 @@ export default class Demo extends React.PureComponent {
           <EditingState
             onCommitChanges={this.commitChanges}
           />
-          
-          
+
           <WeekView
             startDayHour={8}
             endDayHour={20}

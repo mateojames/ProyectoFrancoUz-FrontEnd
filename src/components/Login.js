@@ -3,7 +3,7 @@ import { Modal, Form, Button, Card, Alert } from "react-bootstrap"
 import { useAuth } from "../contexts/AuthContext"
 import { Link, useHistory } from "react-router-dom"
 import GoogleButton from 'react-google-button'
-import DrawerAppBar from "./AppBar"
+import ResponsiveAppBar from "./ResponsiveAppBar"
 import ProductHero from "../views/ProductHero"
 
 
@@ -47,7 +47,8 @@ export default function Login() {
 
   return (
     <>
-      <DrawerAppBar onLoginClicked={()=> setShow(true)}></DrawerAppBar>
+      
+      <ResponsiveAppBar onLoginClicked={()=> setShow(true)}/>
       <ProductHero />
       <Modal show={show} centered onHide={()=>setShow(false)}>
         <Modal.Body>

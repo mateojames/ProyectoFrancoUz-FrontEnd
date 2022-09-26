@@ -5,9 +5,6 @@ import ProductHeroLayout from './ProductHeroLayout';
 
 import ImageFrancoUz from '../images/frente3.png';
 
-const backgroundImage =
-  'https://images.unsplash.com/photo-1534854638093-bada1813ca19?auto=format&fit=crop&w=1400';
-
 export default function ProductHero() {
   return (
     <ProductHeroLayout
@@ -43,9 +40,6 @@ export default function ProductHero() {
       >
         Conozcanos
       </Button>
-      <Typography variant="body2" color="inherit" sx={{ mt: 2 }}>
-        Discover the experience
-      </Typography>
     </ProductHeroLayout>
   );
 }

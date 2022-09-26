@@ -12,6 +12,8 @@ import ForgotPassword from "./ForgotPassword"
 import UpdateProfile from "./UpdateProfile"
 import withRoot from "../withRoot"
 
+
+
 function App() {
   return (
         <Router>

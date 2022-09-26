@@ -1,10 +1,12 @@
 import React, { useRef, useState } from "react"
-import { Modal, Form, Button, Card, Alert } from "react-bootstrap"
+import { Modal, Form, Card, Alert } from "react-bootstrap"
 import { useAuth } from "../contexts/AuthContext"
 import { Link, useHistory } from "react-router-dom"
 import GoogleButton from 'react-google-button'
 import ResponsiveAppBar from "./ResponsiveAppBar"
 import ProductHero from "../views/ProductHero"
+
+import Button from '@mui/material/Button';
 
 
 export default function Login() {
@@ -65,15 +67,15 @@ export default function Login() {
                   <Form.Label>Contraseña</Form.Label>
                   <Form.Control type="password" ref={passwordRef} required />
                 </Form.Group>
-                <Button disabled={loading} className="w-100" type="submit">
+                <Button disabled={loading} className="w-100" variant="contained" color="primary" type="submit">
                   Ingresar
                 </Button>
               </Form>
               <div className="w-100 text-center mt-3">
-                <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
+                <Link to="/forgot-password" color="primary">¿Olvidaste tu contraseña?</Link>
               </div>
               <div className="w-100 text-center mt-3">
-              <GoogleButton disabled={loading}  type="dark" className="w-100"  onClick={handleGoogleSignin} label='Ingresar con Google'></GoogleButton>
+              <GoogleButton disabled={loading}  type="light" className="w-100"  onClick={handleGoogleSignin} label='Ingresar con Google'></GoogleButton>
               </div>
             </Card.Body>
           </Card>

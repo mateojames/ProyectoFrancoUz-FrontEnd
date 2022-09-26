@@ -81,7 +81,6 @@ const ResponsiveAppBar = (props) => {
                                 sx={{
                                 display: { xs: 'none', md: 'flex' },
                                 mr: 2,
-                                fontFamily: 'monospace',
                                 fontWeight: 700,
                                 letterSpacing: '.3rem',
                                 color: 'inherit',

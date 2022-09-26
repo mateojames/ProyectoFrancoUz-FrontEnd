@@ -1,61 +1,50 @@
 import React, { useRef, useState } from "react"
-import { Modal, Form, Card, Alert } from "react-bootstrap"
+import { Form, Card, Alert } from "react-bootstrap"
 import { useAuth } from "../contexts/AuthContext"
 import { Link, useHistory } from "react-router-dom"
 import GoogleButton from 'react-google-button'
-import ResponsiveAppBar from "./ResponsiveAppBar"
-import ProductHero from "../views/ProductHero"
-
-import Button from '@mui/material/Button';
-
+import Button from "./Button"
 
 export default function Login() {
-  const emailRef = useRef()
-  const passwordRef = useRef()
-  const [show, setShow] = useState(false)
-  const { login, loginWithGoogle } = useAuth()
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
-  const history = useHistory()
+    const emailRef = useRef()
+    const passwordRef = useRef()
+    const { login, loginWithGoogle } = useAuth()
+    const [error, setError] = useState("")
+    const [loading, setLoading] = useState(false)
+    const history = useHistory()
 
-  async function handleSubmit(e) {
-    e.preventDefault()
-
-    try {
-      setError("")
-      setLoading(true)
-      await login(emailRef.current.value, passwordRef.current.value)
-      history.push("/")
-    } catch {
-      setError("Error al ingresar")
-    }
-
-    setLoading(false)
-  }
-
-  const handleGoogleSignin = async () => {
-    try {
-      setError("")
-      setLoading(true)
-      await loginWithGoogle();
-      history.push("/")
-    } catch (error) {
-      console.log(error)
-      setError("Error al ingresar")
-    }
-    setLoading(false)
-  };
-
-
+    async function handleSubmit(e) {
+        e.preventDefault()
+    
+        try {
+          setError("")
+          setLoading(true)
+          await login(emailRef.current.value, passwordRef.current.value)
+          history.push("/")
+        } catch {
+          setError("Error al ingresar")
+        }
+    
+        setLoading(false)
+      }
+    
+      const handleGoogleSignin = async () => {
+        try {
+          setError("")
+          setLoading(true)
+          await loginWithGoogle();
+          history.push("/")
+        } catch (error) {
+          console.log(error)
+          setError("Error al ingresar")
+        }
+        setLoading(false)
+      };
+    
   return (
     <>
-      
-      <ResponsiveAppBar onLoginClicked={()=> setShow(true)}/>
-      <ProductHero />
-      <Modal show={show} centered onHide={()=>setShow(false)}>
-        <Modal.Body>
-          <Card>
-            <Card.Body>
+      <Card>
+        <Card.Body>
               <h2 className="text-center mb-4">Ingresar a tu cuenta</h2>
               {error && <Alert variant="danger">{error}</Alert>}
               <Form onSubmit={handleSubmit}>
@@ -82,8 +71,6 @@ export default function Login() {
         <div className="w-100 text-center mt-2">
         ¿No tenes una cuenta? <Link to="/signup">¡Registrate!</Link>
         </div>
-        </Modal.Body>
-      </Modal>
     </>
   )
 }

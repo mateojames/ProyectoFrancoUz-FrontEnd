@@ -1,9 +1,10 @@
 import React, { useRef, useState } from "react"
-import { Form, Button, Card, Alert } from "react-bootstrap"
+import { Form, Card, Alert } from "react-bootstrap"
+import Button from "./Button"
 import { useAuth } from "../contexts/AuthContext"
 import { Link, useHistory } from "react-router-dom"
 
-export default function Signup() {
+export default function Signup(props) {
   const emailRef = useRef()
   const passwordRef = useRef()
   const passwordConfirmRef = useRef()
@@ -50,14 +51,14 @@ export default function Signup() {
               <Form.Label>Repetir Contraseña</Form.Label>
               <Form.Control type="password" ref={passwordConfirmRef} required />
             </Form.Group>
-            <Button disabled={loading} className="w-100" type="submit">
+            <Button disabled={loading} className="w-100" variant="contained" color="primary" type="submit">
               Enviar
             </Button>
           </Form>
         </Card.Body>
       </Card>
       <div className="w-100 text-center mt-2">
-        ¿Ya tenes una cuenta? <Link to="/login">Ingresá</Link>
+        ¿Ya tenes una cuenta? <Link to="#" style={{color: '#FB3640'}} onClick={props.onLoginClicked}>Ingresá</Link>
       </div>
     </>
   )

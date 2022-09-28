@@ -5,7 +5,7 @@ import { Link, useHistory } from "react-router-dom"
 import GoogleButton from 'react-google-button'
 import Button from "./Button"
 
-export default function Login() {
+export default function Login(props) {
     const emailRef = useRef()
     const passwordRef = useRef()
     const { login, loginWithGoogle } = useAuth()
@@ -61,7 +61,7 @@ export default function Login() {
                 </Button>
               </Form>
               <div className="w-100 text-center mt-3">
-                <Link to="/forgot-password" color="primary">¿Olvidaste tu contraseña?</Link>
+                <Link to="#" style={{color: '#FB3640'}} onClick={props.onForgotClicked}>¿Olvidaste tu contraseña?</Link>
               </div>
               <div className="w-100 text-center mt-3">
               <GoogleButton disabled={loading}  type="light" className="w-100"  onClick={handleGoogleSignin} label='Ingresar con Google'></GoogleButton>
@@ -69,7 +69,7 @@ export default function Login() {
             </Card.Body>
           </Card>
         <div className="w-100 text-center mt-2">
-        ¿No tenes una cuenta? <Link to="/signup">¡Registrate!</Link>
+        ¿No tenes una cuenta? <Link to="#" style={{color: '#FB3640'}} onClick={props.onSingUpClicked}>¡Registrate!</Link>
         </div>
     </>
   )

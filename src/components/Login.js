@@ -20,7 +20,7 @@ export default function Login(props) {
           setError("")
           setLoading(true)
           await login(emailRef.current.value, passwordRef.current.value)
-          history.push("/")
+          history.push("/inicio")
         } catch {
           setError("Error al ingresar")
         }
@@ -33,7 +33,7 @@ export default function Login(props) {
           setError("")
           setLoading(true)
           await loginWithGoogle();
-          history.push("/")
+          history.push("/inicio")
         } catch (error) {
           console.log(error)
           setError("Error al ingresar")

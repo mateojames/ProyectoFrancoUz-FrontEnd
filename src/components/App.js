@@ -20,7 +20,8 @@ function App() {
           <AuthProvider>
             <Switch>
               <PrivateRoute exact path="/Calendar" component={Calendar} />
-              <PrivateRoute path="/update-profile" component={UpdateProfile} />
+              <PrivateRoute path="/inicio" component={Dashboard}/>
+              <PrivateRoute path="/update-profile" component={UpdateProfile}/>
               <Route path="/" component={Home} />
             </Switch>
           </AuthProvider>

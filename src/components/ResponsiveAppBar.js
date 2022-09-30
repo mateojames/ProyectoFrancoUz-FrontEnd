@@ -14,15 +14,22 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import LogoFrancoUz from '../images/logoFrancoUz.png';
+import { useDispatch } from 'react-redux';
+import { showModal } from '../store/actions/modal';
 
 const drawerWidth = 240;
 
-const ResponsiveAppBar = (props) => {
+const ResponsiveAppBar = () => {
     const [mobileOpen, setMobileOpen] = React.useState(false);
 
      const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
         console.log(mobileOpen)
+    };
+
+    const dispatch = useDispatch();
+    const handleLoginClicked = () => {
+        dispatch(showModal())
     };
 
     const drawer = (
@@ -33,7 +40,7 @@ const ResponsiveAppBar = (props) => {
         <Divider />
         <List>
             <ListItem key={1} disablePadding>
-                <ListItemButton sx={{ textAlign: 'center' }}  onClick={props.onLoginClicked}>
+                <ListItemButton sx={{ textAlign: 'center' }}  onClick={handleLoginClicked}>
                 <ListItemText>Ingresar</ListItemText>
                 </ListItemButton>
             </ListItem>
@@ -92,7 +99,7 @@ const ResponsiveAppBar = (props) => {
                         </Box>
                     </Box>
                     <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                        <Button sx={{ my: 2, color: 'white', display: 'block' }} onClick={props.onLoginClicked}>
+                        <Button sx={{ my: 2, color: 'white', display: 'block' }} onClick={handleLoginClicked}>
                             Ingresar
                         </Button>
                         <Button sx={{ my: 2, color: 'white', display: 'block' }} >

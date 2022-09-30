@@ -1,45 +1,51 @@
-import React, {useState } from "react"
+import React, {useState, useEffect  } from "react"
 import { Modal} from "react-bootstrap"
-import ResponsiveAppBar from "./ResponsiveAppBar"
 import ProductHero from "../views/ProductHero"
 import Login from "./Login"
 import Signup from "./Signup"
 import ForgotPassword from "./ForgotPassword"
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { hideModal } from '../store/actions/modal';
 
 
 export default function Home() {
-  const [show, setShow] = useState(false)
-  const [showLogin, setShowLogin] = useState(false)
+  const [showLogin, setShowLogin] = useState(true)
   const [showSingUp, setShowSingUp] = useState(false)
   const [showForgot, setShowForgot] = useState(false)
 
+  const show = useSelector(state => state.modal.show);
+  const dispatch = useDispatch();
+
   const handleModalClose = () => {
-    setShow(false);
-    setShowLogin(false);
+    dispatch(hideModal())
+    setShowLogin(true);
     setShowSingUp(false);
     setShowForgot(false);
   }
 
   const handleLoginClicked = () => {
-    setShow(true);
     setShowLogin(true);
     setShowSingUp(false);
     setShowForgot(false);
   }
 
   const handleForgotClicked = () => {
-    setShow(true);
     setShowLogin(false);
     setShowSingUp(false);
     setShowForgot(true);
   }
 
   const handleSingUpClicked = () => {
-    setShow(true);
     setShowLogin(false);
     setShowSingUp(true);
     setShowForgot(false);
   }
+
+  useEffect(() => {
+    //Runs only on the first render
+    dispatch(hideModal())
+  }, []);
 
 
   var form = <></>;
@@ -56,7 +62,6 @@ export default function Home() {
 
   return (
     <>     
-      <ResponsiveAppBar onLoginClicked={handleLoginClicked}/>
       <ProductHero />
       <Modal show={show} centered onHide={handleModalClose}>
         <Modal.Body>

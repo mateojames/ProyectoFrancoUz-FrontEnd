@@ -11,10 +11,12 @@ import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import ReduxThunk from 'redux-thunk';
 import modalReducer from '../store/reducers/modal';
+import calendarReducer from '../store/reducers/calendar';
 import ResponsiveAppBar from "./ResponsiveAppBar"
 
 const rootReducer = combineReducers({
-  modal: modalReducer
+  modal: modalReducer,
+  calendar: calendarReducer
 });
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 

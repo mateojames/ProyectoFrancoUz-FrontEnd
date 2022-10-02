@@ -26,6 +26,7 @@ import { styled } from '@mui/material/styles';
 import classNames from 'clsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { addAppointment } from "../store/actions/addAppointment";
+import { loadAppointments } from "../store/actions/loadAppointments";
 
 const PREFIX = 'FrancoUz';
 
@@ -210,6 +211,10 @@ export default function Demo(){
       {children}
     </Appointments.Appointment>
   );
+
+  useEffect(() => {
+    dispatch(loadAppointments());
+  }, []);
 
   return (
       <Paper>

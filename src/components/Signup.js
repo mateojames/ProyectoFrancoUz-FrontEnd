@@ -1,20 +1,30 @@
 import React, { useRef, useState } from "react"
 import { Form, Card, Alert } from "react-bootstrap"
 import Button from "./Button"
-import { useAuth } from "../contexts/AuthContext"
 import { Link, useHistory } from "react-router-dom"
+import { auth } from "../firebase"
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification
+} from "firebase/auth";
 
 export default function Signup(props) {
   const emailRef = useRef()
   const passwordRef = useRef()
   const passwordConfirmRef = useRef()
-  const { signup } = useAuth()
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const history = useHistory()
 
   async function handleSubmit(e) {
     e.preventDefault()
+
+    async function signup(email, password) {
+      await createUserWithEmailAndPassword(auth, email, password);
+  
+      await sendEmailVerification(auth.currentUser);
+      
+    }
 
     if (passwordRef.current.value !== passwordConfirmRef.current.value) {
       return setError("Las contraseñas no coinciden")

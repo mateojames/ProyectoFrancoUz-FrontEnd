@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useState, useEffect } from "react"
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -14,16 +14,16 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import LogoFrancoUz from '../images/logoFrancoUz.png';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { showModal } from '../store/actions/modal';
-import { useAuth } from "../contexts/AuthContext"
 import { useHistory } from "react-router-dom"
 
 const drawerWidth = 240;
 
 const ResponsiveAppBar = () => {
-    const [mobileOpen, setMobileOpen] = React.useState(false);
-    const { currentUser, updatePass } = useAuth()
+    const [mobileOpen, setMobileOpen] = useState(false);
+    
+    const currentUser = useSelector(state => state.auth.currentUser);
     const history = useHistory()
 
      const handleDrawerToggle = () => {
@@ -39,6 +39,7 @@ const ResponsiveAppBar = () => {
     const handleLoginClicked = () => {
         dispatch(showModal())
     };
+
     var authWebOptions = (
         <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
                         <Button sx={{ my: 2, color: 'white', display: 'block' }} onClick={handleLoginClicked}>

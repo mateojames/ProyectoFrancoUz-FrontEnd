@@ -1,15 +1,20 @@
 import React, { useRef, useState } from "react"
 import { Form, Card, Alert } from "react-bootstrap"
 import Button from "./Button"
-import { useAuth } from "../contexts/AuthContext"
 import { Link } from "react-router-dom"
+import { auth } from "../firebase"
+import {
+  sendPasswordResetEmail
+} from "firebase/auth";
+
 
 export default function ForgotPassword(props) {
   const emailRef = useRef()
-  const { resetPassword } = useAuth()
   const [error, setError] = useState("")
   const [message, setMessage] = useState("")
   const [loading, setLoading] = useState(false)
+
+  const resetPassword = async (email) => sendPasswordResetEmail(auth, email);
 
   async function handleSubmit(e) {
     e.preventDefault()

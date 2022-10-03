@@ -47,7 +47,7 @@ import Create from '@mui/icons-material/Create';
 
 
 //import { appointments } from '../apponitments';
-import appointments from '../today-appointments';
+import {appointments} from '../appointments';
 
 const PREFIX = 'FrancoUz';
 

@@ -16,7 +16,12 @@ import ListItemText from '@mui/material/ListItemText';
 import LogoFrancoUz from '../images/logoFrancoUz.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { showModal } from '../store/actions/modal';
-import { useHistory } from "react-router-dom"
+import { useHistory } from "react-router-dom";
+import Avatar from '@mui/material/Avatar';
+import Tooltip from '@mui/material/Tooltip';
+import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
+import Badge from '@mui/material/Badge';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 
 const drawerWidth = 240;
 
@@ -29,6 +34,10 @@ const ResponsiveAppBar = () => {
      const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
         console.log(mobileOpen)
+    };
+
+    const handlePerfilClicked = () => {
+        history.push("/inicio")
     };
 
     const handleCalendarClicked = () => {
@@ -55,11 +64,25 @@ const ResponsiveAppBar = () => {
     );
     if(currentUser){
         authWebOptions = (
-            <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                        <Button sx={{ my: 2, color: 'white', display: 'block' }} onClick={handleCalendarClicked}>
-                           Calendario
-                        </Button>
-        </Box>
+            <Box sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'space-around' }}>
+                        <Tooltip title="Notificaciones">
+                            <IconButton size="large" color="inherit">
+                                <Badge badgeContent={4} color="error">
+                                    <NotificationsIcon />
+                                </Badge>
+                            </IconButton>
+                         </Tooltip>
+                        <Tooltip title="Calendario">
+                            <IconButton onClick={handleCalendarClicked} sx={{ p: 0 }}>
+                                <InsertInvitationIcon fontSize="large" htmlColor="#FFFFFF"/>
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Perfil">
+                            <IconButton onClick={handlePerfilClicked} sx={{ p: 0 }}>
+                                <Avatar/>
+                            </IconButton>
+                        </Tooltip>
+            </Box>
         );
     }
 
@@ -86,7 +109,7 @@ const ResponsiveAppBar = () => {
         authMobileOptions = (
             <List>
             <ListItem key={1} disablePadding>
-                <ListItemButton sx={{ textAlign: 'center' }}  onClick={handleLoginClicked}>
+                <ListItemButton sx={{ textAlign: 'center' }}  onClick={handleCalendarClicked}>
                     <ListItemText>Calendario</ListItemText>
                 </ListItemButton>
         </ListItem>

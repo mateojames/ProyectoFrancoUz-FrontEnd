@@ -27,7 +27,7 @@ import classNames from 'clsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { addAppointment } from "../store/actions/addAppointment";
 import { loadAppointments } from "../store/actions/loadAppointments";
-
+import {editAppointment} from "../store/actions/editAppointment";
 const PREFIX = 'FrancoUz';
 
 const classes = {
@@ -88,7 +88,6 @@ const getClassByLocation = (classes, location) => {
   if (location === 'Room 1') return classes.firstRoom; //la location esta en el appointment, la cambiamos ahi
   if (location === 'Room 2') return classes.secondRoom;
   if (location === 'La Bombonera') return classes.bomboneraRoom;
-  console.log(location);
   return classes.thirdRoom;
 };
 
@@ -140,8 +139,14 @@ const TextEditor = (props) => {
 };
 
 const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
-  const onCustomFieldChange = (nextValue) => {
-    onFieldChange({ customField: nextValue });
+  const onPatientFieldChange = (nextValue) => {
+    onFieldChange({ patient: nextValue });
+  };
+  const onProfessionalFieldChange = (nextValue) => {
+    onFieldChange({ professional: nextValue });
+  };
+  const onTherapyFieldChange = (nextValue) => {
+    onFieldChange({ therapy: nextValue });
   };
 
   return (
@@ -150,14 +155,34 @@ const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
       onFieldChange={onFieldChange}
       {...restProps}
     >
-      <AppointmentForm.Label
-        text="Participantes"
+     <AppointmentForm.Label
+        text="Paciente"
         type="title"
       />
       <AppointmentForm.TextEditor
-        value={appointmentData.customField}
-        onValueChange={onCustomFieldChange}
-        placeholder="Mandale los que vos quieras rey, aca igual estaria bueno que no sea texto"
+        value={appointmentData.patient}
+        onValueChange={onPatientFieldChange}
+        placeholder="Ingrese el paciente correspondiente"
+      />
+
+      <AppointmentForm.Label
+        text="Profesional"
+        type="title"
+      />
+      <AppointmentForm.TextEditor
+        value={appointmentData.professional}
+        onValueChange={onProfessionalFieldChange}
+        placeholder="Ingrese el profesional correspondiente"
+      />
+
+      <AppointmentForm.Label
+        text="Tipo de Terapia"
+        type="title"
+      />
+      <AppointmentForm.TextEditor
+        value={appointmentData.therapy}
+        onValueChange={onTherapyFieldChange}
+        placeholder="Ingrese el tipo de terapia correspondiente"
       />
     </AppointmentForm.BasicLayout>
   );
@@ -173,12 +198,10 @@ export default function Demo(){
     setCurrentDate(currentDate)
   }
 
-  const handleCommitChanges = (added, changed, deleted ) => {
-    console.log('esto es boca');
-    console.log(added);
-    console.log(changed);
-    console.log(deleted);
-    dispatch(addAppointment(added))
+  const handleCommitChanges = (action) => {
+    console.log('handleCommit');
+    //if(action.added) dispatch(addAppointment(action));
+    if(action.changed)dispatch(editAppointment(action));
     /*this.setState((state) => {
       let { data } = state;
       if (added) {

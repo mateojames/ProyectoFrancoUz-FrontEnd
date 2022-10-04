@@ -1,17 +1,30 @@
 import React, { useRef, useState } from "react"
 import { Form, Card, Alert } from "react-bootstrap"
-import { useAuth } from "../contexts/AuthContext"
 import { Link, useHistory } from "react-router-dom"
 import GoogleButton from 'react-google-button'
 import Button from "./Button"
+import { auth } from "../firebase"
+import {
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 
 export default function Login(props) {
     const emailRef = useRef()
     const passwordRef = useRef()
-    const { login, loginWithGoogle } = useAuth()
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
     const history = useHistory()
+
+    function login(email, password) {
+        return signInWithEmailAndPassword(auth, email, password)
+      }
+    
+    const loginWithGoogle = () => {
+        const googleProvider = new GoogleAuthProvider();
+        return signInWithPopup(auth, googleProvider);
+    };
 
     async function handleSubmit(e) {
         e.preventDefault()

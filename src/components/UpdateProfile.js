@@ -1,15 +1,20 @@
 import React, { useRef, useState } from "react"
 import { Form, Button, Card, Alert } from "react-bootstrap"
-import { useAuth } from "../contexts/AuthContext"
 import { Link, useHistory } from "react-router-dom"
+import {
+  updatePassword
+} from "firebase/auth";
+import { useSelector } from 'react-redux';
 
 export default function UpdateProfile() {
   const passwordRef = useRef()
   const passwordConfirmRef = useRef()
-  const { currentUser, updatePass } = useAuth()
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const history = useHistory()
+  const currentUser = useSelector(state => state.auth.currentUser);
+
+  const updatePass = async (password) => updatePassword(currentUser, password);
 
   function handleSubmit(e) {
     e.preventDefault()

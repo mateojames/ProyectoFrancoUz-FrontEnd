@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useState, useEffect  } from "react"
 import Paper from '@mui/material/Paper';
 import {
   Scheduler,
@@ -17,19 +17,16 @@ import {
   TodayButton,
   ConfirmationDialog
 } from '@devexpress/dx-react-scheduler-material-ui';
-
 import { ViewState, EditingState, IntegratedEditing} from '@devexpress/dx-react-scheduler';
-
 import IconButton from '@mui/material/IconButton';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import Grid from '@mui/material/Grid';
 import Room from '@mui/icons-material/Room';
 import { styled } from '@mui/material/styles';
 import classNames from 'clsx';
-
-
-//import { appointments } from '../apponitments';
-import appointments from '../today-appointments';
+import { useDispatch, useSelector } from 'react-redux';
+import { addAppointment } from "../store/actions/addAppointment";
+import { loadAppointments } from "../store/actions/loadAppointments";
 
 const PREFIX = 'FrancoUz';
 
@@ -168,20 +165,21 @@ const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
 
 
 
-export default class Demo extends React.PureComponent {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      data: appointments,
-      currentDate: '2022-09-22'
-    };
-    this.currentDateChange = (currentDate) => { this.setState({ currentDate }); };
-    this.commitChanges = this.commitChanges.bind(this);
+export default function Demo(){
+  const [currentDate, setCurrentDate] = useState('2022-09-22')
+  const data = useSelector(state => state.calendar.appointments);
+  const dispatch = useDispatch();
+  const handleCurrentDateChange = (currentDate) => {
+    setCurrentDate(currentDate)
   }
 
-  commitChanges({ added, changed, deleted }) {
-    this.setState((state) => {
+  const handleCommitChanges = (added, changed, deleted ) => {
+    console.log('esto es boca');
+    console.log(added);
+    console.log(changed);
+    console.log(deleted);
+    dispatch(addAppointment(added))
+    /*this.setState((state) => {
       let { data } = state;
       if (added) {
         const startingAddedId = data.length > 0 ? data[data.length - 1].id + 1 : 0;
@@ -196,29 +194,29 @@ export default class Demo extends React.PureComponent {
       }
       console.log(this.state);
       return { data };
-    });
+    });*/
   }
+  
+  const Appointment = ({
+    children, style, ...restProps
+  }) => (
+    <Appointments.Appointment
+      {...restProps}
+      style={{
+        ...style,
+        backgroundColor: '#FFC107',
+        borderRadius: '8px',
+      }}
+    >
+      {children}
+    </Appointments.Appointment>
+  );
 
+  useEffect(() => {
+    dispatch(loadAppointments());
+  }, []);
 
-  render() {
-    const { data, currentDate } = this.state;
-
-    const Appointment = ({
-      children, style, ...restProps
-    }) => (
-      <Appointments.Appointment
-        {...restProps}
-        style={{
-          ...style,
-          backgroundColor: '#FFC107',
-          borderRadius: '8px',
-        }}
-      >
-        {children}
-      </Appointments.Appointment>
-    );
-
-    return (
+  return (
       <Paper>
         <Scheduler
           data={data}
@@ -226,10 +224,10 @@ export default class Demo extends React.PureComponent {
         >
           <ViewState
             currentDate={currentDate}
-            onCurrentDateChange={this.currentDateChange}
+            onCurrentDateChange={handleCurrentDateChange}
           />
           <EditingState
-            onCommitChanges={this.commitChanges}
+            onCommitChanges={handleCommitChanges}
           />
 
           <WeekView
@@ -264,6 +262,5 @@ export default class Demo extends React.PureComponent {
           <DragDropProvider />        
         </Scheduler>
       </Paper>
-    );
-  }
+    )
 }

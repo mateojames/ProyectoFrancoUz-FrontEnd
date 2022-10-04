@@ -1,12 +1,18 @@
 import React, { useState } from "react"
 import { Card, Button, Alert } from "react-bootstrap"
-import { useAuth } from "../contexts/AuthContext"
+import { useSelector } from 'react-redux';
 import { Link, useHistory } from "react-router-dom"
+import { auth } from "../firebase"
+import {
+  signOut
+} from "firebase/auth";
 
 export default function Dashboard() {
   const [error, setError] = useState("")
-  const { currentUser, logout } = useAuth()
   const history = useHistory()
+  const currentUser = useSelector(state => state.auth.currentUser);
+
+  const logout = () => signOut(auth);
 
   async function handleLogout() {
     setError("")

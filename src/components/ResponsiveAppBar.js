@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useState, useEffect } from "react"
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -14,16 +14,108 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import LogoFrancoUz from '../images/logoFrancoUz.png';
+import { useDispatch, useSelector } from 'react-redux';
+import { showModal } from '../store/actions/modal';
+import { useHistory } from "react-router-dom";
+import Avatar from '@mui/material/Avatar';
+import Tooltip from '@mui/material/Tooltip';
+import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
+import Badge from '@mui/material/Badge';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 
 const drawerWidth = 240;
 
-const ResponsiveAppBar = (props) => {
-    const [mobileOpen, setMobileOpen] = React.useState(false);
+const ResponsiveAppBar = () => {
+    const [mobileOpen, setMobileOpen] = useState(false);
+    
+    const currentUser = useSelector(state => state.auth.currentUser);
+    const history = useHistory()
 
      const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
         console.log(mobileOpen)
     };
+
+    const handlePerfilClicked = () => {
+        history.push("/inicio")
+    };
+
+    const handleCalendarClicked = () => {
+        history.push("/calendar")
+    };
+
+    const dispatch = useDispatch();
+    const handleLoginClicked = () => {
+        dispatch(showModal())
+    };
+
+    var authWebOptions = (
+        <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+                        <Button sx={{ my: 2, color: 'white', display: 'block' }} onClick={handleLoginClicked}>
+                           {currentUser ? 'Bokita' : 'Ingresar'} 
+                        </Button>
+                        <Button sx={{ my: 2, color: 'white', display: 'block' }} >
+                        Conozcanos
+                        </Button>
+                        <Button sx={{ my: 2, color: 'white', display: 'block' }}>
+                            Historia
+                        </Button>
+        </Box>
+    );
+    if(currentUser){
+        authWebOptions = (
+            <Box sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'space-around' }}>
+                        <Tooltip title="Notificaciones">
+                            <IconButton size="large" color="inherit">
+                                <Badge badgeContent={4} color="error">
+                                    <NotificationsIcon />
+                                </Badge>
+                            </IconButton>
+                         </Tooltip>
+                        <Tooltip title="Calendario">
+                            <IconButton onClick={handleCalendarClicked} sx={{ p: 0 }}>
+                                <InsertInvitationIcon fontSize="large" htmlColor="#FFFFFF"/>
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Perfil">
+                            <IconButton onClick={handlePerfilClicked} sx={{ p: 0 }}>
+                                <Avatar/>
+                            </IconButton>
+                        </Tooltip>
+            </Box>
+        );
+    }
+
+    var authMobileOptions = (
+        <List>
+            <ListItem key={1} disablePadding>
+                <ListItemButton sx={{ textAlign: 'center' }}  onClick={handleLoginClicked}>
+                    <ListItemText>Ingresar</ListItemText>
+                </ListItemButton>
+        </ListItem>
+        <ListItem key={2} disablePadding>
+            <ListItemButton sx={{ textAlign: 'center' }}>
+            <ListItemText>Conozcanos</ListItemText>
+            </ListItemButton>
+        </ListItem>
+        <ListItem key={3} disablePadding>
+            <ListItemButton sx={{ textAlign: 'center' }}>
+            <ListItemText>Historia</ListItemText>
+            </ListItemButton>
+        </ListItem>
+    </List>
+    );
+    if(currentUser){
+        authMobileOptions = (
+            <List>
+            <ListItem key={1} disablePadding>
+                <ListItemButton sx={{ textAlign: 'center' }}  onClick={handleCalendarClicked}>
+                    <ListItemText>Calendario</ListItemText>
+                </ListItemButton>
+        </ListItem>
+    </List>
+        );
+    }
 
     const drawer = (
         <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
@@ -31,23 +123,7 @@ const ResponsiveAppBar = (props) => {
             Asociación Franco Uz
         </Typography>
         <Divider />
-        <List>
-            <ListItem key={1} disablePadding>
-                <ListItemButton sx={{ textAlign: 'center' }}  onClick={props.onLoginClicked}>
-                <ListItemText>Ingresar</ListItemText>
-                </ListItemButton>
-            </ListItem>
-            <ListItem key={2} disablePadding>
-                <ListItemButton sx={{ textAlign: 'center' }}>
-                <ListItemText>Conozcanos</ListItemText>
-                </ListItemButton>
-            </ListItem>
-            <ListItem key={3} disablePadding>
-                <ListItemButton sx={{ textAlign: 'center' }}>
-                <ListItemText>Historia</ListItemText>
-                </ListItemButton>
-            </ListItem>
-        </List>
+        {authMobileOptions}
         </Box>
     );
 
@@ -91,17 +167,7 @@ const ResponsiveAppBar = (props) => {
                             </Typography>
                         </Box>
                     </Box>
-                    <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                        <Button sx={{ my: 2, color: 'white', display: 'block' }} onClick={props.onLoginClicked}>
-                            Ingresar
-                        </Button>
-                        <Button sx={{ my: 2, color: 'white', display: 'block' }} >
-                        Conozcanos
-                        </Button>
-                        <Button sx={{ my: 2, color: 'white', display: 'block' }}>
-                            Historia
-                        </Button>
-                </Box>
+                    {authWebOptions}
 
                 </Toolbar>
 

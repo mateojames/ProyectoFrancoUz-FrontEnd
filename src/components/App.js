@@ -1,30 +1,32 @@
 import React from "react"
-import Signup from "./Signup"
-import { AuthProvider } from "../contexts/AuthContext"
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import Dashboard from "./Dashboard"
 import Home from "./Home"
-
 import Calendar from "./Calendar"
-
 import PrivateRoute from "./PrivateRoute"
-import ForgotPassword from "./ForgotPassword"
 import UpdateProfile from "./UpdateProfile"
 import withRoot from "../withRoot"
+import { createStore, combineReducers, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux';
+import ReduxThunk from 'redux-thunk';
+import modalReducer from '../store/reducers/modal';
+import calendarReducer from '../store/reducers/calendar';
+import authReducer from '../store/reducers/auth';
+import AppContent from "./AppContent"
 
-
+const rootReducer = combineReducers({
+  modal: modalReducer,
+  calendar: calendarReducer,
+  auth: authReducer
+});
+const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 
 function App() {
   return (
         <Router>
-          <AuthProvider>
-            <Switch>
-              <PrivateRoute exact path="/Calendar" component={Calendar} />
-              <PrivateRoute path="/inicio" component={Dashboard}/>
-              <PrivateRoute path="/update-profile" component={UpdateProfile}/>
-              <Route path="/" component={Home} />
-            </Switch>
-          </AuthProvider>
+          <Provider store={store}>
+              <AppContent/>
+          </Provider>
         </Router>
   )
 }

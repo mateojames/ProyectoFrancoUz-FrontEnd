@@ -28,6 +28,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addAppointment } from "../store/actions/addAppointment";
 import { loadAppointments } from "../store/actions/loadAppointments";
 import {editAppointment} from "../store/actions/editAppointment";
+import {deleteAppointment} from "../store/actions/deleteAppointment";
 const PREFIX = 'FrancoUz';
 
 const classes = {
@@ -200,24 +201,10 @@ export default function Demo(){
 
   const handleCommitChanges = (action) => {
     console.log('commit');
+    console.log(action)
     if(action.added) dispatch(addAppointment(action));
     if(action.changed)dispatch(editAppointment(action));
-    /*this.setState((state) => {
-      let { data } = state;
-      if (added) {
-        const startingAddedId = data.length > 0 ? data[data.length - 1].id + 1 : 0;
-        data = [...data, { id: startingAddedId, ...added }];
-      }
-      if (changed) {
-        data = data.map(appointment => (
-          changed[appointment.id] ? { ...appointment, ...changed[appointment.id] } : appointment));
-      }
-      if (deleted !== undefined) {
-        data = data.filter(appointment => appointment.id !== deleted);
-      }
-      console.log(this.state);
-      return { data };
-    });*/
+    if(action.deleted)dispatch(deleteAppointment(action));
   }
   
   const Appointment = ({

@@ -164,9 +164,7 @@ const getClassByLocation = (classes, location) => {
   return classes.thirdRoom;
 };
 
-const Header = (({
-  children, appointmentData, ...restProps
-}) => (
+const Header = (({children, appointmentData, ...restProps}) => (
   <StyledAppointmentTooltipHeader
     {...restProps}
     className={classNames(getClassByLocation(classes, appointmentData.location), classes.header)}
@@ -183,9 +181,7 @@ const Header = (({
   </StyledAppointmentTooltipHeader>
 ));
 
-const Content = (({
-  children, appointmentData, ...restProps
-}) => (
+const Content = (({children, appointmentData, ...restProps}) => (
   <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
     <Grid container alignItems="center">
       <StyledGrid item xs={2} className={classes.textCenter}>
@@ -198,9 +194,7 @@ const Content = (({
   </AppointmentTooltip.Content>
 ));
 
-const CommandButton = (({
-  ...restProps
-}) => (
+const CommandButton = (({...restProps}) => (
   <StyledAppointmentTooltipCommandButton {...restProps} className={classes.commandButton} />
 ));
 
@@ -212,9 +206,7 @@ const TextEditor = (props) => {
 };
 
 
-
-
-const AppointmentFormContainerBasic = ({ onFieldChange, ...restProps }) => {
+const AppointmentFormContainerBasic = (({ onFieldChange, ...restProps }) => {
   const [state, setState] = useState({
     appointmentChanges: {},
   });
@@ -382,7 +374,7 @@ const AppointmentFormContainerBasic = ({ onFieldChange, ...restProps }) => {
       </StyledDiv>
     </AppointmentForm.Overlay>
   );
-};
+});
 
 const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
   const onCustomFieldChange = (nextValue) => {
@@ -437,13 +429,13 @@ export default function Demo(){
   });
 
   
-  const handleCurrentDateChange = (currentDate) => { setState({ currentDate }); };
+  const handleCurrentDateChange = (({currentDate}) => { setState({ currentDate }); });
 
-  const handleOnEditingAppointmentChange = (editingAppointment) => {
+  const handleOnEditingAppointmentChange = (({editingAppointment}) => {
     setState({ editingAppointment });
-  };
+  });
 
-  const handleOnAddedAppointmentChange = (addedAppointment) => {
+  const handleOnAddedAppointmentChange = ({addedAppointment}) => {
     setState({ addedAppointment });
     const { editingAppointment } = state;
     if (editingAppointment !== undefined) {
@@ -454,7 +446,7 @@ export default function Demo(){
     setState({ editingAppointment: undefined, isNewAppointment: true });
   }
 
-  const handleSetDeletedAppointmentId = (id) => {
+  const handleSetDeletedAppointmentId = ({id}) => {
     setState({ deletedAppointmentId: id });
   }
 
@@ -480,7 +472,7 @@ export default function Demo(){
     handleToggleConfirmationVisible();
   }
 
-  const handleCommitChanges = (added, changed, deleted ) => {
+  const handleCommitChanges = ({added, changed, deleted }) => {
     setState((state) => {
       let { data } = state;
       if (added) {

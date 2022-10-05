@@ -199,8 +199,8 @@ export default function Demo(){
   }
 
   const handleCommitChanges = (action) => {
-    console.log('handleCommit');
-    //if(action.added) dispatch(addAppointment(action));
+    console.log('commit');
+    if(action.added) dispatch(addAppointment(action));
     if(action.changed)dispatch(editAppointment(action));
     /*this.setState((state) => {
       let { data } = state;
@@ -261,7 +261,6 @@ export default function Demo(){
           <MonthView />
 
           <EditRecurrenceMenu />
-          <IntegratedEditing />
           <ConfirmationDialog />
 
           <Toolbar />

@@ -4,6 +4,7 @@ import Dashboard from "./Dashboard"
 import Home from "./Home"
 import Calendar from "./Calendar"
 import Calendarr from "./Calendar1"
+import Calendarrr from "./Calendar2"
 import UpdateProfile from "./UpdateProfile"
 import withRoot from "../withRoot"
 import { useSelector } from 'react-redux';
@@ -16,6 +17,7 @@ function AuthSwitch() {
         <Switch>
             <Route exact path="/Calendar" component={Calendar} />
             <Route exact path="/Calendar1" component={Calendarr} />
+            <Route exact path="/Calendar2" component={Calendarrr} />
             <Route path="/inicio" component={Dashboard}/>
             <Route path="/update-profile" component={UpdateProfile}/>
             <Route path="/" component={Home} />

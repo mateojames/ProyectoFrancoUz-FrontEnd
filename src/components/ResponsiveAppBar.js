@@ -22,6 +22,7 @@ import Tooltip from '@mui/material/Tooltip';
 import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
 import Badge from '@mui/material/Badge';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import PersonIcon from '@mui/icons-material/Person';
 
 const drawerWidth = 240;
 
@@ -66,20 +67,20 @@ const ResponsiveAppBar = () => {
         authWebOptions = (
             <Box sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'space-around' }}>
                         <Tooltip title="Notificaciones">
-                            <IconButton size="large" color="inherit">
+                            <IconButton color="inherit" sx={{ mr: 3 }}>
                                 <Badge badgeContent={4} color="error">
                                     <NotificationsIcon />
                                 </Badge>
                             </IconButton>
                          </Tooltip>
                         <Tooltip title="Calendario">
-                            <IconButton onClick={handleCalendarClicked} sx={{ p: 0 }}>
-                                <InsertInvitationIcon fontSize="large" htmlColor="#FFFFFF"/>
+                            <IconButton onClick={handleCalendarClicked} color="inherit" sx={{ mr: 2 }}>
+                                <InsertInvitationIcon />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Perfil">
-                            <IconButton onClick={handlePerfilClicked} sx={{ p: 0 }}>
-                                <Avatar/>
+                            <IconButton onClick={handlePerfilClicked} color="inherit" sx={{ mr: 0 }}>
+                                <PersonIcon />
                             </IconButton>
                         </Tooltip>
             </Box>
@@ -119,11 +120,11 @@ const ResponsiveAppBar = () => {
 
     const drawer = (
         <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
-        <Typography variant="h6" sx={{ my: 2 }}>
-            Asociación Franco Uz
-        </Typography>
-        <Divider />
-        {authMobileOptions}
+            <Typography variant="h6" sx={{ my: 2 }}>
+                Asociación Franco Uz
+            </Typography>
+            <Divider />
+            {authMobileOptions}
         </Box>
     );
 
@@ -148,7 +149,7 @@ const ResponsiveAppBar = () => {
 
                     <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'flex' }, mr: 2 }} >
                         <Box container alignItems="center" justifyContent="center" display="flex" flexDirection="row">
-                            <img src={LogoFrancoUz} alt="Kitty Katty!" style={{maxWidth: 40, marginRight: '10px'}} />
+                            <img src={LogoFrancoUz} alt="LogoFrancoUz" style={{maxWidth: 40, marginRight: '10px', borderRadius: 20}} />
                             <Typography
                                 variant="h6"
                                 noWrap

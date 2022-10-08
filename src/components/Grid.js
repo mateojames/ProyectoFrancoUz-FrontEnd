@@ -34,6 +34,7 @@ import TableCell from '@mui/material/TableCell';
 import Input from '@mui/material/Input';
 import { styled } from '@mui/material/styles';
 import { loadUsers } from '../store/actions/loadUsers';
+import { editRole } from "../store/actions/editRole";
 
 
 const PREFIX = 'Demo';
@@ -142,7 +143,7 @@ const Command = ({ id, onExecute }) => {
 };
 
 const availableValues = {
-  role: ['Profesional', 'Paciente', 'Sin Asignar']
+  role: ['profesional', 'paciente', 'Sin asignar']
 };
 
 const LookupEditCell = ({
@@ -174,9 +175,7 @@ const LookupEditCell = ({
 
 const EditCell = (props) => {
   const { column } = props;
-  console.log(column);
   const availableColumnValues = availableValues[column.name];
-  console.log(availableColumnValues);
   if (availableColumnValues) {
     return <LookupEditCell {...props} availableColumnValues={availableColumnValues} />;
   }
@@ -202,26 +201,15 @@ export default function UsersGrid(props) {
   const dispatch = useDispatch();
   const data = useSelector(state => state.user.users);
 
-  const commitChanges = ({ added, changed, deleted }) => {
-    let changedRows;
-    if (added) {
-      const startingAddedId = rows.length > 0 ? rows[rows.length - 1].id + 1 : 0;
-      changedRows = [
-        ...rows,
-        ...added.map((row, index) => ({
-          id: startingAddedId + index,
-          ...row,
-        })),
-      ];
+  const commitChanges = (action) => {
+    console.log(action)
+    if(action.changed){
+        if(Object.values(action.changed)[0].role){
+            console.log('dispatch')
+            dispatch(editRole(action))
+        }
     }
-    if (changed) {
-      changedRows = rows.map(row => (changed[row.id] ? { ...row, ...changed[row.id] } : row));
-    }
-    if (deleted) {
-      const deletedSet = new Set(deleted);
-      changedRows = rows.filter(row => !deletedSet.has(row.id));
-    }
-    setRows(changedRows);
+    //setRows(changedRows);
   };
 
   useEffect(() => {

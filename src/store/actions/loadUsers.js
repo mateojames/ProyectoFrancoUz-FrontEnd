@@ -1,6 +1,6 @@
 export const LOADUSERS = 'LOADUSERS';
 
-export const loadUsers = () => {
+export const loadUsers = (handleloading) => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
@@ -22,6 +22,7 @@ export const loadUsers = () => {
                     return response.json();
                 })
                 .then((myJson) => {
+                    handleloading();
                     console.log(myJson);
                     dispatch({type:LOADUSERS, users: myJson.users});
                 })

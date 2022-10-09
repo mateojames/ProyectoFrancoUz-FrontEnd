@@ -1,7 +1,7 @@
 
 export const EDITUSER = 'EDITUSER';
 
-export const editRole = (event) => {
+export const editRole = (event, handleLoading) => {
     console.log("editAppointment");
     return (dispatch, getState) => {
         const uid = Object.keys(event.changed)[0];
@@ -28,6 +28,7 @@ export const editRole = (event) => {
                     return response.json();
                 })
                 .then((myJson) => {
+                    handleLoading()
                     console.log(myJson);
                     dispatch({type:EDITUSER, user: myJson.user});
                 })

@@ -1,6 +1,6 @@
 export const LOADAPPOINTMENTS = 'LOADAPPOINTMENTS';
 
-export const loadAppointments = () => {
+export const loadAppointments = (handleLoading) => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
@@ -22,6 +22,7 @@ export const loadAppointments = () => {
                     return response.json();
                 })
                 .then((myJson) => {
+                    handleLoading();
                     console.log(myJson);
                     dispatch({type:LOADAPPOINTMENTS, appointments: myJson.appointments});
                 })

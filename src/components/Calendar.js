@@ -18,8 +18,9 @@ import {
   ConfirmationDialog
 } from '@devexpress/dx-react-scheduler-material-ui';
 import { ViewState, EditingState, IntegratedEditing} from '@devexpress/dx-react-scheduler';
-import IconButton from '@mui/material/IconButton';
-import MoreIcon from '@mui/icons-material/MoreVert';
+import Diversity2Icon from '@mui/icons-material/Diversity2';
+import EscalatorWarningIcon from '@mui/icons-material/EscalatorWarning';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import Grid from '@mui/material/Grid';
 import Room from '@mui/icons-material/Room';
 import { styled } from '@mui/material/styles';
@@ -29,6 +30,7 @@ import { addAppointment } from "../store/actions/addAppointment";
 import { loadAppointments } from "../store/actions/loadAppointments";
 import {editAppointment} from "../store/actions/editAppointment";
 import {deleteAppointment} from "../store/actions/deleteAppointment";
+import { Loading } from './Loading/Loading.js';
 const PREFIX = 'FrancoUz';
 
 const classes = {
@@ -61,19 +63,31 @@ const StyledAppointmentTooltipHeader = styled(AppointmentTooltip.Header)(() => (
   },
 }));
 
-const StyledIconButton = styled(IconButton)(() => ({
-  [`&.${classes.commandButton}`]: {
-    backgroundColor: 'rgba(255,255,255,0.65)',
-  },
-}));
-
 const StyledGrid = styled(Grid)(() => ({
   [`&.${classes.textCenter}`]: {
     textAlign: 'center',
   },
 }));
 
+const StyledPatient = styled(EscalatorWarningIcon)(({ theme: { palette } }) => ({
+  [`&.${classes.icon}`]: {
+    color: palette.action.active,
+  },
+}));
+
 const StyledRoom = styled(Room)(({ theme: { palette } }) => ({
+  [`&.${classes.icon}`]: {
+    color: palette.action.active,
+  },
+}));
+
+const StyledTherapy = styled(Diversity2Icon)(({ theme: { palette } }) => ({
+  [`&.${classes.icon}`]: {
+    color: palette.action.active,
+  },
+}));
+
+const StyledProfessional = styled(AssignmentIndIcon)(({ theme: { palette } }) => ({
   [`&.${classes.icon}`]: {
     color: palette.action.active,
   },
@@ -100,14 +114,6 @@ const Header = (({
     className={classNames(getClassByLocation(classes, appointmentData.location), classes.header)}
     appointmentData={appointmentData}
   >
-    <StyledIconButton
-      /* eslint-disable-next-line no-alert */
-      onClick={() => alert(JSON.stringify(appointmentData))}
-      className={classes.commandButton}
-      size="large"
-    >
-      <MoreIcon />
-    </StyledIconButton>
   </StyledAppointmentTooltipHeader>
 ));
 
@@ -115,12 +121,33 @@ const Content = (({
   children, appointmentData, ...restProps
 }) => (
   <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
-    <Grid container alignItems="center">
+    <Grid container alignItems="center" rowSpacing={1}>
       <StyledGrid item xs={2} className={classes.textCenter}>
         <StyledRoom className={classes.icon} />
       </StyledGrid>
       <Grid item xs={10}>
         <span>{appointmentData.location}</span>
+      </Grid>
+      <StyledGrid item xs={2} className={classes.textCenter}>
+        <StyledPatient className={classes.icon} />
+      </StyledGrid>
+      <Grid item xs={10}>
+        <span style={{fontWeight: 'bold'}}>Paciente: </span>
+        <span>{appointmentData.patient}</span>
+      </Grid>
+      <StyledGrid item xs={2} className={classes.textCenter}>
+        <StyledProfessional className={classes.icon} />
+      </StyledGrid>
+      <Grid item xs={10}>
+        <span style={{fontWeight: 'bold'}}>Profesional: </span>
+        <span>{appointmentData.professional}</span>
+      </Grid>
+      <StyledGrid item xs={2} className={classes.textCenter}>
+        <StyledTherapy className={classes.icon} />
+      </StyledGrid>
+      <Grid item xs={10}>
+        <span style={{fontWeight: 'bold'}}>Terapia: </span>
+        <span>{appointmentData.therapy}</span>
       </Grid>
     </Grid>
   </AppointmentTooltip.Content>
@@ -192,9 +219,10 @@ const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
 
 
 export default function Demo(){
-  const [currentDate, setCurrentDate] = useState('2022-09-22')
+  const [currentDate, setCurrentDate] = useState(new Date())
   const data = useSelector(state => state.calendar.appointments);
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
   const handleCurrentDateChange = (currentDate) => {
     setCurrentDate(currentDate)
   }
@@ -206,7 +234,11 @@ export default function Demo(){
     if(action.changed)dispatch(editAppointment(action));
     if(action.deleted)dispatch(deleteAppointment(action));
   }
-  
+
+  const handleLoading = () => {
+    setLoading(false)
+  };
+
   const Appointment = ({
     children, style, ...restProps
   }) => (
@@ -223,13 +255,15 @@ export default function Demo(){
   );
 
   useEffect(() => {
-    dispatch(loadAppointments());
+    setLoading(true);
+    dispatch(loadAppointments(handleLoading));
   }, []);
 
   return (
       <Paper>
         <Scheduler
           data={data}
+          locale='es-ES'
           height={870}
         >
           <ViewState
@@ -262,6 +296,7 @@ export default function Demo(){
             commandButtonComponent={CommandButton}
             showOpenButton
             showCloseButton
+            showDeleteButton
           />
           <AppointmentForm
             basicLayoutComponent={BasicLayout}
@@ -270,6 +305,7 @@ export default function Demo(){
           
           <DragDropProvider />        
         </Scheduler>
+        {loading && <Loading />}
       </Paper>
     )
 }

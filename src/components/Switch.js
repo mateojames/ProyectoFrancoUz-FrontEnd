@@ -8,7 +8,7 @@ import Calendarrr from "./Calendar2"
 import UpdateProfile from "./UpdateProfile"
 import { useSelector } from 'react-redux'
 import UsersGrid from './Grid'
-import Grid2 from './Grid2'
+import SessionsGrid from "./SessionGrid"
 
 function AuthSwitch() {
 
@@ -22,6 +22,7 @@ function AuthSwitch() {
             <Route path="/inicio" component={Dashboard}/>
             <Route path="/update-profile" component={UpdateProfile}/>
             <Route path="/usuarios" component={UsersGrid}/>
+            <Route path="/sesiones" component={SessionsGrid}/>
             <Route path="/" component={Home} />
         </Switch>
     );

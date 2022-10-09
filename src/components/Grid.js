@@ -32,6 +32,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import TableCell from '@mui/material/TableCell';
 import Input from '@mui/material/Input';
+import { Loading } from './Loading/Loading.js';
 import { styled } from '@mui/material/styles';
 import { loadUsers } from '../store/actions/loadUsers';
 import { editRole } from "../store/actions/editRole";
@@ -191,7 +192,7 @@ export default function UsersGrid(props) {
     { name: 'isVerified', title: 'Cuenta verificada?' },
     { name: 'role', title: 'Rol' }
   ]);
-  const [rows,setRows] = useState([]);
+  const rows = useSelector(state => state.user.users);
   const [editingStateColumnExtensions] = useState([
     { columnName: 'email', editingEnabled: false },
     { columnName: 'isVerified', editingEnabled: false }
@@ -199,31 +200,41 @@ export default function UsersGrid(props) {
   const [pageSize, setPageSize] = useState(0);
   const [pageSizes] = useState([5, 10, 0]);
   const dispatch = useDispatch();
-  const data = useSelector(state => state.user.users);
+  const [loading, setLoading] = useState(false);
 
   const commitChanges = (action) => {
     console.log(action)
     if(action.changed){
         if(Object.values(action.changed)[0].role){
             console.log('dispatch')
-            dispatch(editRole(action))
+            setLoading(true)
+            dispatch(editRole(action, handleLoading))
         }
     }
     //setRows(changedRows);
   };
 
-  useEffect(() => {
-    dispatch(loadUsers());
-  }, []);
+  const handleLoading = () => {
+    setLoading(false)
+  };
 
   useEffect(() => {
-   setRows(data);
-  }, [data]);
+    console.log('dispatch')
+    setLoading(true)
+    dispatch(loadUsers(handleLoading))
+  }, []);
+
+  /*useEffect(() => {
+    setRows(data);
+    console.log('setRows')
+    setLoading(false)
+  }, [data]);*/
 
   return (
     <Paper>
       <Grid
         rows={rows}
+        locale='es-ES'
         columns={columns}
         getRowId={getRowId}
       >
@@ -261,6 +272,7 @@ export default function UsersGrid(props) {
         <SearchPanel />
         <TableFilterRow />
       </Grid>
+      {loading && <Loading />}
     </Paper>
   );
 };

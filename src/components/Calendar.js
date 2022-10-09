@@ -17,6 +17,11 @@ import {
   TodayButton,
   ConfirmationDialog
 } from '@devexpress/dx-react-scheduler-material-ui';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { Autocomplete } from '@mui/material';
+import TextField from '@mui/material/TextField';
 import { ViewState, EditingState, IntegratedEditing} from '@devexpress/dx-react-scheduler';
 import Diversity2Icon from '@mui/icons-material/Diversity2';
 import EscalatorWarningIcon from '@mui/icons-material/EscalatorWarning';
@@ -159,16 +164,44 @@ const CommandButton = (({
   <StyledAppointmentTooltipCommandButton {...restProps} className={classes.commandButton} />
 ));
 
+const BooleanEditor =(props) => {
+  if(props.label=="All Day"){
+    return null
+  }
+  else{
+    return <AppointmentForm.BooleanEditor {...props}/>
+  }
+}
+
+const DateEditor=(props) => {
+  return ( 
+  <LocalizationProvider dateAdapter={AdapterMoment}>
+    <DateTimePicker
+    label="Fecha"
+    renderInput={ props => <TextField {...props} />}
+    value={props.value}
+    onChange={props.onValueChange}
+    className={props.className}
+    readOnly={props.readOnly}
+  />
+  </LocalizationProvider>)
+}
+
+const uniqueOptions = [{label: 'Jorge', id: 0},
+                        {label: 'Hernan', id: 1},
+                        {label: 'Julian', id: 2}]
+
 const TextEditor = (props) => {
   // eslint-disable-next-line react/destructuring-assignment
   if (props.type === 'multilineTextEditor') {
     return null;
-  } return <AppointmentForm.TextEditor {...props} />;
+  } return <TextField label={props.placeholder} value={props.value} disabled={props.readOnly} fullWidth onChange={(event) => props.onValueChange(event.target.value)} />;
 };
 
 const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
-  const onPatientFieldChange = (nextValue) => {
-    onFieldChange({ patient: nextValue });
+  const onPatientFieldChange = (event, nextValue) => {
+    console.log(nextValue)
+    onFieldChange({ patient: nextValue.label || '' });
   };
   const onProfessionalFieldChange = (nextValue) => {
     onFieldChange({ professional: nextValue });
@@ -182,16 +215,15 @@ const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
       appointmentData={appointmentData}
       onFieldChange={onFieldChange}
       {...restProps}
+      labelComponent={(props) => {
+        console.log(props)
+        if(props.text==="-"){
+          return <AppointmentForm.Label {...props}/>
+        }
+        else{
+          return null
+      }}}
     >
-     <AppointmentForm.Label
-        text="Paciente"
-        type="title"
-      />
-      <AppointmentForm.TextEditor
-        value={appointmentData.patient}
-        onValueChange={onPatientFieldChange}
-        placeholder="Ingrese el paciente correspondiente"
-      />
 
       <AppointmentForm.Label
         text="Profesional"
@@ -212,6 +244,17 @@ const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
         onValueChange={onTherapyFieldChange}
         placeholder="Ingrese el tipo de terapia correspondiente"
       />
+
+      <Autocomplete
+        disablePortal
+        id="combo-box-demo"
+        options={uniqueOptions}
+        sx={{ width: 300 }}
+        value={appointmentData.patient || ''}
+        onChange={onPatientFieldChange}
+        isOptionEqualToValue ={(option, value) => option.label === value}
+        renderInput={(params) => <TextField {...params} label="Movie" />}
+    />
     </AppointmentForm.BasicLayout>
   );
 };
@@ -301,6 +344,8 @@ export default function Demo(){
           <AppointmentForm
             basicLayoutComponent={BasicLayout}
             textEditorComponent={TextEditor}
+            booleanEditorComponent={BooleanEditor}
+            dateEditorComponent={DateEditor}
           />
           
           <DragDropProvider />        

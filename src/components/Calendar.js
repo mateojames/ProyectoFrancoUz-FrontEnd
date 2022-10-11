@@ -38,7 +38,7 @@ import {deleteAppointment} from "../store/actions/deleteAppointment";
 import { Loading } from './Loading/Loading.js';
 import { loadPatients } from "../store/actions/loadPatients";
 import { loadProfessionals } from "../store/actions/loadProfessionals";
-import { loadTherapies } from "../store/actions/resources";
+import { loadLocations, loadTherapies } from "../store/actions/resources";
 const PREFIX = 'FrancoUz';
 
 const classes = {
@@ -130,12 +130,6 @@ const Content = (({
 }) => (
   <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
     <Grid container alignItems="center" rowSpacing={1}>
-      <StyledGrid item xs={2} className={classes.textCenter}>
-        <StyledRoom className={classes.icon} />
-      </StyledGrid>
-      <Grid item xs={10}>
-        <span>{appointmentData.location}</span>
-      </Grid>
       <StyledGrid item xs={2} className={classes.textCenter}>
         <StyledPatient className={classes.icon} />
       </StyledGrid>
@@ -248,8 +242,12 @@ const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
 export default function Demo(){
   const [currentDate, setCurrentDate] = useState(new Date())
   const data = useSelector(state => state.calendar.appointments);
-  const [resources, setResources] = useState([{fieldName: 'therapy', title: 'Tipo de terapia',instances: []}]);
+  const [resources, setResources] = useState([
+    {fieldName: 'therapy', title: 'Tipo de terapia',instances: []},
+    {fieldName: 'location', title: 'Ubicación',instances: []}
+  ]);
   const therapies = useSelector(state => state.resource.therapies);
+  const locations = useSelector(state => state.resource.locations);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const handleCurrentDateChange = (currentDate) => {
@@ -301,8 +299,19 @@ export default function Demo(){
         return previousState.map((resource)=>{
           return resource.fieldName == 'therapy'? {...resource, instances: theToRes} : resource
         })
-      })
+      })}
   }
+
+  const handleLocationsToResources = () => {
+    if(locations.length > 0){
+      const locToRes = locations.map((location)=>{
+        return {id:location.id, text: location.name}
+      });
+      setResources((previousState) => {
+        return previousState.map((resource)=>{
+          return resource.fieldName == 'location'? {...resource, instances: locToRes} : resource
+        })
+      })}
   }
 
   useEffect(() => {
@@ -310,12 +319,18 @@ export default function Demo(){
     dispatch(loadAppointments(handleLoading));
     dispatch(loadPatients());
     dispatch(loadProfessionals());
-    dispatch(loadTherapies())
+    dispatch(loadTherapies());
+    dispatch(loadLocations())
   }, []);
 
   useEffect(()=>{
     handleTherapiesToResources()
   },[therapies])
+
+  useEffect(()=>{
+    handleLocationsToResources()
+  },[locations])
+
 
   return (
       <Paper>

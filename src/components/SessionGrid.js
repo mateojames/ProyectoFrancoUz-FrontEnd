@@ -21,6 +21,7 @@ import {
 } from '@devexpress/dx-react-grid-material-ui';
 import { Loading } from './Loading/Loading.js';
 import { loadAppointments } from "../store/actions/loadAppointments";
+import { loadLocations, loadTherapies } from "../store/actions/resources.js";
 
 const getRowId = row => row.id;
 
@@ -30,10 +31,14 @@ export default function SessionsGrid(props) {
     { name: 'therapy', title: 'Terapia' },
     { name: 'patient', title: 'Paciente' },
     { name: 'professional', title: 'Profesional' },
+    { name: 'location', title: 'Ubicación' },
     { name: 'date', title: 'Fecha de inicio' },
     { name: 'isRecurrent', title: '¿Es recurrente?' }
   ]);
-  const rows = useSelector(state => state.calendar.appointments);
+  const [rows, setRows] = useState([]);
+  const appointments = useSelector(state => state.calendar.appointments);
+  const therapies = useSelector(state => state.resource.therapies);
+  const locations = useSelector(state => state.resource.locations);
   const [pageSize, setPageSize] = useState(0);
   const [pageSizes] = useState([5, 10, 0]);
   const [loading, setLoading] = useState(false);
@@ -44,11 +49,39 @@ export default function SessionsGrid(props) {
     setLoading(false)
   };
 
+  const handleAppointmentsToRows = () => {
+    console.log('terapias ', therapies)
+    console.log('locations ', locations)
+    console.log('sesiones ', appointments)
+
+
+    setRows(() => {
+      return appointments.map((appointment) => {
+      const therapy = therapies.find((therapy)=> therapy.id == appointment.therapy)
+      const location = locations.find((location)=> location.id == appointment.location)
+      return {
+        ...appointment,
+        therapy: therapy ? therapy.name : 'No encontrada',
+        location: location ? location.name : 'No encontrada',
+        patient: appointment.patient.name,
+        professional: appointment.professional.name
+      }
+    })
+  })
+    console.log('rows ', rows)
+  }
+
   useEffect(() => {
     console.log('dispatch')
     setLoading(true)
     dispatch(loadAppointments(handleLoading))
+    dispatch(loadTherapies())
+    dispatch(loadLocations())
   }, []);
+
+  useEffect(() => {
+    handleAppointmentsToRows()
+  }, [appointments, locations, therapies]);
 
 
   return (

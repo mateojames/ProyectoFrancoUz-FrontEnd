@@ -13,13 +13,15 @@ import modalReducer from '../store/reducers/modal';
 import calendarReducer from '../store/reducers/calendar';
 import authReducer from '../store/reducers/auth';
 import userReducer from '../store/reducers/user';
+import resourceReducer from '../store/reducers/resource';
 import AppContent from "./AppContent"
 
 const rootReducer = combineReducers({
   modal: modalReducer,
   calendar: calendarReducer,
   auth: authReducer,
-  user: userReducer
+  user: userReducer,
+  resource: resourceReducer
 });
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 

@@ -2,7 +2,7 @@ import React, {useState, useEffect  } from "react"
 import Paper from '@mui/material/Paper';
 import {
   Scheduler,
-  AllDayPanel,
+  Resources,
   DayView,
   WeekView,
   MonthView,
@@ -36,6 +36,9 @@ import { loadAppointments } from "../store/actions/loadAppointments";
 import {editAppointment} from "../store/actions/editAppointment";
 import {deleteAppointment} from "../store/actions/deleteAppointment";
 import { Loading } from './Loading/Loading.js';
+import { loadPatients } from "../store/actions/loadPatients";
+import { loadProfessionals } from "../store/actions/loadProfessionals";
+import { loadTherapies } from "../store/actions/resources";
 const PREFIX = 'FrancoUz';
 
 const classes = {
@@ -138,21 +141,14 @@ const Content = (({
       </StyledGrid>
       <Grid item xs={10}>
         <span style={{fontWeight: 'bold'}}>Paciente: </span>
-        <span>{appointmentData.patient}</span>
+        <span>{appointmentData.patient.name}</span>
       </Grid>
       <StyledGrid item xs={2} className={classes.textCenter}>
         <StyledProfessional className={classes.icon} />
       </StyledGrid>
       <Grid item xs={10}>
         <span style={{fontWeight: 'bold'}}>Profesional: </span>
-        <span>{appointmentData.professional}</span>
-      </Grid>
-      <StyledGrid item xs={2} className={classes.textCenter}>
-        <StyledTherapy className={classes.icon} />
-      </StyledGrid>
-      <Grid item xs={10}>
-        <span style={{fontWeight: 'bold'}}>Terapia: </span>
-        <span>{appointmentData.therapy}</span>
+        <span>{appointmentData.professional.name}</span>
       </Grid>
     </Grid>
   </AppointmentTooltip.Content>
@@ -187,10 +183,6 @@ const DateEditor=(props) => {
   </LocalizationProvider>)
 }
 
-const uniqueOptions = [{label: 'Jorge', id: 0},
-                        {label: 'Hernan', id: 1},
-                        {label: 'Julian', id: 2}]
-
 const TextEditor = (props) => {
   // eslint-disable-next-line react/destructuring-assignment
   if (props.type === 'multilineTextEditor') {
@@ -199,24 +191,21 @@ const TextEditor = (props) => {
 };
 
 const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
-  const onPatientFieldChange = (event, nextValue) => {
-    console.log(nextValue)
-    onFieldChange({ patient: nextValue.label || '' });
+  const patients = useSelector(state => state.user.patients);
+  const professionals = useSelector(state => state.user.professionals);
+  const onPatientFieldChange = (event, newValue) => {
+    onFieldChange({ patient: newValue || null });
   };
-  const onProfessionalFieldChange = (nextValue) => {
-    onFieldChange({ professional: nextValue });
+  const onProfessionalFieldChange = (event, newValue) => {
+    onFieldChange({ professional: newValue || null });
   };
-  const onTherapyFieldChange = (nextValue) => {
-    onFieldChange({ therapy: nextValue });
-  };
-
+  
   return (
     <AppointmentForm.BasicLayout
       appointmentData={appointmentData}
       onFieldChange={onFieldChange}
       {...restProps}
       labelComponent={(props) => {
-        console.log(props)
         if(props.text==="-"){
           return <AppointmentForm.Label {...props}/>
         }
@@ -225,36 +214,31 @@ const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
       }}}
     >
 
-      <AppointmentForm.Label
-        text="Profesional"
-        type="title"
-      />
-      <AppointmentForm.TextEditor
-        value={appointmentData.professional}
-        onValueChange={onProfessionalFieldChange}
-        placeholder="Ingrese el profesional correspondiente"
-      />
-
-      <AppointmentForm.Label
-        text="Tipo de Terapia"
-        type="title"
-      />
-      <AppointmentForm.TextEditor
-        value={appointmentData.therapy}
-        onValueChange={onTherapyFieldChange}
-        placeholder="Ingrese el tipo de terapia correspondiente"
+      <Autocomplete
+        disablePortal
+        id="combo-box-demo"
+        options={patients}
+        fullWidth
+        sx={{mt:1}}
+        value={appointmentData.patient || null}
+        onChange={onPatientFieldChange}
+        getOptionLabel={(option) => option.name || ''}
+        isOptionEqualToValue ={(option, value) => option.id === value.id}
+        renderInput={(params) => <TextField {...params} label="Paciente" />}
       />
 
       <Autocomplete
         disablePortal
         id="combo-box-demo"
-        options={uniqueOptions}
-        sx={{ width: 300 }}
-        value={appointmentData.patient || ''}
-        onChange={onPatientFieldChange}
-        isOptionEqualToValue ={(option, value) => option.label === value}
-        renderInput={(params) => <TextField {...params} label="Movie" />}
-    />
+        options={professionals}
+        fullWidth
+        sx={{mt:2}}
+        value={appointmentData.professional || null}
+        onChange={onProfessionalFieldChange}
+        getOptionLabel={(option) => option.name || ''}
+        isOptionEqualToValue ={(option, value) => option.id === value.id}
+        renderInput={(params) => <TextField {...params} label="Profesional" />}
+      />
     </AppointmentForm.BasicLayout>
   );
 };
@@ -264,17 +248,29 @@ const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
 export default function Demo(){
   const [currentDate, setCurrentDate] = useState(new Date())
   const data = useSelector(state => state.calendar.appointments);
+  const [resources, setResources] = useState([{fieldName: 'therapy', title: 'Tipo de terapia',instances: []}]);
+  const therapies = useSelector(state => state.resource.therapies);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const handleCurrentDateChange = (currentDate) => {
     setCurrentDate(currentDate)
   }
 
+  const addTherapy = (appointment) => {
+    const therapy = therapies.find(therapy => therapy.id === appointment.therapy)
+    appointment = {...appointment, therapy: therapy}
+    return appointment
+  }
+
   const handleCommitChanges = (action) => {
     console.log('commit');
-    console.log(action)
-    if(action.added) dispatch(addAppointment(action));
-    if(action.changed)dispatch(editAppointment(action));
+    if(action.added){
+      dispatch(addAppointment(action));
+      console.log(action)
+    }
+    if(action.changed){
+      dispatch(editAppointment(action));
+    }
     if(action.deleted)dispatch(deleteAppointment(action));
   }
 
@@ -289,7 +285,6 @@ export default function Demo(){
       {...restProps}
       style={{
         ...style,
-        backgroundColor: '#FFC107',
         borderRadius: '8px',
       }}
     >
@@ -297,10 +292,30 @@ export default function Demo(){
     </Appointments.Appointment>
   );
 
+  const handleTherapiesToResources = () => {
+    if(therapies.length > 0){
+      const theToRes = therapies.map((therapy)=>{
+        return {id:therapy.id, text: therapy.name}
+      });
+      setResources((previousState) => {
+        return previousState.map((resource)=>{
+          return resource.fieldName == 'therapy'? {...resource, instances: theToRes} : resource
+        })
+      })
+  }
+  }
+
   useEffect(() => {
     setLoading(true);
     dispatch(loadAppointments(handleLoading));
+    dispatch(loadPatients());
+    dispatch(loadProfessionals());
+    dispatch(loadTherapies())
   }, []);
+
+  useEffect(()=>{
+    handleTherapiesToResources()
+  },[therapies])
 
   return (
       <Paper>
@@ -347,7 +362,10 @@ export default function Demo(){
             booleanEditorComponent={BooleanEditor}
             dateEditorComponent={DateEditor}
           />
-          
+          <Resources
+            data={resources}
+            mainResourceName="therapy"
+          />
           <DragDropProvider />        
         </Scheduler>
         {loading && <Loading />}

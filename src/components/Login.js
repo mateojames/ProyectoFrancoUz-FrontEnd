@@ -8,7 +8,10 @@ import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
+  getAdditionalUserInfo
 } from "firebase/auth";
+import { useDispatch } from "react-redux"
+import { createUserProfile } from "../store/actions/createUser"
 
 export default function Login(props) {
     const emailRef = useRef()
@@ -16,14 +19,19 @@ export default function Login(props) {
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
     const history = useHistory()
+    const dispatch = useDispatch();
 
     function login(email, password) {
         return signInWithEmailAndPassword(auth, email, password)
       }
     
-    const loginWithGoogle = () => {
+    const loginWithGoogle = async () => {
         const googleProvider = new GoogleAuthProvider();
-        return signInWithPopup(auth, googleProvider);
+        const result = await signInWithPopup(auth, googleProvider);
+        if(getAdditionalUserInfo(result).isNewUser){
+          dispatch(createUserProfile({uid:result.user.uid,name: result.user.displayName}))
+        }
+        return result
     };
 
     async function handleSubmit(e) {
@@ -45,7 +53,7 @@ export default function Login(props) {
         try {
           setError("")
           setLoading(true)
-          await loginWithGoogle();
+          loginWithGoogle();
           history.push("/inicio")
         } catch (error) {
           console.log(error)

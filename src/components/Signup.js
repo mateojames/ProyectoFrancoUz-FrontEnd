@@ -7,24 +7,28 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification
 } from "firebase/auth";
+import { useDispatch } from "react-redux"
+import { createUserProfile } from "../store/actions/createUser"
 
 export default function Signup(props) {
+  const nameRef = useRef()
   const emailRef = useRef()
   const passwordRef = useRef()
   const passwordConfirmRef = useRef()
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const history = useHistory()
+  const dispatch = useDispatch()
+
+  async function signup(name, email, password) {
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+    dispatch(createUserProfile({uid: result.user.uid, name: name}))
+    await sendEmailVerification(auth.currentUser);
+    
+  }
 
   async function handleSubmit(e) {
     e.preventDefault()
-
-    async function signup(email, password) {
-      await createUserWithEmailAndPassword(auth, email, password);
-  
-      await sendEmailVerification(auth.currentUser);
-      
-    }
 
     if (passwordRef.current.value !== passwordConfirmRef.current.value) {
       return setError("Las contraseñas no coinciden")
@@ -33,7 +37,7 @@ export default function Signup(props) {
     try {
       setError("")
       setLoading(true)
-      await signup(emailRef.current.value, passwordRef.current.value)
+      await signup(nameRef.current.value, emailRef.current.value, passwordRef.current.value)
       history.push("/")
     } catch {
       setError("Error al crear la cuenta")
@@ -49,6 +53,10 @@ export default function Signup(props) {
           <h2 className="text-center mb-4">Registrarme</h2>
           {error && <Alert variant="danger">{error}</Alert>}
           <Form onSubmit={handleSubmit}>
+          <Form.Group id="email">
+              <Form.Label>Nombre y apellido</Form.Label>
+              <Form.Control type="name" ref={nameRef} required />
+            </Form.Group>
             <Form.Group id="email">
               <Form.Label>Email</Form.Label>
               <Form.Control type="email" ref={emailRef} required />

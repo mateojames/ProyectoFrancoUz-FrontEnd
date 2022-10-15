@@ -1270,6 +1270,11 @@
   resolved "https://registry.yarnpkg.com/@devexpress/dx-core/-/dx-core-3.0.5.tgz#96231f333b3634990801cd93cd760566e26c4093"
   integrity sha512-LIMzInUVtc2u8ajI4Dn0WJOrCrHfq6KE+D5sOoJlR/5TWxQ46C4FT9qrryJwYp1SlYQO2auAybcmPzmM82svsQ==
 
+"@devexpress/dx-grid-core@3.0.5":
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/@devexpress/dx-grid-core/-/dx-grid-core-3.0.5.tgz#b9391f7577ae677ffd5ac7099097d777886ce402"
+  integrity sha512-WIVsuHAnGcoM6ryWJI9FcP2C7h6g+R4vaSpPyO9lVCHWNV1AiwSaTe6kQ9ja2ILXhjmiLO0EyfG2N0ER5qsdnA==
+
 "@devexpress/dx-react-core@^3.0.5":
   version "3.0.5"
   resolved "https://registry.yarnpkg.com/@devexpress/dx-react-core/-/dx-react-core-3.0.5.tgz#fdd9c2647dd61a71e0b7f417f299258327606fc1"
@@ -1277,6 +1282,21 @@
   dependencies:
     "@devexpress/dx-core" "3.0.5"
     prop-types "^15.7.2"
+
+"@devexpress/dx-react-grid-material-ui@^3.0.5":
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/@devexpress/dx-react-grid-material-ui/-/dx-react-grid-material-ui-3.0.5.tgz#16d3095aa8971f72200733acbbf70eb36460490f"
+  integrity sha512-QrUMy+u5WyEmJt5Xq4V0h/cwRMT6yD9XphcrOk7G9W+j0q0jKeCM9mU/axFVXWuMcUtQeQD+ZBpiKvTthxIJQg==
+  dependencies:
+    clsx "^1.0.4"
+    prop-types "^15.7.2"
+
+"@devexpress/dx-react-grid@^3.0.5":
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/@devexpress/dx-react-grid/-/dx-react-grid-3.0.5.tgz#0859026f9fbcc4478f643d1c2513d1226a41c6d8"
+  integrity sha512-AwO7WAR4Ke1/DROl+zsd7r5v3Kab15G5Ca5gKCAsFoaZ+gQi/x+IsBj5Ougapq4/g1RfquoYbBrTxnnputHL3Q==
+  dependencies:
+    "@devexpress/dx-grid-core" "3.0.5"
 
 "@devexpress/dx-react-scheduler-material-ui@^3.0.5":
   version "3.0.5"

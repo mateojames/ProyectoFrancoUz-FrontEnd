@@ -2,7 +2,7 @@ import React, {useState, useEffect  } from "react"
 import Paper from '@mui/material/Paper';
 import {
   Scheduler,
-  AllDayPanel,
+  Resources,
   DayView,
   WeekView,
   MonthView,
@@ -17,9 +17,15 @@ import {
   TodayButton,
   ConfirmationDialog
 } from '@devexpress/dx-react-scheduler-material-ui';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { Autocomplete } from '@mui/material';
+import TextField from '@mui/material/TextField';
 import { ViewState, EditingState, IntegratedEditing} from '@devexpress/dx-react-scheduler';
-import IconButton from '@mui/material/IconButton';
-import MoreIcon from '@mui/icons-material/MoreVert';
+import Diversity2Icon from '@mui/icons-material/Diversity2';
+import EscalatorWarningIcon from '@mui/icons-material/EscalatorWarning';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import Grid from '@mui/material/Grid';
 import Room from '@mui/icons-material/Room';
 import { styled } from '@mui/material/styles';
@@ -27,7 +33,12 @@ import classNames from 'clsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { addAppointment } from "../store/actions/addAppointment";
 import { loadAppointments } from "../store/actions/loadAppointments";
-
+import {editAppointment} from "../store/actions/editAppointment";
+import {deleteAppointment} from "../store/actions/deleteAppointment";
+import { Loading } from './Loading/Loading.js';
+import { loadPatients } from "../store/actions/loadPatients";
+import { loadProfessionals } from "../store/actions/loadProfessionals";
+import { loadLocations, loadTherapies } from "../store/actions/resources";
 const PREFIX = 'FrancoUz';
 
 const classes = {
@@ -60,19 +71,31 @@ const StyledAppointmentTooltipHeader = styled(AppointmentTooltip.Header)(() => (
   },
 }));
 
-const StyledIconButton = styled(IconButton)(() => ({
-  [`&.${classes.commandButton}`]: {
-    backgroundColor: 'rgba(255,255,255,0.65)',
-  },
-}));
-
 const StyledGrid = styled(Grid)(() => ({
   [`&.${classes.textCenter}`]: {
     textAlign: 'center',
   },
 }));
 
+const StyledPatient = styled(EscalatorWarningIcon)(({ theme: { palette } }) => ({
+  [`&.${classes.icon}`]: {
+    color: palette.action.active,
+  },
+}));
+
 const StyledRoom = styled(Room)(({ theme: { palette } }) => ({
+  [`&.${classes.icon}`]: {
+    color: palette.action.active,
+  },
+}));
+
+const StyledTherapy = styled(Diversity2Icon)(({ theme: { palette } }) => ({
+  [`&.${classes.icon}`]: {
+    color: palette.action.active,
+  },
+}));
+
+const StyledProfessional = styled(AssignmentIndIcon)(({ theme: { palette } }) => ({
   [`&.${classes.icon}`]: {
     color: palette.action.active,
   },
@@ -88,7 +111,6 @@ const getClassByLocation = (classes, location) => {
   if (location === 'Room 1') return classes.firstRoom; //la location esta en el appointment, la cambiamos ahi
   if (location === 'Room 2') return classes.secondRoom;
   if (location === 'La Bombonera') return classes.bomboneraRoom;
-  console.log(location);
   return classes.thirdRoom;
 };
 
@@ -100,14 +122,6 @@ const Header = (({
     className={classNames(getClassByLocation(classes, appointmentData.location), classes.header)}
     appointmentData={appointmentData}
   >
-    <StyledIconButton
-      /* eslint-disable-next-line no-alert */
-      onClick={() => alert(JSON.stringify(appointmentData))}
-      className={classes.commandButton}
-      size="large"
-    >
-      <MoreIcon />
-    </StyledIconButton>
   </StyledAppointmentTooltipHeader>
 ));
 
@@ -115,12 +129,20 @@ const Content = (({
   children, appointmentData, ...restProps
 }) => (
   <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
-    <Grid container alignItems="center">
+    <Grid container alignItems="center" rowSpacing={1}>
       <StyledGrid item xs={2} className={classes.textCenter}>
-        <StyledRoom className={classes.icon} />
+        <StyledPatient className={classes.icon} />
       </StyledGrid>
       <Grid item xs={10}>
-        <span>{appointmentData.location}</span>
+        <span style={{fontWeight: 'bold'}}>Paciente: </span>
+        <span>{appointmentData.patient.name}</span>
+      </Grid>
+      <StyledGrid item xs={2} className={classes.textCenter}>
+        <StyledProfessional className={classes.icon} />
+      </StyledGrid>
+      <Grid item xs={10}>
+        <span style={{fontWeight: 'bold'}}>Profesional: </span>
+        <span>{appointmentData.professional.name}</span>
       </Grid>
     </Grid>
   </AppointmentTooltip.Content>
@@ -132,32 +154,84 @@ const CommandButton = (({
   <StyledAppointmentTooltipCommandButton {...restProps} className={classes.commandButton} />
 ));
 
+const BooleanEditor =(props) => {
+  if(props.label=="All Day"){
+    return null
+  }
+  else{
+    return <AppointmentForm.BooleanEditor {...props}/>
+  }
+}
+
+const DateEditor=(props) => {
+  return ( 
+  <LocalizationProvider dateAdapter={AdapterMoment}>
+    <DateTimePicker
+    label="Fecha"
+    renderInput={ props => <TextField {...props} />}
+    value={props.value}
+    onChange={props.onValueChange}
+    className={props.className}
+    readOnly={props.readOnly}
+  />
+  </LocalizationProvider>)
+}
+
 const TextEditor = (props) => {
   // eslint-disable-next-line react/destructuring-assignment
   if (props.type === 'multilineTextEditor') {
     return null;
-  } return <AppointmentForm.TextEditor {...props} />;
+  } return <TextField label={props.placeholder} value={props.value} disabled={props.readOnly} fullWidth onChange={(event) => props.onValueChange(event.target.value)} />;
 };
 
 const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
-  const onCustomFieldChange = (nextValue) => {
-    onFieldChange({ customField: nextValue });
+  const patients = useSelector(state => state.user.patients);
+  const professionals = useSelector(state => state.user.professionals);
+  const onPatientFieldChange = (event, newValue) => {
+    onFieldChange({ patient: newValue || null });
   };
-
+  const onProfessionalFieldChange = (event, newValue) => {
+    onFieldChange({ professional: newValue || null });
+  };
+  
   return (
     <AppointmentForm.BasicLayout
       appointmentData={appointmentData}
       onFieldChange={onFieldChange}
       {...restProps}
+      labelComponent={(props) => {
+        if(props.text==="-"){
+          return <AppointmentForm.Label {...props}/>
+        }
+        else{
+          return null
+      }}}
     >
-      <AppointmentForm.Label
-        text="Participantes"
-        type="title"
+
+      <Autocomplete
+        disablePortal
+        id="combo-box-demo"
+        options={patients}
+        fullWidth
+        sx={{mt:1}}
+        value={appointmentData.patient || null}
+        onChange={onPatientFieldChange}
+        getOptionLabel={(option) => option.name || ''}
+        isOptionEqualToValue ={(option, value) => option.id === value.id}
+        renderInput={(params) => <TextField {...params} label="Paciente" />}
       />
-      <AppointmentForm.TextEditor
-        value={appointmentData.customField}
-        onValueChange={onCustomFieldChange}
-        placeholder="Mandale los que vos quieras rey, aca igual estaria bueno que no sea texto"
+
+      <Autocomplete
+        disablePortal
+        id="combo-box-demo"
+        options={professionals}
+        fullWidth
+        sx={{mt:2}}
+        value={appointmentData.professional || null}
+        onChange={onProfessionalFieldChange}
+        getOptionLabel={(option) => option.name || ''}
+        isOptionEqualToValue ={(option, value) => option.id === value.id}
+        renderInput={(params) => <TextField {...params} label="Profesional" />}
       />
     </AppointmentForm.BasicLayout>
   );
@@ -166,37 +240,42 @@ const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
 
 
 export default function Demo(){
-  const [currentDate, setCurrentDate] = useState('2022-09-22')
+  const [currentDate, setCurrentDate] = useState(new Date())
   const data = useSelector(state => state.calendar.appointments);
+  const [resources, setResources] = useState([
+    {fieldName: 'therapy', title: 'Tipo de terapia',instances: []},
+    {fieldName: 'location', title: 'Ubicación',instances: []}
+  ]);
+  const therapies = useSelector(state => state.resource.therapies);
+  const locations = useSelector(state => state.resource.locations);
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
   const handleCurrentDateChange = (currentDate) => {
     setCurrentDate(currentDate)
   }
 
-  const handleCommitChanges = (added, changed, deleted ) => {
-    console.log('esto es boca');
-    console.log(added);
-    console.log(changed);
-    console.log(deleted);
-    dispatch(addAppointment(added))
-    /*this.setState((state) => {
-      let { data } = state;
-      if (added) {
-        const startingAddedId = data.length > 0 ? data[data.length - 1].id + 1 : 0;
-        data = [...data, { id: startingAddedId, ...added }];
-      }
-      if (changed) {
-        data = data.map(appointment => (
-          changed[appointment.id] ? { ...appointment, ...changed[appointment.id] } : appointment));
-      }
-      if (deleted !== undefined) {
-        data = data.filter(appointment => appointment.id !== deleted);
-      }
-      console.log(this.state);
-      return { data };
-    });*/
+  const addTherapy = (appointment) => {
+    const therapy = therapies.find(therapy => therapy.id === appointment.therapy)
+    appointment = {...appointment, therapy: therapy}
+    return appointment
   }
-  
+
+  const handleCommitChanges = (action) => {
+    console.log('commit');
+    if(action.added){
+      dispatch(addAppointment(action));
+      console.log(action)
+    }
+    if(action.changed){
+      dispatch(editAppointment(action));
+    }
+    if(action.deleted)dispatch(deleteAppointment(action));
+  }
+
+  const handleLoading = () => {
+    setLoading(false)
+  };
+
   const Appointment = ({
     children, style, ...restProps
   }) => (
@@ -204,7 +283,6 @@ export default function Demo(){
       {...restProps}
       style={{
         ...style,
-        backgroundColor: '#FFC107',
         borderRadius: '8px',
       }}
     >
@@ -212,14 +290,53 @@ export default function Demo(){
     </Appointments.Appointment>
   );
 
+  const handleTherapiesToResources = () => {
+    if(therapies.length > 0){
+      const theToRes = therapies.map((therapy)=>{
+        return {id:therapy.id, text: therapy.name}
+      });
+      setResources((previousState) => {
+        return previousState.map((resource)=>{
+          return resource.fieldName == 'therapy'? {...resource, instances: theToRes} : resource
+        })
+      })}
+  }
+
+  const handleLocationsToResources = () => {
+    if(locations.length > 0){
+      const locToRes = locations.map((location)=>{
+        return {id:location.id, text: location.name}
+      });
+      setResources((previousState) => {
+        return previousState.map((resource)=>{
+          return resource.fieldName == 'location'? {...resource, instances: locToRes} : resource
+        })
+      })}
+  }
+
   useEffect(() => {
-    dispatch(loadAppointments());
+    setLoading(true);
+    dispatch(loadAppointments(handleLoading));
+    dispatch(loadPatients());
+    dispatch(loadProfessionals());
+    dispatch(loadTherapies());
+    dispatch(loadLocations())
   }, []);
+
+  useEffect(()=>{
+    handleTherapiesToResources()
+  },[therapies])
+
+  useEffect(()=>{
+    handleLocationsToResources()
+  },[locations])
+
 
   return (
       <Paper>
         <Scheduler
           data={data}
+          locale='es-ES'
           height={870}
         >
           <ViewState
@@ -238,7 +355,6 @@ export default function Demo(){
           <MonthView />
 
           <EditRecurrenceMenu />
-          <IntegratedEditing />
           <ConfirmationDialog />
 
           <Toolbar />
@@ -253,14 +369,21 @@ export default function Demo(){
             commandButtonComponent={CommandButton}
             showOpenButton
             showCloseButton
+            showDeleteButton
           />
           <AppointmentForm
             basicLayoutComponent={BasicLayout}
             textEditorComponent={TextEditor}
+            booleanEditorComponent={BooleanEditor}
+            dateEditorComponent={DateEditor}
           />
-          
+          <Resources
+            data={resources}
+            mainResourceName="therapy"
+          />
           <DragDropProvider />        
         </Scheduler>
+        {loading && <Loading />}
       </Paper>
     )
 }

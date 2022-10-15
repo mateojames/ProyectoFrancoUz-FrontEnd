@@ -1,19 +1,18 @@
+export const UPDATEPROFILE = 'UPDATEPROFILE';
 
-export const ADDAPPOINTMENT = 'ADDAPPOINTMENT';
-export const LOADAPPOINTMENTS = 'LOADAPPOINTMENTS';
-
-export const addAppointment = (appointment) => {
+export const createUserProfile = (user) => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('http://localhost:8080/session', {
+                fetch('http://localhost:8080/user', {
                     method: 'POST',
                     headers: {
                     "Content-Type": "application/json",
                     "Authorization": idToken
                     },
                     body: JSON.stringify({
-                    appointment: appointment.added
+                    uid: user.uid,
+                    name: user.name
                     })
                 })
                 .then((response) => {
@@ -28,7 +27,7 @@ export const addAppointment = (appointment) => {
                 })
                 .then((myJson) => {
                     console.log(myJson);
-                    dispatch({type:LOADAPPOINTMENTS, appointments: myJson.appointments});
+                    dispatch({type:UPDATEPROFILE, profile: myJson.profile});
                 })
             })
             .catch(err => console.log(err));

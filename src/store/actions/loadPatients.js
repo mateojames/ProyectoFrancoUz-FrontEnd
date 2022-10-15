@@ -1,20 +1,15 @@
+export const LOADPATIENTS = 'LOADPATIENTS';
 
-export const ADDAPPOINTMENT = 'ADDAPPOINTMENT';
-export const LOADAPPOINTMENTS = 'LOADAPPOINTMENTS';
-
-export const addAppointment = (appointment) => {
+export const loadPatients = () => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('http://localhost:8080/session', {
-                    method: 'POST',
+                fetch('http://localhost:8080/usersByRole/paciente', {
+                    method: 'GET',
                     headers: {
                     "Content-Type": "application/json",
                     "Authorization": idToken
-                    },
-                    body: JSON.stringify({
-                    appointment: appointment.added
-                    })
+                    }
                 })
                 .then((response) => {
                     console.log('RESPONSE');
@@ -28,7 +23,7 @@ export const addAppointment = (appointment) => {
                 })
                 .then((myJson) => {
                     console.log(myJson);
-                    dispatch({type:LOADAPPOINTMENTS, appointments: myJson.appointments});
+                    dispatch({type:LOADPATIENTS, users: myJson.users});
                 })
             })
             .catch(err => console.log(err));

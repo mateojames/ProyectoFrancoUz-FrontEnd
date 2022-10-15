@@ -1,20 +1,20 @@
 
-export const ADDAPPOINTMENT = 'ADDAPPOINTMENT';
+export const EDITAPPOINTMENT = 'EDITAPPOINTMENT';
 export const LOADAPPOINTMENTS = 'LOADAPPOINTMENTS';
 
-export const addAppointment = (appointment) => {
+export const deleteAppointment = (event) => {
+    console.log("editAppointment");
+    console.log(event.deleted);
     return (dispatch, getState) => {
+        const appointmentId = event.deleted;
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('http://localhost:8080/session', {
-                    method: 'POST',
+                fetch(`http://localhost:8080/deleteSession/${appointmentId}`, {
+                    method: 'PUT',
                     headers: {
                     "Content-Type": "application/json",
                     "Authorization": idToken
                     },
-                    body: JSON.stringify({
-                    appointment: appointment.added
-                    })
                 })
                 .then((response) => {
                     console.log('RESPONSE');

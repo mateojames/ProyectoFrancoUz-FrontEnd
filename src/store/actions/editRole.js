@@ -1,19 +1,20 @@
 
-export const ADDAPPOINTMENT = 'ADDAPPOINTMENT';
-export const LOADAPPOINTMENTS = 'LOADAPPOINTMENTS';
+export const EDITUSER = 'EDITUSER';
 
-export const addAppointment = (appointment) => {
+export const editRole = (event, handleLoading) => {
+    console.log("editAppointment");
     return (dispatch, getState) => {
+        const uid = Object.keys(event.changed)[0];
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('http://localhost:8080/session', {
-                    method: 'POST',
+                fetch(`http://localhost:8080/userRole/${uid}`, {
+                    method: 'PUT',
                     headers: {
                     "Content-Type": "application/json",
                     "Authorization": idToken
                     },
                     body: JSON.stringify({
-                    appointment: appointment.added
+                    user: event.changed[uid]
                     })
                 })
                 .then((response) => {
@@ -27,8 +28,9 @@ export const addAppointment = (appointment) => {
                     return response.json();
                 })
                 .then((myJson) => {
+                    handleLoading()
                     console.log(myJson);
-                    dispatch({type:LOADAPPOINTMENTS, appointments: myJson.appointments});
+                    dispatch({type:EDITUSER, user: myJson.user});
                 })
             })
             .catch(err => console.log(err));

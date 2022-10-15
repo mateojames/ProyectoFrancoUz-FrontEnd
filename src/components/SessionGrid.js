@@ -29,7 +29,6 @@ import { Link } from "react-router-dom";
 const getRowId = row => row.id;
 
 const Cell = (props) => {
-  console.log('Cel ', props)
   const { column } = props;
   if (column.name === 'link') {
     return <Link

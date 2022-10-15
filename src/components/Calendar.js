@@ -1,4 +1,4 @@
-import React, {useState, useEffect  } from "react"
+import React, {useState, useEffect, useRef, useCallback} from "react"
 import Paper from '@mui/material/Paper';
 import {
   Scheduler,
@@ -39,6 +39,8 @@ import { Loading } from './Loading/Loading.js';
 import { loadPatients } from "../store/actions/loadPatients";
 import { loadProfessionals } from "../store/actions/loadProfessionals";
 import { loadLocations, loadTherapies } from "../store/actions/resources";
+import { useLocation } from "react-router-dom";
+import { TapAndPlay } from "@mui/icons-material";
 const PREFIX = 'FrancoUz';
 
 const classes = {
@@ -193,7 +195,7 @@ const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
   const onProfessionalFieldChange = (event, newValue) => {
     onFieldChange({ professional: newValue || null });
   };
-  
+  //console.log(restProps.appointmentRef);
   return (
     <AppointmentForm.BasicLayout
       appointmentData={appointmentData}
@@ -253,6 +255,8 @@ export default function Demo(){
   const handleCurrentDateChange = (currentDate) => {
     setCurrentDate(currentDate)
   }
+
+  const dataSession = useLocation();
 
   const addTherapy = (appointment) => {
     const therapy = therapies.find(therapy => therapy.id === appointment.therapy)
@@ -314,13 +318,31 @@ export default function Demo(){
       })}
   }
 
+  const handleSessionFocus = () => {
+    if(dataSession.state != undefined){
+      const date = dataSession.state.date;
+      console.log("Session info1 -->", date);
+
+      const d = date.slice(0,2);
+      const m = date.slice(3,5) - 1;
+      const y = date.slice(6,10);
+
+      const newDate = new Date(y, m, d);
+      console.log("Nueva fecha",newDate);
+
+      handleCurrentDateChange(newDate);
+    }
+  }
+  
+
   useEffect(() => {
     setLoading(true);
     dispatch(loadAppointments(handleLoading));
     dispatch(loadPatients());
     dispatch(loadProfessionals());
     dispatch(loadTherapies());
-    dispatch(loadLocations())
+    dispatch(loadLocations());
+    handleSessionFocus();
   }, []);
 
   useEffect(()=>{

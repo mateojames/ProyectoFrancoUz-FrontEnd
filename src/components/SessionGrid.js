@@ -23,7 +23,24 @@ import { Loading } from './Loading/Loading.js';
 import { loadAppointments } from "../store/actions/loadAppointments";
 import { loadLocations, loadTherapies } from "../store/actions/resources.js";
 
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { Link } from "react-router-dom";
+
 const getRowId = row => row.id;
+
+const Cell = (props) => {
+  console.log('Cel ', props)
+  const { column } = props;
+  if (column.name === 'link') {
+    return <Link
+    to={{
+      pathname: "/calendar",
+      state: props.row
+    }}
+  ><OpenInNewIcon/></Link>;
+  }
+  return <Table.Cell {...props} />;
+};
 
 export default function SessionsGrid(props) {
   const [columns] = useState([
@@ -33,7 +50,8 @@ export default function SessionsGrid(props) {
     { name: 'professional', title: 'Profesional' },
     { name: 'location', title: 'Ubicación' },
     { name: 'date', title: 'Fecha de inicio' },
-    { name: 'isRecurrent', title: '¿Es recurrente?' }
+    { name: 'isRecurrent', title: '¿Es recurrente?' },
+    { name: 'link', title: 'Link'}
   ]);
   const [rows, setRows] = useState([]);
   const appointments = useSelector(state => state.calendar.appointments);
@@ -104,7 +122,9 @@ export default function SessionsGrid(props) {
           defaultSorting={[]}
         />
         <IntegratedSorting />
-        <Table />
+        <Table
+          cellComponent={Cell}
+        />
         <TableHeaderRow showSortingControls />
         <Toolbar />
         <PagingPanel

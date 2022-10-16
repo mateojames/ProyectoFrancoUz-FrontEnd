@@ -247,10 +247,10 @@ export default function UsersGrid(props) {
   }, []);
 
   const [columnWidths, setColumnWidths] = useState([
-    { columnName: 'email', width: window.innerWidth/4 },
-    { columnName: 'isVerified', width: window.innerWidth/4 },
-    { columnName: 'role', width: window.innerWidth/4 },
-    { columnName: 'link', width: window.innerWidth/8 }
+    { columnName: 'email', width: window.innerWidth/columns.length },
+    { columnName: 'isVerified', width: window.innerWidth/columns.length },
+    { columnName: 'role', width: window.innerWidth/columns.length },
+    { columnName: 'link', width: window.innerWidth/(columns.length * 2) }
   ])
 
   /*useEffect(() => {
@@ -262,10 +262,10 @@ export default function UsersGrid(props) {
   useEffect(() => {
     function handleWindowResize() {
       setColumnWidths(
-        { columnName: 'email', width: window.innerWidth/4 },
-        { columnName: 'isVerified', width: window.innerWidth/4 },
-        { columnName: 'role', width: window.innerWidth/4 },
-        { columnName: 'link', width: window.innerWidth/8 });
+        { columnName: 'email', width: window.innerWidth/columns.length },
+        { columnName: 'isVerified', width: window.innerWidth/columns.length },
+        { columnName: 'role', width: window.innerWidth/columns.length },
+        { columnName: 'link', width: window.innerWidth/(columns.length * 2) });
     }
 
     window.addEventListener('resize', handleWindowResize);

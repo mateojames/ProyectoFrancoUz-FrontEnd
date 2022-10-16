@@ -17,7 +17,8 @@ import {
   PagingPanel,
   Toolbar,
   SearchPanel,
-  TableFilterRow
+  TableFilterRow,
+  TableColumnResizing
 } from '@devexpress/dx-react-grid-material-ui';
 import { Loading } from './Loading/Loading.js';
 import { loadAppointments } from "../store/actions/loadAppointments";
@@ -85,6 +86,17 @@ export default function SessionsGrid(props) {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
+  const [columnWidths, setColumnWidths] = useState([
+    { columnName: 'title', width: window.innerWidth/columns.length },
+    { columnName: 'therapy', width: window.innerWidth/columns.length},
+    { columnName: 'patient', width: window.innerWidth/columns.length },
+    { columnName: 'professional', width: window.innerWidth/columns.length },
+    { columnName: 'location', width: window.innerWidth/columns.length },
+    { columnName: 'date', width: window.innerWidth/columns.length },
+    { columnName: 'isRecurrent', width: window.innerWidth/columns.length },
+    { columnName: 'link', width: window.innerWidth/(columns.length * 2)}
+  ])
+
 
   const handleLoading = () => {
     setLoading(false)
@@ -124,6 +136,25 @@ export default function SessionsGrid(props) {
     handleAppointmentsToRows()
   }, [appointments, locations, therapies]);
 
+  useEffect(() => {
+    function handleWindowResize() {
+      setColumnWidths(
+        { columnName: 'title', width: window.innerWidth/columns.length },
+        { columnName: 'therapy', width: window.innerWidth/columns.length},
+        { columnName: 'patient', width: window.innerWidth/columns.length },
+        { columnName: 'professional', width: window.innerWidth/columns.length },
+        { columnName: 'location', width: window.innerWidth/columns.length },
+        { columnName: 'date', width: window.innerWidth/columns.length },
+        { columnName: 'isRecurrent', width: window.innerWidth/columns.length },
+        { columnName: 'link', width: window.innerWidth/(columns.length * 2)});
+    }
+
+    window.addEventListener('resize', handleWindowResize);
+
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, []);
 
   return (
     <Paper>
@@ -147,6 +178,10 @@ export default function SessionsGrid(props) {
         <IntegratedSorting />
         <Table
           cellComponent={Cell}
+        />
+        <TableColumnResizing
+          columnWidths={columnWidths}
+          onColumnWidthsChange={setColumnWidths}
         />
         <TableHeaderRow showSortingControls />
         <Toolbar />

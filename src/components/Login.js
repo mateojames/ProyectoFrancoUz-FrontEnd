@@ -41,7 +41,7 @@ export default function Login(props) {
           setError("")
           setLoading(true)
           await login(emailRef.current.value, passwordRef.current.value)
-          history.push("/inicio")
+          history.push("/calendar")
         } catch {
           setError("Error al ingresar")
         }
@@ -54,7 +54,7 @@ export default function Login(props) {
           setError("")
           setLoading(true)
           loginWithGoogle();
-          history.push("/inicio")
+          history.push("/calendar")
         } catch (error) {
           console.log(error)
           setError("Error al ingresar")

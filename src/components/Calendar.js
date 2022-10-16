@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef, useCallback} from "react"
+import React, {useState, useEffect} from "react"
 import Paper from '@mui/material/Paper';
 import {
   Scheduler,
@@ -22,7 +22,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Autocomplete } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import { ViewState, EditingState, IntegratedEditing} from '@devexpress/dx-react-scheduler';
+import { ViewState, EditingState} from '@devexpress/dx-react-scheduler';
 import Diversity2Icon from '@mui/icons-material/Diversity2';
 import EscalatorWarningIcon from '@mui/icons-material/EscalatorWarning';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
@@ -40,7 +40,6 @@ import { loadPatients } from "../store/actions/loadPatients";
 import { loadProfessionals } from "../store/actions/loadProfessionals";
 import { loadLocations, loadTherapies } from "../store/actions/resources";
 import { useLocation } from "react-router-dom";
-import { TapAndPlay } from "@mui/icons-material";
 const PREFIX = 'FrancoUz';
 
 const classes = {

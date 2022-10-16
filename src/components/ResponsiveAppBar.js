@@ -40,7 +40,7 @@ const ResponsiveAppBar = () => {
     };
 
     const handlePerfilClicked = () => {
-        history.push("/inicio")
+        history.push("/perfil")
     };
 
     const handleCalendarClicked = () => {

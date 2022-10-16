@@ -1,12 +1,11 @@
 import React from "react"
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
-import Dashboard from "./Dashboard"
 import Home from "./Home"
 import Calendar from "./Calendar"
-import UpdateProfile from "./UpdateProfile"
 import { useSelector } from 'react-redux'
 import UsersGrid from './Grid'
 import SessionsGrid from "./SessionGrid"
+import Profile from "./Profile"
 
 function AuthSwitch() {
 
@@ -15,10 +14,9 @@ function AuthSwitch() {
     const authRoutes = (
         <Switch>
             <Route exact path="/Calendar" component={Calendar} />
-            <Route path="/inicio" component={Dashboard}/>
-            <Route path="/update-profile" component={UpdateProfile}/>
-            <Route path="/usuarios" component={UsersGrid}/>
-            <Route path="/sesiones" component={SessionsGrid}/>
+            <Route exact path="/perfil" component={Profile}/>
+            <Route exact path="/usuarios" component={UsersGrid}/>
+            <Route exact path="/sesiones" component={SessionsGrid}/>
             <Route path="/" component={Home} />
         </Switch>
     );

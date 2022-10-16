@@ -1,10 +1,5 @@
 import React from "react"
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
-import Dashboard from "./Dashboard"
-import Home from "./Home"
-import Calendar from "./Calendar"
-import PrivateRoute from "./PrivateRoute"
-import UpdateProfile from "./UpdateProfile"
 import withRoot from "../withRoot"
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';

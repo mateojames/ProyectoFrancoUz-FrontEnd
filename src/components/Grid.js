@@ -39,6 +39,7 @@ import { loadUsers } from '../store/actions/loadUsers';
 import { editRole } from "../store/actions/editRole";
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Link, useHistory } from "react-router-dom";
+import MainBox from "./MainBox.js";
 
 
 const PREFIX = 'Demo';

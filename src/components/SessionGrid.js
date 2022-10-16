@@ -22,24 +22,47 @@ import {
 import { Loading } from './Loading/Loading.js';
 import { loadAppointments } from "../store/actions/loadAppointments";
 import { loadLocations, loadTherapies } from "../store/actions/resources.js";
-
+import IconButton from '@mui/material/IconButton';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 const getRowId = row => row.id;
 
+const ViewOnCalendarCell = (props) => {
+  console.log('PROPS ',props)
+  const history = useHistory()
+    return (
+    <Table.Cell {...props} style={{display: 'flex', alignContent: 'center' }}>
+        <IconButton
+          onClick={() => {
+            history.push({
+              pathname: "/calendar",
+              state: props.row
+            })
+          }}
+          title="Ver en Calendario"
+          size="large"
+          disabled={props.disabled}
+        >
+          <OpenInNewIcon/>
+        </IconButton>
+    </Table.Cell>);
+};
+
 const Cell = (props) => {
-  console.log('Cel ', props)
   const { column } = props;
   if (column.name === 'link') {
-    return <Link
-    to={{
-      pathname: "/calendar",
-      state: props.row
-    }}
-  ><OpenInNewIcon/></Link>;
+    return <ViewOnCalendarCell {...props} disabled={false}/>
   }
   return <Table.Cell {...props} />;
+};
+
+const FilterCell = (props) => {
+  const { column } = props;
+  if (column.name === 'link') {
+    return <></>;
+  }
+  return <TableFilterRow.Cell {...props} />;
 };
 
 export default function SessionsGrid(props) {
@@ -131,7 +154,9 @@ export default function SessionsGrid(props) {
           pageSizes={pageSizes}
         />
         <SearchPanel />
-        <TableFilterRow />
+        <TableFilterRow
+          cellComponent={FilterCell}
+        />
       </Grid>
       {loading && <Loading />}
     </Paper>

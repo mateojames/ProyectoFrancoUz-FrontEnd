@@ -17,12 +17,14 @@ import LogoFrancoUz from '../images/logoFrancoUz.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { showModal } from '../store/actions/modal';
 import { useHistory } from "react-router-dom";
-import Avatar from '@mui/material/Avatar';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import Tooltip from '@mui/material/Tooltip';
 import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
 import Badge from '@mui/material/Badge';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import PersonIcon from '@mui/icons-material/Person';
+import LoginIcon from '@mui/icons-material/Login';
+import BarMenu from "./BarMenu";
+import CalendarMenu from "./CalendarMenu";
 
 const drawerWidth = 240;
 
@@ -50,22 +52,42 @@ const ResponsiveAppBar = () => {
         dispatch(showModal())
     };
 
+    const [anchorMenu, setAnchorMenu] = useState(null);
+    const openMenu = Boolean(anchorMenu);
+    const handleMenuClick = (event) => {
+        setAnchorMenu(event.currentTarget);
+    };
+    const handleMenuClose = () => {
+        setAnchorMenu(null);
+    };
+
+    const [anchorCalendarMenu, setAnchorCalendarMenu] = useState(null);
+    const openCalendarMenu = Boolean(anchorCalendarMenu);
+    const handleCalendarMenuClick = (event) => {
+        setAnchorCalendarMenu(event.currentTarget);
+    };
+    const handleCalendarMenuClose = () => {
+        setAnchorCalendarMenu(null);
+    };
+
+
     var authWebOptions = (
-        <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                        <Button sx={{ my: 2, color: 'white', display: 'block' }} onClick={handleLoginClicked}>
-                           {currentUser ? 'Bokita' : 'Ingresar'} 
+        <Box sx={{ display:'flex'}}>
+                        <Button sx={{ my: 2, color: 'white', display: { xs: 'block', md: 'block' } }} onClick={handleLoginClicked}>
+                           Ingresar
                         </Button>
-                        <Button sx={{ my: 2, color: 'white', display: 'block' }} >
+                        <Button sx={{ my: 2, color: 'white', display: { xs: 'none', md: 'block' } }} >
                         Conozcanos
                         </Button>
-                        <Button sx={{ my: 2, color: 'white', display: 'block' }}>
+                        <Button sx={{ my: 2, color: 'white',display: { xs: 'none', md: 'block' } }}>
                             Historia
                         </Button>
         </Box>
+        
     );
     if(currentUser){
         authWebOptions = (
-            <Box sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'space-around' }}>
+            <Box sx={{ display: { xs: 'flex', md: 'flex' }, justifyContent: 'space-around' }}>
                         <Tooltip title="Notificaciones">
                             <IconButton color="inherit" sx={{ mr: 3 }}>
                                 <Badge badgeContent={4} color="error">
@@ -74,13 +96,13 @@ const ResponsiveAppBar = () => {
                             </IconButton>
                          </Tooltip>
                         <Tooltip title="Calendario">
-                            <IconButton onClick={handleCalendarClicked} color="inherit" sx={{ mr: 2 }}>
+                            <IconButton onClick={handleCalendarMenuClick} color="inherit" sx={{ mr: 2 }}>
                                 <InsertInvitationIcon />
                             </IconButton>
                         </Tooltip>
-                        <Tooltip title="Perfil">
-                            <IconButton onClick={handlePerfilClicked} color="inherit" sx={{ mr: 0 }}>
-                                <PersonIcon />
+                        <Tooltip title="Panel de administrador">
+                            <IconButton onClick={handleMenuClick} color="inherit" sx={{ mr: 0 }}>
+                                <ManageAccountsIcon />
                             </IconButton>
                         </Tooltip>
             </Box>
@@ -130,67 +152,71 @@ const ResponsiveAppBar = () => {
 
 
     return (
-        <Box sx={{ display: 'flex'}}>
-            <AppBar position="static">
-            <Container maxWidth="xxl">
-                <Toolbar disableGutters>
-                    <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-                        <IconButton
-                            size="large"
-                            aria-label="account of current user"
-                            aria-controls="menu-appbar"
-                            aria-haspopup="true"
-                            color="inherit"
-                            onClick={handleDrawerToggle}
-                        >
-                        <MenuIcon />
-                        </IconButton>
-                    </Box>
-
-                    <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'flex' }, mr: 2 }} >
-                        <Box container alignItems="center" justifyContent="center" display="flex" flexDirection="row">
-                            <img src={LogoFrancoUz} alt="LogoFrancoUz" style={{maxWidth: 40, marginRight: '10px', borderRadius: 20}} />
-                            <Typography
-                                variant="h6"
-                                noWrap
-                                component="a"
-                                href="/"
-                                sx={{
-                                display: { xs: 'none', md: 'flex' },
-                                mr: 2,
-                                fontWeight: 700,
-                                letterSpacing: '.3rem',
-                                color: 'inherit',
-                                textDecoration: 'none',
-                                }}
+        <>
+            <Box sx={{ display: 'flex'}}>
+                <AppBar position="static">
+                <Container maxWidth="xxl">
+                    <Toolbar disableGutters>
+                        <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+                            <IconButton
+                                size="large"
+                                aria-label="account of current user"
+                                aria-controls="menu-appbar"
+                                aria-haspopup="true"
+                                color="inherit"
+                                onClick={handleDrawerToggle}
                             >
-                                Asociación Franco Uz
-                            </Typography>
+                                <img src={LogoFrancoUz} alt="LogoFrancoUz" style={{maxWidth: 40, marginRight: '10px', borderRadius: 20}} />
+                            </IconButton>
                         </Box>
-                    </Box>
-                    {authWebOptions}
 
-                </Toolbar>
+                        <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, mr: 2 }} >
+                            <Box container alignItems="center" justifyContent="center" display="flex" flexDirection="row">
+                                <img src={LogoFrancoUz} alt="LogoFrancoUz" style={{maxWidth: 40, marginRight: '10px', borderRadius: 20}} />
+                                <Typography
+                                    variant="h6"
+                                    noWrap
+                                    component="a"
+                                    href="/"
+                                    sx={{
+                                    display: { xs: 'none', md: 'flex' },
+                                    mr: 2,
+                                    fontWeight: 700,
+                                    letterSpacing: '.3rem',
+                                    color: 'inherit',
+                                    textDecoration: 'none',
+                                    }}
+                                >
+                                    Asociación Franco Uz
+                                </Typography>
+                            </Box>
+                        </Box>
+                        {authWebOptions}
 
-            </Container>
-            </AppBar>
-            <Box component="nav">
-                <Drawer
-                    variant="temporary"
-                    open={mobileOpen}
-                    onClose={handleDrawerToggle}
-                    ModalProps={{
-                        keepMounted: true, // Better open performance on mobile.
-                    }}
-                    sx={{
-                        display: { xs: 'flex', md: 'none' },
-                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-                    }}
-                    >
-                    {drawer}
-                </Drawer>
+                    </Toolbar>
+
+                </Container>
+                </AppBar>
+                <Box component="nav">
+                    <Drawer
+                        variant="temporary"
+                        open={mobileOpen}
+                        onClose={handleDrawerToggle}
+                        ModalProps={{
+                            keepMounted: true, // Better open performance on mobile.
+                        }}
+                        sx={{
+                            display: { xs: 'flex', md: 'none' },
+                            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+                        }}
+                        >
+                        {drawer}
+                    </Drawer>
+                </Box>
             </Box>
-        </Box>
+            <BarMenu open={openMenu} handleClose={handleMenuClose} handleClick={handleMenuClick} anchorEl={anchorMenu}/>
+            <CalendarMenu open={openCalendarMenu} handleClose={handleCalendarMenuClose} handleClick={handleCalendarClicked} anchorEl={anchorCalendarMenu}/>
+        </>
     );
 };
 export default ResponsiveAppBar;

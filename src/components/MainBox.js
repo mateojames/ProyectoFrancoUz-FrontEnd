@@ -24,7 +24,7 @@ export default function MainBox(props) {
   return (
     <Box sx={{display: 'flex', alignContent:'center', justifyContent: 'center', alignItems: 'center'}}>
       <Paper elevation={10} 
-          style={{display: 'flex', alignContent:'center', justifyContent: 'center', alignItems: 'center', height: 0.9*windowSize.innerHeight, width: 0.95*windowSize.innerWidth}}
+          style={{display: 'flex',  flexDirection: props.flexDirection,alignContent:'center', justifyContent: 'center', alignItems: 'center', height: 0.9*windowSize.innerHeight, width: 0.95*windowSize.innerWidth}}
           sx={{margin:1}}
         >
         {props.children}

@@ -75,7 +75,7 @@ export default function SessionsGrid(props) {
     { name: 'location', title: 'Ubicación' },
     { name: 'date', title: 'Fecha de inicio' },
     { name: 'isRecurrent', title: '¿Es recurrente?' },
-    { name: 'link', title: 'Link'}
+    { name: 'link', title: 'Ver en Calendario'}
   ]);
   const [rows, setRows] = useState([]);
   const appointments = useSelector(state => state.calendar.appointments);
@@ -94,7 +94,7 @@ export default function SessionsGrid(props) {
     { columnName: 'location', width: window.innerWidth/columns.length },
     { columnName: 'date', width: window.innerWidth/columns.length },
     { columnName: 'isRecurrent', width: window.innerWidth/columns.length },
-    { columnName: 'link', width: window.innerWidth/(columns.length * 2)}
+    { columnName: 'link', width: window.innerWidth/(columns.length )}
   ])
 
 

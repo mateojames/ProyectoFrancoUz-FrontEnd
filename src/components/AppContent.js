@@ -1,4 +1,4 @@
-import React, {useEffect} from "react"
+import React, {useEffect, useState} from "react"
 import ResponsiveAppBar from "./ResponsiveAppBar"
 import AuthSwitch from "./Switch"
 import { setCurrentUser, setLoading } from "../store/actions/auth";
@@ -11,7 +11,16 @@ import { useDispatch, useSelector } from 'react-redux';
 function AppContent() {
 
     const isLoading = useSelector(state => state.auth.isLoading);
+    const user = useSelector(state => state.auth.currentUser);
+    const [role, setRole] = useState(null)
     const dispatch = useDispatch();
+
+    async function obtainClaims() {
+        const IdToken = user ? await user.getIdTokenResult() : null
+        if(IdToken){
+            setRole(IdToken.claims.role)
+        }
+    }
     
     useEffect(() => {
         dispatch(setLoading());
@@ -24,14 +33,28 @@ function AppContent() {
         return () => unsubuscribe();
     }, []);
 
+    useEffect (() => {
+        obtainClaims()
+    }, [user])
+
+    useEffect (() => {
+        console.log('rol ',role)
+    }, [role])
+
     const authContent = (
         <>
-            <ResponsiveAppBar/>
-            <AuthSwitch/>
+            <ResponsiveAppBar role={role}/>
+            <AuthSwitch role={role}/>
         </>
     )
 
-     return (isLoading ? null : authContent)
+    var content = null
+
+    if(!isLoading && ((user != null  && role != null) || user === null)){
+        content = authContent
+    }
+
+     return (content)
 }
 
 export default AppContent;

@@ -35,6 +35,46 @@ export default function BarMenu(props) {
         history.push("/usuarios")
     }
 
+    var items = (<>
+        <MenuItem>
+          <Avatar /> Perfil
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleLogout}>
+          <ListItemIcon>
+            <Logout fontSize="small" />
+          </ListItemIcon>
+          Cerrar Sesión
+        </MenuItem>
+    </>)
+
+    if(props.role === 'admin'){
+        items = (<>
+            <MenuItem>
+              <Avatar /> Perfil
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={handleAdminUsers}>
+              <ListItemIcon>
+                <GroupIcon fontSize="small" />
+              </ListItemIcon>
+              Administar Usuarios
+            </MenuItem>
+            <MenuItem>
+              <ListItemIcon>
+                <Settings fontSize="small" />
+              </ListItemIcon>
+              Configuración
+            </MenuItem>
+            <MenuItem onClick={handleLogout}>
+              <ListItemIcon>
+                <Logout fontSize="small" />
+              </ListItemIcon>
+              Cerrar Sesión
+            </MenuItem>
+        </>)
+    }
+
   return (
       <Menu
         anchorEl={props.anchorEl}
@@ -71,28 +111,7 @@ export default function BarMenu(props) {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem>
-          <Avatar /> Perfil
-        </MenuItem>
-        <Divider />
-        <MenuItem onClick={handleAdminUsers}>
-          <ListItemIcon>
-            <GroupIcon fontSize="small" />
-          </ListItemIcon>
-          Administar Usuarios
-        </MenuItem>
-        <MenuItem>
-          <ListItemIcon>
-            <Settings fontSize="small" />
-          </ListItemIcon>
-          Configuración
-        </MenuItem>
-        <MenuItem onClick={handleLogout}>
-          <ListItemIcon>
-            <Logout fontSize="small" />
-          </ListItemIcon>
-          Cerrar Sesión
-        </MenuItem>
+        {items}
       </Menu>
   );
 }

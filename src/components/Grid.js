@@ -216,6 +216,7 @@ export default function UsersGrid(props) {
     { name: 'link', title: 'Perfil' }
   ]);
   const rows = useSelector(state => state.user.users);
+  const currentUser = useSelector(state => state.auth.currentUser);
   const [editingStateColumnExtensions] = useState([
     { columnName: 'email', editingEnabled: false },
     { columnName: 'isVerified', editingEnabled: false }
@@ -279,7 +280,7 @@ export default function UsersGrid(props) {
   return (
     <Paper>
       <Grid
-        rows={rows}
+        rows={rows ? rows.filter((user) => user.id != currentUser.uid) : []}
         locale='es-ES'
         columns={columns}
         getRowId={getRowId}

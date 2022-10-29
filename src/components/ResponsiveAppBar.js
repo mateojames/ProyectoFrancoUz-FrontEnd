@@ -28,7 +28,7 @@ import CalendarMenu from "./CalendarMenu";
 
 const drawerWidth = 240;
 
-const ResponsiveAppBar = () => {
+const ResponsiveAppBar = (props) => {
     const [mobileOpen, setMobileOpen] = useState(false);
     
     const currentUser = useSelector(state => state.auth.currentUser);
@@ -100,7 +100,7 @@ const ResponsiveAppBar = () => {
                                 <InsertInvitationIcon />
                             </IconButton>
                         </Tooltip>
-                        <Tooltip title="Panel de administrador">
+                        <Tooltip title="Opciones de Usuario">
                             <IconButton onClick={handleMenuClick} color="inherit" sx={{ mr: 0 }}>
                                 <ManageAccountsIcon />
                             </IconButton>
@@ -214,7 +214,7 @@ const ResponsiveAppBar = () => {
                     </Drawer>
                 </Box>
             </Box>
-            <BarMenu open={openMenu} handleClose={handleMenuClose} handleClick={handleMenuClick} anchorEl={anchorMenu}/>
+            <BarMenu open={openMenu} handleClose={handleMenuClose} handleClick={handleMenuClick} anchorEl={anchorMenu} role={props.role}/>
             <CalendarMenu open={openCalendarMenu} handleClose={handleCalendarMenuClose} handleClick={handleCalendarClicked} anchorEl={anchorCalendarMenu}/>
         </>
     );

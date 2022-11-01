@@ -5,6 +5,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline';
 import EventIcon from '@mui/icons-material/Event';
 import { useHistory } from "react-router-dom"
+import finalPropsSelectorFactory from "react-redux/es/connect/selectorFactory";
 
 export default function CalendarMenu(props) {
     const history = useHistory()
@@ -21,7 +22,7 @@ export default function CalendarMenu(props) {
       <Menu
         anchorEl={props.anchorEl}
         id="account-menu"
-        open={props.open}
+        open={ (props.role === 'Sin asignar' || props.role === undefined) ? false : props.open}
         onClose={props.handleClose}
         onClick={props.handleClose}
         PaperProps={{

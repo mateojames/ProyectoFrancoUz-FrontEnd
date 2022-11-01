@@ -240,7 +240,7 @@ const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
 
 
 
-export default function Demo(){
+export default function AdminCalendar(){
   const [currentDate, setCurrentDate] = useState(new Date())
   const data = useSelector(state => state.calendar.appointments);
   const [resources, setResources] = useState([

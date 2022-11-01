@@ -215,7 +215,7 @@ const ResponsiveAppBar = (props) => {
                 </Box>
             </Box>
             <BarMenu open={openMenu} handleClose={handleMenuClose} handleClick={handleMenuClick} anchorEl={anchorMenu} role={props.role}/>
-            <CalendarMenu open={openCalendarMenu} handleClose={handleCalendarMenuClose} handleClick={handleCalendarClicked} anchorEl={anchorCalendarMenu}/>
+            <CalendarMenu open={openCalendarMenu} handleClose={handleCalendarMenuClose} handleClick={handleCalendarClicked} anchorEl={anchorCalendarMenu} role={props.role}/>
         </>
     );
 };

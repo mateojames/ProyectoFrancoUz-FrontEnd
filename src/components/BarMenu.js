@@ -13,6 +13,7 @@ import { auth } from "../firebase"
 import {
     signOut
   } from "firebase/auth";
+import { MenuList } from "@mui/material";
 
 export default function BarMenu(props) {
     const [error, setError] = useState("")
@@ -35,7 +36,7 @@ export default function BarMenu(props) {
         history.push("/usuarios")
     }
 
-    var items = (<>
+    var items = (<MenuList>
         <MenuItem>
           <Avatar /> Perfil
         </MenuItem>
@@ -46,10 +47,10 @@ export default function BarMenu(props) {
           </ListItemIcon>
           Cerrar Sesión
         </MenuItem>
-    </>)
+        </MenuList>)
 
     if(props.role === 'admin'){
-        items = (<>
+        items = (<MenuList>
             <MenuItem>
               <Avatar /> Perfil
             </MenuItem>
@@ -72,7 +73,7 @@ export default function BarMenu(props) {
               </ListItemIcon>
               Cerrar Sesión
             </MenuItem>
-        </>)
+        </MenuList>)
     }
 
   return (

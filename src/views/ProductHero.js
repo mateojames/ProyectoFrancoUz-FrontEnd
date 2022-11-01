@@ -5,7 +5,7 @@ import ProductHeroLayout from './ProductHeroLayout';
 
 import ImageFrancoUz from '../images/frente3.png';
 
-export default function ProductHero() {
+export default function ProductHero(props) {
   return (
     <ProductHeroLayout
       sxBackground={{
@@ -21,7 +21,7 @@ export default function ProductHero() {
         alt="increase priority"
       />
       <Typography color="inherit" align="center" variant="h2" marked="center">
-        Por una mirada feliz
+        {props.title}
       </Typography>
       <Typography
         color="inherit"
@@ -29,9 +29,10 @@ export default function ProductHero() {
         variant="h5"
         sx={{ mb: 4, mt: { sx: 4, sm: 10 } }}
       >
-        Nuestro propósito es brindar un espacio en el que la persona con diagnóstico de TGD-TEA se encuentre contenido a la vez que lleve a cabo su tratamiento.
+        {props.description}
       </Typography>
       <Button
+        show={props.showConozcanos}
         color="secondary"
         variant="contained"
         size="large"

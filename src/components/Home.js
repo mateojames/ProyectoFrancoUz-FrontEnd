@@ -16,7 +16,8 @@ export default function Home() {
 
   const show = useSelector(state => state.modal.show);
   const dispatch = useDispatch();
-
+  const title = 'Por una mirada feliz'
+  const description = 'Nuestro propósito es brindar un espacio en el que la persona con diagnóstico de TGD-TEA se encuentre contenido a la vez que lleve a cabo su tratamiento.'
   const handleModalClose = () => {
     dispatch(hideModal())
     setShowLogin(true);
@@ -62,7 +63,7 @@ export default function Home() {
 
   return (
     <>     
-      <ProductHero />
+      <ProductHero title={title} description={description} showConozcanos={true} />
       <Modal show={show} centered onHide={handleModalClose}>
         <Modal.Body>
           {form}

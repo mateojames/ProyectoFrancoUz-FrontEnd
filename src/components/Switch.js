@@ -1,12 +1,15 @@
 import React from "react"
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import Home from "./Home"
-import Calendar from "./Calendar"
+import AdminCalendar from "./AdminCalendar"
 import { useSelector } from 'react-redux'
 import UsersGrid from './Grid'
 import SessionsGrid from "./SessionGrid"
 import Profile from "./Profile"
 import {auth} from '../firebase'
+import PatientCalendar from "./PatientCalendar"
+import ProfessionalCalendar from "./ProfessionalCalendar"
+import NotAsignedHome from "./NotAsignedHome"
 
 
 
@@ -16,7 +19,7 @@ function AuthSwitch(props) {
     
     const authAdminRoutes = (
         <Switch>
-            <Route exact path="/Calendar" component={Calendar} />
+            <Route exact path="/Calendar" component={AdminCalendar} />
             <Route exact path="/perfil" component={Profile}/>
             <Route exact path="/usuarios" component={UsersGrid}/>
             <Route exact path="/sesiones" component={SessionsGrid}/>
@@ -26,7 +29,7 @@ function AuthSwitch(props) {
 
     const authPatientRoutes = (
         <Switch>
-            <Route exact path="/Calendar" component={Calendar} />
+            <Route exact path="/Calendar" component={PatientCalendar} />
             <Route exact path="/perfil" component={Profile}/>
             <Route path="/" component={Home} />
         </Switch>
@@ -34,7 +37,7 @@ function AuthSwitch(props) {
 
     const authProfessionalRoutes = (
         <Switch>
-            <Route exact path="/Calendar" component={Calendar} />
+            <Route exact path="/Calendar" component={ProfessionalCalendar} />
             <Route exact path="/perfil" component={Profile}/>
             <Route exact path="/sesiones" component={SessionsGrid}/>
             <Route path="/" component={Home} />
@@ -43,8 +46,7 @@ function AuthSwitch(props) {
 
     const authUndefinedRoutes = (
         <Switch>
-            <Route exact path="/Calendar" component={Calendar} />
-            <Route path="/" component={Home} />
+            <Route path="/" component={NotAsignedHome} />
         </Switch>
     );
 

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react"
+import React, {useState, useEffect, useRef} from "react"
 import Paper from '@mui/material/Paper';
 import {
   Scheduler,
@@ -34,6 +34,17 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { List, ListItem } from "@mui/material";
+import InputBase from "@mui/material/InputBase";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import InsertCommentIcon from "@mui/icons-material/InsertComment";
+import SendIcon from '@mui/icons-material/Send';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import Avatar from '@mui/material/Avatar';
+import FormControl from '@mui/material/FormControl';
+import { addComment } from "../store/actions/addComment";
+
 const PREFIX = 'FrancoUz';
 
 const classes = {
@@ -44,6 +55,7 @@ const classes = {
   thirdRoom: `${PREFIX}-SalaJuegos`,
   bomboneraRoom: `${PREFIX}-LaBombonera`,
   header: `${PREFIX}-header`,
+  layout: `${PREFIX}-layout`,
   commandButton: `${PREFIX}-commandButton`,
 };
 
@@ -109,84 +121,9 @@ const getClassByLocation = (classes, location) => {
   return classes.thirdRoom;
 };
 
-const Header = (({
-  children, appointmentData, ...restProps
-}) => (
-  <StyledAppointmentTooltipHeader
-    {...restProps}
-    className={classNames(getClassByLocation(classes, appointmentData.location), classes.header)}
-    appointmentData={appointmentData}
-  >
-  </StyledAppointmentTooltipHeader>
-));
-
-const Content = (({
-  children, appointmentData, ...restProps
-}) => (
-  <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
-    <Grid container alignItems="center" rowSpacing={1}>
-      <StyledGrid item xs={2} className={classes.textCenter}>
-        <StyledPatient className={classes.icon} />
-      </StyledGrid>
-      <Grid item xs={10}>
-        <span style={{fontWeight: 'bold'}}>Paciente: </span>
-        <span>{appointmentData.patient.name}</span>
-      </Grid>
-      <StyledGrid item xs={2} className={classes.textCenter}>
-        <StyledProfessional className={classes.icon} />
-      </StyledGrid>
-      <Grid item xs={10}>
-        <span style={{fontWeight: 'bold'}}>Profesional: </span>
-        <span>{appointmentData.professional.name}</span>
-      </Grid>
-    </Grid>
-    <List style={{maxHeight: '250px', overflow:'auto'}}>
-    <ListItem>
-      <Accordion>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
-        >
-          <Typography>Accordion 1</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget.
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
-      </ListItem>
-      <ListItem>
-      <Accordion>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel2a-content"
-          id="panel2a-header"
-        >
-          <Typography>Accordion 2</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget.
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
-      </ListItem>
-    </List>
-  </AppointmentTooltip.Content>
-));
-
-const CommandButton = (({
-  ...restProps
-}) => (
-  <StyledAppointmentTooltipCommandButton {...restProps} className={classes.commandButton} />
-));
-
 
 export default function ProfessionalCalendar(){
+    const [windowSize, setWindowSize] = useState(getWindowSize());
   const [currentDate, setCurrentDate] = useState(new Date())
   const data = useSelector(state => state.calendar.appointments);
   const [resources, setResources] = useState([
@@ -197,12 +134,71 @@ export default function ProfessionalCalendar(){
   const locations = useSelector(state => state.resource.locations);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const commentRef = useRef()
+  const currentUser = useSelector(state => state.auth.currentUser);
   const handleCurrentDateChange = (currentDate) => {
     setCurrentDate(currentDate)
   }
 
   const dataSession = useLocation();
 
+  function getWindowSize() {
+    const {innerWidth, innerHeight} = window;
+    return {innerWidth, innerHeight};
+  }
+
+  useEffect(() => {
+    function handleWindowResize() {
+      setWindowSize(getWindowSize());
+    }
+
+    window.addEventListener('resize', handleWindowResize);
+
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, []);
+
+  const StyledAppointmentTooltipLayout = styled(AppointmentTooltip.Layout)(() => ({
+    [`&.${classes.layout}`]: {
+        maxHeight: windowSize.innerHeight / 1.5
+    },
+  }));
+
+  const hanldeSubmitComment = (appointment) => {
+    //console.log('comentario: ', commentRef.current.value)
+    console.log('appointment, ', appointment)
+    //console.log('user, ', currentUser)
+    const authorData = appointment.patient.id === currentUser.uid ? { role: 'paciente', ...appointment.patient} : { role: 'paciente', ...appointment.professional}
+   //console.log('author, ', authorData)
+    const comment = {
+        id: new Date().valueOf().toString(),
+        author: authorData,
+        comment: commentRef.current.value,
+        date: new Date().toLocaleDateString('en-GB').concat(' ', new Date().toLocaleTimeString())
+    }
+    const commentActionData = {
+        appointment: appointment.id,
+        comment: comment
+    }
+    console.log('object comment, ', commentActionData)
+    //dispatch(addComment(commentActionData))
+    commentRef.current.value = ''
+  }
+
+  
+const Layout = (({
+    children, ...restProps
+  }) => { 
+    console.log('children, ', children)
+    console.log('restProps, ', restProps)
+    return (
+    <StyledAppointmentTooltipLayout
+      {...restProps}
+      className={classNames(classes.layout)}
+    >
+    </StyledAppointmentTooltipLayout>
+  )});
 
   const handleLoading = () => {
     setLoading(false)
@@ -221,6 +217,152 @@ export default function ProfessionalCalendar(){
       {children}
     </Appointments.Appointment>
   );
+
+  const Header = (({
+    children, appointmentData, ...restProps
+  }) => (
+    <StyledAppointmentTooltipHeader
+      {...restProps}
+      className={classNames(getClassByLocation(classes, appointmentData.location), classes.header)}
+      appointmentData={appointmentData}
+    >
+    </StyledAppointmentTooltipHeader>
+  ));
+  
+  const Content = (({
+    children, appointmentData, ...restProps
+  }) => {
+      return (
+    <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
+      <Grid container alignItems="center" rowSpacing={1}>
+        <StyledGrid item xs={2} className={classes.textCenter}>
+          <StyledPatient className={classes.icon} />
+        </StyledGrid>
+        <Grid item xs={10}>
+          <span style={{fontWeight: 'bold'}}>Paciente: </span>
+          <span>{appointmentData.patient.name}</span>
+        </Grid>
+        <StyledGrid item xs={2} className={classes.textCenter}>
+          <StyledProfessional className={classes.icon} />
+        </StyledGrid>
+        <Grid item xs={10}>
+          <span style={{fontWeight: 'bold'}}>Profesional: </span>
+          <span>{appointmentData.professional.name}</span>
+        </Grid>
+      </Grid>
+      <List style={{maxHeight: windowSize.innerHeight / 3.5, overflow:'auto'}}>
+      <ListItem>
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
+          >
+            <Typography>Ver Comentarios</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+          <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+      <ListItem alignItems="flex-start">
+        <ListItemAvatar>
+          <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+        </ListItemAvatar>
+        <ListItemText
+          primary="Brunch this weekend?"
+          secondary={
+            <React.Fragment>
+              <Typography
+                sx={{ display: 'inline' }}
+                component="span"
+                variant="body2"
+                color="text.primary"
+              >
+                Ali Connors
+              </Typography>
+              {" — I'll be in your neighborhood doing errands this…"}
+            </React.Fragment>
+          }
+        />
+      </ListItem>
+      <Divider variant="inset" component="li" />
+      <ListItem alignItems="flex-start">
+        <ListItemAvatar>
+          <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
+        </ListItemAvatar>
+        <ListItemText
+          primary="Summer BBQ"
+          secondary={
+            <React.Fragment>
+              <Typography
+                sx={{ display: 'inline' }}
+                component="span"
+                variant="body2"
+                color="text.primary"
+              >
+                to Scott, Alex, Jennifer
+              </Typography>
+              {" — Wish I could come, but I'm out of town this…"}
+            </React.Fragment>
+          }
+        />
+      </ListItem>
+      <Divider variant="inset" component="li" />
+      <ListItem alignItems="flex-start">
+        <ListItemAvatar>
+          <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
+        </ListItemAvatar>
+        <ListItemText
+          primary="Oui Oui"
+          secondary={
+            <React.Fragment>
+              <Typography
+                sx={{ display: 'inline' }}
+                component="span"
+                variant="body2"
+                color="text.primary"
+              >
+                Sandra Adams
+              </Typography>
+              {' — Do you have Paris recommendations? Have you ever…'}
+            </React.Fragment>
+          }
+        />
+      </ListItem>
+    </List>
+          </AccordionDetails>
+        </Accordion>
+        </ListItem>
+        <ListItem>
+                <Paper
+            component="form"
+            sx={{ p: "2px 4px", display: "flex", alignItems: "center", width: 400 }}
+            >
+            <IconButton color="primary" sx={{ p: "10px" }} disabled>
+                <InsertCommentIcon />
+            </IconButton>
+            <FormControl sx={{ ml: 1, flex: 1 }}>
+            <InputBase
+                inputRef={commentRef}
+                placeholder="Agregar comentario"
+                inputProps={{ "aria-label": "Agregar comentario" }}
+            />
+            </FormControl>
+            <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+            <IconButton color="primary" sx={{ p: "10px" }} aria-label="directions" onClick={() => hanldeSubmitComment(appointmentData)}>
+                <SendIcon/>
+            </IconButton>
+            </Paper>
+        </ListItem>
+      </List>
+    </AppointmentTooltip.Content>
+  )}
+  );
+  
+  const CommandButton = (({
+    ...restProps
+  }) => (
+    <StyledAppointmentTooltipCommandButton {...restProps} className={classes.commandButton} />
+  ));
+  
 
   const handleTherapiesToResources = () => {
     if(therapies.length > 0){
@@ -311,6 +453,7 @@ export default function ProfessionalCalendar(){
             headerComponent={Header}
             contentComponent={Content}
             commandButtonComponent={CommandButton}
+            layoutComponent={Layout}
             showCloseButton
           />
           <Resources

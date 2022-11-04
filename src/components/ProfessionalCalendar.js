@@ -44,6 +44,7 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import FormControl from '@mui/material/FormControl';
 import { addComment } from "../store/actions/addComment";
+import Badge from '@mui/material/Badge';
 
 const PREFIX = 'FrancoUz';
 
@@ -161,7 +162,8 @@ export default function ProfessionalCalendar(){
 
   const StyledAppointmentTooltipLayout = styled(AppointmentTooltip.Layout)(() => ({
     [`&.${classes.layout}`]: {
-        maxHeight: windowSize.innerHeight / 1.5
+        maxHeight: windowSize.innerHeight / 1.5,
+        
     },
   }));
 
@@ -182,7 +184,7 @@ export default function ProfessionalCalendar(){
         comment: comment
     }
     console.log('object comment, ', commentActionData)
-    //dispatch(addComment(commentActionData))
+    dispatch(addComment(commentActionData))
     commentRef.current.value = ''
   }
 
@@ -228,10 +230,63 @@ const Layout = (({
     >
     </StyledAppointmentTooltipHeader>
   ));
-  
+  const [expanded, setExpanded] = useState(false);
   const Content = (({
     children, appointmentData, ...restProps
   }) => {
+
+    const commentsList = (
+            <List sx={{bgcolor: 'background.paper', maxHeight: windowSize.innerHeight / 4, overflow:'auto'}}>
+                {appointmentData.comments.map((item) => {
+                    return (
+                        <>
+                        <ListItem alignItems="flex-start">
+                            <ListItemAvatar>
+                                <Avatar alt={item.author.name} />
+                            </ListItemAvatar>
+                            <ListItemText
+                            primary={
+                                <React.Fragment>
+                                <Typography
+                                    component="span"
+                                    variant="body1"
+                                    color="text.primary"
+                                >
+                                    {item.comment}
+                                </Typography>
+                                </React.Fragment>
+                            }
+                            secondary={
+                                <React.Fragment>
+                                <Typography
+                                    sx={{ display: 'inline' }}
+                                    component="span"
+                                    variant="body4"
+                                    color="text.secondary"
+                                >
+                                    {item.author.name + ' - ' + item.author.role}
+                                </Typography>
+                                <br></br>
+                                <Typography
+                                    sx={{ display: 'inline' }}
+                                    component="span"
+                                    variant="body6"
+                                    color="text.secondary"
+                                >
+                                    {item.date}
+                                </Typography>
+                                </React.Fragment>
+                            }
+                            
+                            />
+                        </ListItem>
+                         <Divider variant="inset" component="li" />
+                         </>
+                    )
+                })}
+            </List>
+        )
+
       return (
     <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
       <Grid container alignItems="center" rowSpacing={1}>
@@ -250,92 +305,26 @@ const Layout = (({
           <span>{appointmentData.professional.name}</span>
         </Grid>
       </Grid>
-      <List style={{maxHeight: windowSize.innerHeight / 3.5, overflow:'auto'}}>
-      <ListItem>
-        <Accordion>
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1a-content"
-            id="panel1a-header"
-          >
-            <Typography>Ver Comentarios</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-          <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Brunch this weekend?"
-          secondary={
-            <React.Fragment>
-              <Typography
-                sx={{ display: 'inline' }}
-                component="span"
-                variant="body2"
-                color="text.primary"
-              >
-                Ali Connors
-              </Typography>
-              {" — I'll be in your neighborhood doing errands this…"}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-      <Divider variant="inset" component="li" />
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Summer BBQ"
-          secondary={
-            <React.Fragment>
-              <Typography
-                sx={{ display: 'inline' }}
-                component="span"
-                variant="body2"
-                color="text.primary"
-              >
-                to Scott, Alex, Jennifer
-              </Typography>
-              {" — Wish I could come, but I'm out of town this…"}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-      <Divider variant="inset" component="li" />
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Oui Oui"
-          secondary={
-            <React.Fragment>
-              <Typography
-                sx={{ display: 'inline' }}
-                component="span"
-                variant="body2"
-                color="text.primary"
-              >
-                Sandra Adams
-              </Typography>
-              {' — Do you have Paris recommendations? Have you ever…'}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-    </List>
-          </AccordionDetails>
-        </Accordion>
-        </ListItem>
-        <ListItem>
-                <Paper
-            component="form"
-            sx={{ p: "2px 4px", display: "flex", alignItems: "center", width: 400 }}
-            >
+      <Divider variant="middle" sx={{mt: 2, mb: 2}}/>
+    <Accordion onChange={() => setExpanded((previousState) => !previousState)} expanded={expanded}>
+        <AccordionSummary
+          expandIcon={
+            <Badge badgeContent={appointmentData.comments.length} color="primary" invisible={expanded}>
+                <ExpandMoreIcon />
+            </Badge>}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography>Ver Comentarios</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+            {commentsList}
+        </AccordionDetails>
+      </Accordion>
+      <Paper
+        component="form"
+        sx={{ p: "2px 4px", display: "flex", alignItems: "center", mt: 1}}
+        >
             <IconButton color="primary" sx={{ p: "10px" }} disabled>
                 <InsertCommentIcon />
             </IconButton>
@@ -350,9 +339,7 @@ const Layout = (({
             <IconButton color="primary" sx={{ p: "10px" }} aria-label="directions" onClick={() => hanldeSubmitComment(appointmentData)}>
                 <SendIcon/>
             </IconButton>
-            </Paper>
-        </ListItem>
-      </List>
+        </Paper>
     </AppointmentTooltip.Content>
   )}
   );

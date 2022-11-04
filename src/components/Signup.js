@@ -5,7 +5,8 @@ import { Link, useHistory } from "react-router-dom"
 import { auth } from "../firebase"
 import {
   createUserWithEmailAndPassword,
-  sendEmailVerification
+  sendEmailVerification,
+  signOut
 } from "firebase/auth";
 import { useDispatch } from "react-redux"
 import { createUserProfile } from "../store/actions/createUser"
@@ -38,6 +39,7 @@ export default function Signup(props) {
       setError("")
       setLoading(true)
       await signup(nameRef.current.value, emailRef.current.value, passwordRef.current.value)
+      await signOut(auth)
       history.push("/")
     } catch {
       setError("Error al crear la cuenta")

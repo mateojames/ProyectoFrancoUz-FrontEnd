@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react"
+import React, {useState, useEffect, useRef} from "react"
 import Paper from '@mui/material/Paper';
 import {
   Scheduler,
@@ -40,6 +40,23 @@ import { loadPatients } from "../store/actions/loadPatients";
 import { loadProfessionals } from "../store/actions/loadProfessionals";
 import { loadLocations, loadTherapies } from "../store/actions/resources";
 import { useLocation } from "react-router-dom";
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { List, ListItem } from "@mui/material";
+import InputBase from "@mui/material/InputBase";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import InsertCommentIcon from "@mui/icons-material/InsertComment";
+import SendIcon from '@mui/icons-material/Send';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import Avatar from '@mui/material/Avatar';
+import FormControl from '@mui/material/FormControl';
+import { addComment } from "../store/actions/addComment";
+import Badge from '@mui/material/Badge';
 const PREFIX = 'FrancoUz';
 
 const classes = {
@@ -50,6 +67,7 @@ const classes = {
   thirdRoom: `${PREFIX}-SalaJuegos`,
   bomboneraRoom: `${PREFIX}-LaBombonera`,
   header: `${PREFIX}-header`,
+  layout: `${PREFIX}-layout`,
   commandButton: `${PREFIX}-commandButton`,
 };
 
@@ -115,6 +133,59 @@ const getClassByLocation = (classes, location) => {
   return classes.thirdRoom;
 };
 
+
+const StyledAppointmentTooltipLayout = styled(AppointmentTooltip.Layout)((props) => ({
+  [`&.${classes.layout}`]: {
+      maxHeight: props.size.innerHeight / 1.6
+      
+  },
+}));
+
+
+const Layout = (({
+  children, ...restProps
+}) => { 
+  const [windowSize, setWindowSize] = useState(getWindowSize());
+  useEffect(() => {
+      function handleWindowResize() {
+        setWindowSize(getWindowSize());
+      }
+  
+      window.addEventListener('resize', handleWindowResize);
+  
+      return () => {
+        window.removeEventListener('resize', handleWindowResize);
+      };
+    }, []);
+  return (
+  <StyledAppointmentTooltipLayout
+    {...restProps}
+    size={windowSize}
+    className={classNames(classes.layout)}
+  >
+  </StyledAppointmentTooltipLayout>
+)});
+
+function getWindowSize() {
+  const {innerWidth, innerHeight} = window;
+  return {innerWidth, innerHeight};
+}
+
+
+const Appointment = ({
+  children, style, ...restProps
+}) => (
+  <Appointments.Appointment
+    {...restProps}
+    style={{
+      ...style,
+      borderRadius: '8px',
+    }}
+  >
+    {children}
+  </Appointments.Appointment>
+);
+
 const Header = (({
   children, appointmentData, ...restProps
 }) => (
@@ -128,7 +199,105 @@ const Header = (({
 
 const Content = (({
   children, appointmentData, ...restProps
-}) => (
+}) => {
+
+  const [expanded, setExpanded] = useState(false);
+  const [windowSize, setWindowSize] = useState(getWindowSize());
+  const commentRef = useRef()
+  const currentUser = useSelector(state => state.auth.currentUser);
+  const dispatch = useDispatch();
+  const appointments = useSelector(state => state.calendar.appointments);
+  
+  let currentAppointment = appointments.find(appointment => appointment.id === appointmentData.id)
+  currentAppointment = currentAppointment ? currentAppointment : appointmentData
+  console.log('appointment ', currentAppointment)
+
+  useEffect(() => {
+      function handleWindowResize() {
+        setWindowSize(getWindowSize());
+      }
+  
+      window.addEventListener('resize', handleWindowResize);
+  
+      return () => {
+        window.removeEventListener('resize', handleWindowResize);
+      };
+    }, []);
+
+  const hanldeSubmitComment = (appointment) => {
+      //console.log('comentario: ', commentRef.current.value)
+      console.log('appointment, ', appointment)
+      //console.log('user, ', currentUser)
+      const authorData = appointment.patient.id === currentUser.uid ? { role: 'paciente', ...appointment.patient} : { role: 'paciente', ...appointment.professional}
+     //console.log('author, ', authorData)
+      const comment = {
+          id: new Date().valueOf().toString(),
+          author: authorData,
+          comment: commentRef.current.value,
+          date: new Date().toLocaleDateString('en-GB').concat(' ', new Date().toLocaleTimeString())
+      }
+      const commentActionData = {
+          appointment: appointment.id,
+          comment: comment
+      }
+      console.log('object comment, ', commentActionData)
+      dispatch(addComment(commentActionData))
+      commentRef.current.value = ''
+  }
+
+  const commentsList = (
+          <List sx={{bgcolor: 'background.paper', maxHeight: windowSize.innerHeight / 4, overflow:'auto'}}>
+              {currentAppointment.comments.map((item) => {
+                  return (
+                      <>
+                      <ListItem alignItems="flex-start">
+                          <ListItemAvatar>
+                              <Avatar alt={item.author.name} />
+                          </ListItemAvatar>
+                          <ListItemText
+                          primary={
+                              <React.Fragment>
+                              <Typography
+                                  component="span"
+                                  variant="body1"
+                                  color="text.primary"
+                              >
+                                  {item.comment}
+                              </Typography>
+                              </React.Fragment>
+                          }
+                          secondary={
+                              <React.Fragment>
+                              <Typography
+                                  sx={{ display: 'inline' }}
+                                  component="span"
+                                  variant="body4"
+                                  color="text.secondary"
+                              >
+                                  {item.author.name + ' - ' + item.author.role}
+                              </Typography>
+                              <br></br>
+                              <Typography
+                                  sx={{ display: 'inline' }}
+                                  component="span"
+                                  variant="body6"
+                                  color="text.secondary"
+                              >
+                                  {item.date}
+                              </Typography>
+                              </React.Fragment>
+                          }
+                          
+                          />
+                      </ListItem>
+                       <Divider variant="inset" component="li" />
+                       </>
+                  )
+              })}
+          </List>
+      )
+
+    return (
   <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
     <Grid container alignItems="center" rowSpacing={1}>
       <StyledGrid item xs={2} className={classes.textCenter}>
@@ -146,8 +315,44 @@ const Content = (({
         <span>{appointmentData.professional.name}</span>
       </Grid>
     </Grid>
+    <Divider variant="middle" sx={{mt: 2, mb: 2}}/>
+  <Accordion onChange={() => setExpanded((previousState) => !previousState)} expanded={expanded}>
+      <AccordionSummary
+        expandIcon={
+          <Badge badgeContent={currentAppointment.comments.length} color="primary" invisible={expanded}>
+              <ExpandMoreIcon />
+          </Badge>}
+        aria-controls="panel1a-content"
+        id="panel1a-header"
+      >
+        <Typography>Ver Comentarios</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+          {commentsList}
+      </AccordionDetails>
+    </Accordion>
+    <Paper
+      component="form"
+      sx={{ p: "2px 4px", display: "flex", alignItems: "center", mt: 1}}
+      >
+          <IconButton color="primary" sx={{ p: "10px" }} disabled>
+              <InsertCommentIcon />
+          </IconButton>
+          <FormControl sx={{ ml: 1, flex: 1 }}>
+          <InputBase
+              inputRef={commentRef}
+              placeholder="Agregar comentario"
+              inputProps={{ "aria-label": "Agregar comentario" }}
+          />
+          </FormControl>
+          <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+          <IconButton color="primary" sx={{ p: "10px" }} aria-label="directions" onClick={() => hanldeSubmitComment(appointmentData)}>
+              <SendIcon/>
+          </IconButton>
+      </Paper>
   </AppointmentTooltip.Content>
-));
+)}
+);
 
 const CommandButton = (({
   ...restProps
@@ -279,20 +484,6 @@ export default function AdminCalendar(){
     setLoading(false)
   };
 
-  const Appointment = ({
-    children, style, ...restProps
-  }) => (
-    <Appointments.Appointment
-      {...restProps}
-      style={{
-        ...style,
-        borderRadius: '8px',
-      }}
-    >
-      {children}
-    </Appointments.Appointment>
-  );
-
   const handleTherapiesToResources = () => {
     if(therapies.length > 0){
       const theToRes = therapies.map((therapy)=>{
@@ -388,6 +579,7 @@ export default function AdminCalendar(){
             headerComponent={Header}
             contentComponent={Content}
             commandButtonComponent={CommandButton}
+            layoutComponent={Layout}
             showOpenButton
             showCloseButton
             showDeleteButton

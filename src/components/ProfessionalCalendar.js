@@ -122,91 +122,45 @@ const getClassByLocation = (classes, location) => {
   return classes.thirdRoom;
 };
 
-
-export default function ProfessionalCalendar(){
-    const [windowSize, setWindowSize] = useState(getWindowSize());
-  const [currentDate, setCurrentDate] = useState(new Date())
-  const data = useSelector(state => state.calendar.appointments);
-  const [resources, setResources] = useState([
-    {fieldName: 'therapy', title: 'Tipo de terapia',instances: []},
-    {fieldName: 'location', title: 'Ubicación',instances: []}
-  ]);
-  const therapies = useSelector(state => state.resource.therapies);
-  const locations = useSelector(state => state.resource.locations);
-  const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false);
-  const commentRef = useRef()
-  const currentUser = useSelector(state => state.auth.currentUser);
-  const handleCurrentDateChange = (currentDate) => {
-    setCurrentDate(currentDate)
-  }
-
-  const dataSession = useLocation();
-
-  function getWindowSize() {
-    const {innerWidth, innerHeight} = window;
-    return {innerWidth, innerHeight};
-  }
-
-  useEffect(() => {
-    function handleWindowResize() {
-      setWindowSize(getWindowSize());
-    }
-
-    window.addEventListener('resize', handleWindowResize);
-
-    return () => {
-      window.removeEventListener('resize', handleWindowResize);
-    };
-  }, []);
-
-  const StyledAppointmentTooltipLayout = styled(AppointmentTooltip.Layout)(() => ({
+const StyledAppointmentTooltipLayout = styled(AppointmentTooltip.Layout)((props) => ({
     [`&.${classes.layout}`]: {
-        maxHeight: windowSize.innerHeight / 1.5,
+        maxHeight: props.size.innerHeight / 1.6
         
     },
   }));
-
-  const hanldeSubmitComment = (appointment) => {
-    //console.log('comentario: ', commentRef.current.value)
-    console.log('appointment, ', appointment)
-    //console.log('user, ', currentUser)
-    const authorData = appointment.patient.id === currentUser.uid ? { role: 'paciente', ...appointment.patient} : { role: 'paciente', ...appointment.professional}
-   //console.log('author, ', authorData)
-    const comment = {
-        id: new Date().valueOf().toString(),
-        author: authorData,
-        comment: commentRef.current.value,
-        date: new Date().toLocaleDateString('en-GB').concat(' ', new Date().toLocaleTimeString())
-    }
-    const commentActionData = {
-        appointment: appointment.id,
-        comment: comment
-    }
-    console.log('object comment, ', commentActionData)
-    dispatch(addComment(commentActionData))
-    commentRef.current.value = ''
-  }
 
   
 const Layout = (({
     children, ...restProps
   }) => { 
-    console.log('children, ', children)
-    console.log('restProps, ', restProps)
+    const [windowSize, setWindowSize] = useState(getWindowSize());
+    useEffect(() => {
+        function handleWindowResize() {
+          setWindowSize(getWindowSize());
+        }
+    
+        window.addEventListener('resize', handleWindowResize);
+    
+        return () => {
+          window.removeEventListener('resize', handleWindowResize);
+        };
+      }, []);
     return (
     <StyledAppointmentTooltipLayout
       {...restProps}
+      size={windowSize}
       className={classNames(classes.layout)}
     >
     </StyledAppointmentTooltipLayout>
   )});
 
-  const handleLoading = () => {
-    setLoading(false)
-  };
+function getWindowSize() {
+    const {innerWidth, innerHeight} = window;
+    return {innerWidth, innerHeight};
+  }
 
-  const Appointment = ({
+
+const Appointment = ({
     children, style, ...restProps
   }) => (
     <Appointments.Appointment
@@ -220,7 +174,7 @@ const Layout = (({
     </Appointments.Appointment>
   );
 
-  const Header = (({
+const Header = (({
     children, appointmentData, ...restProps
   }) => (
     <StyledAppointmentTooltipHeader
@@ -230,14 +184,58 @@ const Layout = (({
     >
     </StyledAppointmentTooltipHeader>
   ));
-  const [expanded, setExpanded] = useState(false);
-  const Content = (({
+
+const Content = (({
     children, appointmentData, ...restProps
   }) => {
 
+    const [expanded, setExpanded] = useState(false);
+    const [windowSize, setWindowSize] = useState(getWindowSize());
+    const commentRef = useRef()
+    const currentUser = useSelector(state => state.auth.currentUser);
+    const dispatch = useDispatch();
+    const appointments = useSelector(state => state.calendar.appointments);
+    
+    let currentAppointment = appointments.find(appointment => appointment.id === appointmentData.id)
+    currentAppointment = currentAppointment ? currentAppointment : appointmentData
+    console.log('appointment ', currentAppointment)
+
+    useEffect(() => {
+        function handleWindowResize() {
+          setWindowSize(getWindowSize());
+        }
+    
+        window.addEventListener('resize', handleWindowResize);
+    
+        return () => {
+          window.removeEventListener('resize', handleWindowResize);
+        };
+      }, []);
+
+    const hanldeSubmitComment = (appointment) => {
+        //console.log('comentario: ', commentRef.current.value)
+        console.log('appointment, ', appointment)
+        //console.log('user, ', currentUser)
+        const authorData = appointment.patient.id === currentUser.uid ? { role: 'paciente', ...appointment.patient} : { role: 'paciente', ...appointment.professional}
+       //console.log('author, ', authorData)
+        const comment = {
+            id: new Date().valueOf().toString(),
+            author: authorData,
+            comment: commentRef.current.value,
+            date: new Date().toLocaleDateString('en-GB').concat(' ', new Date().toLocaleTimeString())
+        }
+        const commentActionData = {
+            appointment: appointment.id,
+            comment: comment
+        }
+        console.log('object comment, ', commentActionData)
+        dispatch(addComment(commentActionData))
+        commentRef.current.value = ''
+    }
+
     const commentsList = (
             <List sx={{bgcolor: 'background.paper', maxHeight: windowSize.innerHeight / 4, overflow:'auto'}}>
-                {appointmentData.comments.map((item) => {
+                {currentAppointment.comments.map((item) => {
                     return (
                         <>
                         <ListItem alignItems="flex-start">
@@ -309,7 +307,7 @@ const Layout = (({
     <Accordion onChange={() => setExpanded((previousState) => !previousState)} expanded={expanded}>
         <AccordionSummary
           expandIcon={
-            <Badge badgeContent={appointmentData.comments.length} color="primary" invisible={expanded}>
+            <Badge badgeContent={currentAppointment.comments.length} color="primary" invisible={expanded}>
                 <ExpandMoreIcon />
             </Badge>}
           aria-controls="panel1a-content"
@@ -351,6 +349,25 @@ const Layout = (({
   ));
   
 
+
+export default function ProfessionalCalendar(){
+  const [currentDate, setCurrentDate] = useState(new Date())
+  const data = useSelector(state => state.calendar.appointments);
+  const [resources, setResources] = useState([
+    {fieldName: 'therapy', title: 'Tipo de terapia',instances: []},
+    {fieldName: 'location', title: 'Ubicación',instances: []}
+  ]);
+  const therapies = useSelector(state => state.resource.therapies);
+  const locations = useSelector(state => state.resource.locations);
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const handleCurrentDateChange = (currentDate) => {
+    setCurrentDate(currentDate)
+  }
+
+  const dataSession = useLocation();
+
+
   const handleTherapiesToResources = () => {
     if(therapies.length > 0){
       const theToRes = therapies.map((therapy)=>{
@@ -390,6 +407,10 @@ const Layout = (({
       handleCurrentDateChange(newDate);
     }
   }
+
+  const handleLoading = () => {
+    setLoading(false)
+  };
   
 
   useEffect(() => {

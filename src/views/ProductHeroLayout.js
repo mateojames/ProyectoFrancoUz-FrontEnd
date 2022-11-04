@@ -5,12 +5,12 @@ import { styled } from '@mui/material/styles';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 
-const ProductHeroLayoutRoot = styled('section')(({ theme }) => ({
+const ProductHeroLayoutRoot = styled('section')(({ theme, size }) => ({
   color: theme.palette.common.white,
   position: 'relative',
   display: 'flex',
   alignItems: 'center',
-  height: window.innerHeight
+  height: size.innerHeight
 }));
 
 const Background = styled(Box)({
@@ -26,9 +26,27 @@ const Background = styled(Box)({
 
 function ProductHeroLayout(props) {
   const { sxBackground, children } = props;
+  const [windowSize, setWindowSize] = React.useState(getWindowSize());
+  
+  function getWindowSize() {
+    const {innerWidth, innerHeight} = window;
+    return {innerWidth, innerHeight};
+  }
+
+  React.useEffect(() => {
+    function handleWindowResize() {
+      setWindowSize(getWindowSize());
+    }
+
+    window.addEventListener('resize', handleWindowResize);
+
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, []);
 
   return (
-    <ProductHeroLayoutRoot>
+    <ProductHeroLayoutRoot size={windowSize}>
       <Container
         sx={{
           mt: 3,

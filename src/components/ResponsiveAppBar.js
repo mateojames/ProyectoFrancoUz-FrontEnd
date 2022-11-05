@@ -25,6 +25,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import LoginIcon from '@mui/icons-material/Login';
 import BarMenu from "./BarMenu";
 import CalendarMenu from "./CalendarMenu";
+import NotificationsMenu from "./Notifications";
 
 const drawerWidth = 240;
 
@@ -70,6 +71,15 @@ const ResponsiveAppBar = (props) => {
         setAnchorCalendarMenu(null);
     };
 
+    const [anchorNotificationsMenu, setAnchorNotificationsMenu] = useState(null);
+    const openNotificationsMenu = Boolean(anchorNotificationsMenu);
+    const handleNotificationsMenuClick = (event) => {
+        setAnchorCalendarMenu(event.currentTarget);
+    };
+    const handleNotficationsMenuClose = () => {
+        setAnchorCalendarMenu(null);
+    };
+
 
     var authWebOptions = (
         <Box sx={{ display:'flex'}}>
@@ -89,7 +99,7 @@ const ResponsiveAppBar = (props) => {
         authWebOptions = (
             <Box sx={{ display: { xs: 'flex', md: 'flex' }, justifyContent: 'space-around' }}>
                         <Tooltip title="Notificaciones">
-                            <IconButton color="inherit" sx={{ mr: 3 }}>
+                            <IconButton color="inherit" sx={{ mr: 3 }} onClick={handleNotificationsMenuClick}>
                                 <Badge badgeContent={4} color="error">
                                     <NotificationsIcon />
                                 </Badge>
@@ -216,6 +226,7 @@ const ResponsiveAppBar = (props) => {
             </Box>
             <BarMenu open={openMenu} handleClose={handleMenuClose} handleClick={handleMenuClick} anchorEl={anchorMenu} role={props.role}/>
             <CalendarMenu open={openCalendarMenu} handleClose={handleCalendarMenuClose} handleClick={handleCalendarClicked} anchorEl={anchorCalendarMenu} role={props.role}/>
+            <NotificationsMenu open={openNotificationsMenu} handleClose={handleNotficationsMenuClose} handleClick={handleNotificationsMenuClick} anchorEl={anchorNotificationsMenu} role={props.role}/>
         </>
     );
 };

@@ -543,6 +543,12 @@ export default function AdminCalendar(){
     handleLocationsToResources()
   },[locations])
 
+  useEffect(()=>{
+    handleSessionFocus()
+  },[dataSession])
+
+
+
 
   return (
       <Paper>

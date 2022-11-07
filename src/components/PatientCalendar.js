@@ -431,6 +431,12 @@ export default function PatientCalendar(){
     handleLocationsToResources()
   },[locations])
 
+  useEffect(()=>{
+    handleSessionFocus()
+  },[dataSession])
+
+
+
 
   return (
       <Paper>

@@ -234,7 +234,7 @@ const Content = (({
     }
 
     const commentsList = (
-            <List sx={{bgcolor: 'background.paper', maxHeight: windowSize.innerHeight / 4, overflow:'auto'}}>
+            <List sx={{bgcolor: 'background.paper', maxHeight: windowSize.innerHeight / 4,overflow:'auto'}}>
                 {currentAppointment.comments.map((item) => {
                     return (
                         <>
@@ -430,6 +430,11 @@ export default function ProfessionalCalendar(){
   useEffect(()=>{
     handleLocationsToResources()
   },[locations])
+
+  useEffect(()=>{
+    handleSessionFocus()
+  },[dataSession])
+
 
 
   return (

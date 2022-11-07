@@ -38,7 +38,7 @@ const ViewOnCalendarCell = (props) => {
           onClick={() => {
             history.push({
               pathname: "/calendar",
-              state: props.row
+              state: {...props.row}
             })
           }}
           title="Ver en Calendario"

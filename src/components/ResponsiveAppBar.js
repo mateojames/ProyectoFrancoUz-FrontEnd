@@ -22,10 +22,11 @@ import Tooltip from '@mui/material/Tooltip';
 import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
 import Badge from '@mui/material/Badge';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import LoginIcon from '@mui/icons-material/Login';
 import BarMenu from "./BarMenu";
 import CalendarMenu from "./CalendarMenu";
 import NotificationsMenu from "./Notifications";
+import { loadNotifications } from "../store/actions/loadNotifications";
+import { FlashOffOutlined } from "@mui/icons-material";
 
 const drawerWidth = 240;
 
@@ -33,6 +34,8 @@ const ResponsiveAppBar = (props) => {
     const [mobileOpen, setMobileOpen] = useState(false);
     
     const currentUser = useSelector(state => state.auth.currentUser);
+    const notifications = useSelector(state => state.notification.notifications);
+    const pendingNotifications = notifications.filter((notification => notification.read === false))
     const history = useHistory()
 
      const handleDrawerToggle = () => {
@@ -74,11 +77,18 @@ const ResponsiveAppBar = (props) => {
     const [anchorNotificationsMenu, setAnchorNotificationsMenu] = useState(null);
     const openNotificationsMenu = Boolean(anchorNotificationsMenu);
     const handleNotificationsMenuClick = (event) => {
-        setAnchorCalendarMenu(event.currentTarget);
+        setAnchorNotificationsMenu(event.currentTarget);
     };
     const handleNotficationsMenuClose = () => {
-        setAnchorCalendarMenu(null);
+        setAnchorNotificationsMenu(null);
     };
+
+    useEffect(() => {
+        if(currentUser){
+            dispatch(loadNotifications())
+        }
+
+      }, [currentUser]);
 
 
     var authWebOptions = (
@@ -100,7 +110,7 @@ const ResponsiveAppBar = (props) => {
             <Box sx={{ display: { xs: 'flex', md: 'flex' }, justifyContent: 'space-around' }}>
                         <Tooltip title="Notificaciones">
                             <IconButton color="inherit" sx={{ mr: 3 }} onClick={handleNotificationsMenuClick}>
-                                <Badge badgeContent={4} color="error">
+                                <Badge badgeContent={pendingNotifications.length} color="error">
                                     <NotificationsIcon />
                                 </Badge>
                             </IconButton>
@@ -159,6 +169,8 @@ const ResponsiveAppBar = (props) => {
             {authMobileOptions}
         </Box>
     );
+
+    
 
 
     return (

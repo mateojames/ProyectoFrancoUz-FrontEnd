@@ -1,5 +1,4 @@
 import React, {useState, useEffect  } from "react"
-import { Modal} from "react-bootstrap"
 import ProductHero from "../views/ProductHero"
 import Login from "./Login"
 import Signup from "./Signup"
@@ -7,6 +6,7 @@ import ForgotPassword from "./ForgotPassword"
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { hideModal } from '../store/actions/modal';
+import FullBModal from "./BoostrapModal"
 
 
 export default function Home() {
@@ -64,11 +64,7 @@ export default function Home() {
   return (
     <>     
       <ProductHero title={title} description={description} showConozcanos={true} />
-      <Modal show={show} centered onHide={handleModalClose}>
-        <Modal.Body>
-          {form}
-        </Modal.Body>
-      </Modal>
+      <FullBModal form={form} handleModalClose={handleModalClose}/>
     </>
   )
 }

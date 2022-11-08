@@ -45,6 +45,15 @@ import Avatar from '@mui/material/Avatar';
 import FormControl from '@mui/material/FormControl';
 import { addComment } from "../store/actions/addComment";
 import Badge from '@mui/material/Badge';
+import MoreIcon from '@mui/icons-material/MoreVert';
+import HeaderMenu from "./HeaderMenu";
+import Button from "./Button"
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 const PREFIX = 'FrancoUz';
 
@@ -174,16 +183,105 @@ const Appointment = ({
     </Appointments.Appointment>
   );
 
+  const StyledIconButton = styled(IconButton)(() => ({
+    [`&.${classes.commandButton}`]: {
+      backgroundColor: 'rgba(255,255,255,0.65)',
+    },
+  }));
+
 const Header = (({
     children, appointmentData, ...restProps
-  }) => (
-    <StyledAppointmentTooltipHeader
-      {...restProps}
-      className={classNames(getClassByLocation(classes, appointmentData.location), classes.header)}
-      appointmentData={appointmentData}
-    >
-    </StyledAppointmentTooltipHeader>
-  ));
+  }) => {
+        const emailRef = useRef()
+        const [anchorHeaderMenu, setAnchorHeaderMenu] = useState(null);
+        const openHeaderMenu = Boolean(anchorHeaderMenu);
+        const [open, setOpen] = React.useState(false);
+        const [openCancelar, setOpenCancelar] = React.useState(false);
+        const handleClickOpen = () => {
+          setOpen(true);
+        };
+
+        const handleClose = () => {
+          setOpen(false);
+          setOpenCancelar(false)
+        };
+        const handleHeaderMenuClick = (event) => {
+            setAnchorHeaderMenu(event.currentTarget);
+        };
+        const handleHeaderMenuClose = () => {
+            setAnchorHeaderMenu(null);
+        };
+        const handleFinalizarClicked = () =>{
+            console.log('FINALIZAR')
+            handleClickOpen()
+        }
+        const handleCancelarClicked = () =>{
+            console.log('CANCELAR')
+            setOpenCancelar(true)
+        }
+
+        return (
+            <StyledAppointmentTooltipHeader
+            {...restProps}
+            className={classNames(getClassByLocation(classes, appointmentData.location), classes.header)}
+            appointmentData={appointmentData}
+            >
+            <StyledIconButton
+            onClick={handleHeaderMenuClick}
+            className={classes.commandButton}
+            size="large"
+            >
+            <MoreIcon />
+            </StyledIconButton>
+            <HeaderMenu open={openHeaderMenu} handleClose={handleHeaderMenuClose} handleClick={handleHeaderMenuClick} anchorEl={anchorHeaderMenu} role={'profesional'} handleFinalizar={handleFinalizarClicked} handleCancelar={handleCancelarClicked} appointment={appointmentData}/>
+            <Dialog open={open} onClose={handleClose}>
+                <DialogTitle>Finalizar Sesión</DialogTitle>
+                <DialogContent>
+                <DialogContentText>
+                    Para finalizar la sesión por favor deje un comentario dando un breve resumen de la misma
+                </DialogContentText>
+                <FormControl fullWidth>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Agregue un comentario"
+                        type="text"
+                        fullWidth
+                        variant="standard"
+                        multiline
+                    />
+                </FormControl>
+                </DialogContent>
+                <DialogActions>
+                <Button onClick={handleClose}>Cancelar</Button>
+                <Button onClick={handleClose}>Finalizar</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog open={openCancelar} onClose={handleClose}>
+                <DialogTitle>Cancelar Sesión</DialogTitle>
+                <DialogContent>
+                <DialogContentText>
+                    Para cancelar la sesión por favor deje un comentario con el motivo de la cancelación
+                </DialogContentText>
+                <FormControl fullWidth>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Agregue un comentario"
+                        type="text"
+                        fullWidth
+                        variant="standard"
+                        multiline
+                    />
+                </FormControl>
+                </DialogContent>
+                <DialogActions>
+                <Button onClick={handleClose}>Atrás</Button>
+                <Button onClick={handleClose}>Enviar</Button>
+                </DialogActions>
+            </Dialog>
+            </StyledAppointmentTooltipHeader>
+        )});
 
 const Content = (({
     children, appointmentData, ...restProps

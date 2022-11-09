@@ -192,11 +192,13 @@ const Appointment = ({
 const Header = (({
     children, appointmentData, ...restProps
   }) => {
-        const emailRef = useRef()
+        const commentRef = useRef()
+        const currentUser = useSelector(state => state.auth.currentUser);
         const [anchorHeaderMenu, setAnchorHeaderMenu] = useState(null);
         const openHeaderMenu = Boolean(anchorHeaderMenu);
         const [open, setOpen] = React.useState(false);
         const [openCancelar, setOpenCancelar] = React.useState(false);
+        const dispatch = useDispatch()
         const handleClickOpen = () => {
           setOpen(true);
         };
@@ -218,6 +220,25 @@ const Header = (({
         const handleCancelarClicked = () =>{
             console.log('CANCELAR')
             setOpenCancelar(true)
+        }
+        const handleSubmitAction = (appointment, action) => {
+            const authorData = appointment.patient.id === currentUser.uid ? { role: 'paciente', ...appointment.patient} : { role: 'profesional', ...appointment.professional}
+            const comment = {
+                id: new Date().valueOf().toString(),
+                author: authorData,
+                comment: commentRef.current.value,
+                date: new Date().toLocaleDateString('en-GB').concat(' ', new Date().toLocaleTimeString()),
+                action: action
+            }
+            const commentActionData = {
+                appointment: appointment.id,
+                comment: comment
+            }
+            console.log('object comment, ', commentActionData)
+            dispatch(addComment(commentActionData))
+            console.log('action ', commentActionData)
+            handleClose()
+            commentRef.current.value = ''
         }
 
         return (
@@ -248,13 +269,14 @@ const Header = (({
                         type="text"
                         fullWidth
                         variant="standard"
+                        inputRef={commentRef}
                         multiline
                     />
                 </FormControl>
                 </DialogContent>
                 <DialogActions>
                 <Button onClick={handleClose}>Cancelar</Button>
-                <Button onClick={handleClose}>Finalizar</Button>
+                <Button onClick={() => handleSubmitAction(appointmentData, 'finalizar')}>Finalizar</Button>
                 </DialogActions>
             </Dialog>
             <Dialog open={openCancelar} onClose={handleClose}>
@@ -271,13 +293,14 @@ const Header = (({
                         type="text"
                         fullWidth
                         variant="standard"
+                        inputRef={commentRef}
                         multiline
                     />
                 </FormControl>
                 </DialogContent>
                 <DialogActions>
                 <Button onClick={handleClose}>Atrás</Button>
-                <Button onClick={handleClose}>Enviar</Button>
+                <Button onClick={() => handleSubmitAction(appointmentData, 'cancelar')}>Enviar</Button>
                 </DialogActions>
             </Dialog>
             </StyledAppointmentTooltipHeader>
@@ -314,7 +337,7 @@ const Content = (({
         //console.log('comentario: ', commentRef.current.value)
         console.log('appointment, ', appointment)
         //console.log('user, ', currentUser)
-        const authorData = appointment.patient.id === currentUser.uid ? { role: 'paciente', ...appointment.patient} : { role: 'paciente', ...appointment.professional}
+        const authorData = appointment.patient.id === currentUser.uid ? { role: 'paciente', ...appointment.patient} : { role: 'profesional', ...appointment.professional}
        //console.log('author, ', authorData)
         const comment = {
             id: new Date().valueOf().toString(),

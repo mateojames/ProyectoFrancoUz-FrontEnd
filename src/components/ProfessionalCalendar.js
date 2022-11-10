@@ -33,7 +33,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { List, ListItem } from "@mui/material";
+import { Chip, List, ListItem, Tooltip } from "@mui/material";
 import InputBase from "@mui/material/InputBase";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
@@ -171,17 +171,67 @@ function getWindowSize() {
 
 const Appointment = ({
     children, style, ...restProps
-  }) => (
+  }) => {
+    
+    console.log('APPOINTMENT ', restProps)
+
+    let dinamicStyle = {
+        ...style,
+        borderRadius: '8px'
+      }
+    let state = (
+        <Typography
+            component="span"
+            variant="body1"
+            color="white"
+            style={{margin: '5px'}}
+        >
+            
+        </Typography>
+    )
+
+    if(restProps.data.state){
+        if(restProps.data.state === 'finalized' || restProps.data.state === 'cancelled'){
+            dinamicStyle = {
+                ...style,
+                borderRadius: '8px',
+                backgroundColor: 'lightgrey'
+              }
+            if(restProps.data.state === 'finalized'){
+                state = (
+                    <Typography
+                        component="span"
+                        variant="body1"
+                        color="white"
+                        style={{margin: '5px'}}
+                    >
+                        FINALIZADA
+                    </Typography>
+                )
+            }else if(restProps.data.state === 'cancelled'){
+                state = (
+                    <Typography
+                        component="span"
+                        variant="body1"
+                        color="white"
+                        style={{margin: '5px'}}
+                    >
+                        CANCELADA
+                    </Typography>
+                )
+            }
+        }
+    }
+
+    return (
     <Appointments.Appointment
       {...restProps}
-      style={{
-        ...style,
-        borderRadius: '8px',
-      }}
+      style={dinamicStyle}
     >
+    {state}
       {children}
     </Appointments.Appointment>
-  );
+  )};
 
   const StyledIconButton = styled(IconButton)(() => ({
     [`&.${classes.commandButton}`]: {
@@ -353,16 +403,60 @@ const Content = (({
         dispatch(addComment(commentActionData))
         commentRef.current.value = ''
     }
+    const commentsToDisplay = [...currentAppointment.comments].reverse()
 
     const commentsList = (
             <List sx={{bgcolor: 'background.paper', maxHeight: windowSize.innerHeight / 4,overflow:'auto'}}>
-                {currentAppointment.comments.map((item) => {
-                    return (
-                        <>
+                {commentsToDisplay.map((item) => {
+                    let listItem = (
                         <ListItem alignItems="flex-start">
+                        <ListItemAvatar>
+                            <Avatar alt={item.author.name} />
+                        </ListItemAvatar>
+                        <ListItemText
+                        primary={
+                            <React.Fragment>
+                            <Typography
+                                component="span"
+                                variant="body1"
+                                color="text.primary"
+                            >
+                                {item.comment}
+                            </Typography>
+                            </React.Fragment>
+                        }
+                        secondary={
+                            <React.Fragment>
+                            <Typography
+                                sx={{ display: 'inline' }}
+                                component="span"
+                                variant="body4"
+                                color="text.secondary"
+                            >
+                                {item.author.name + ' - ' + item.author.role}
+                            </Typography>
+                            <br></br>
+                            <Typography
+                                sx={{ display: 'inline' }}
+                                component="span"
+                                variant="body6"
+                                color="text.secondary"
+                            >
+                                {item.date}
+                            </Typography>
+                            </React.Fragment>
+                        }
+                        
+                        />
+                    </ListItem>
+                    )
+                    if(item.action === 'finalizar'){
+                        listItem = (
+                            <ListItem alignItems="flex-start" sx={{bgcolor: 'lightgray', borderRadius: 2, margin:0.5}}>
                             <ListItemAvatar>
                                 <Avatar alt={item.author.name} />
                             </ListItemAvatar>
+                            <Tooltip disableFocusListener title="Comentario de finalización" arrow>
                             <ListItemText
                             primary={
                                 <React.Fragment>
@@ -398,13 +492,69 @@ const Content = (({
                             }
                             
                             />
-                        </ListItem>
+                            </Tooltip>
+                        </ListItem>)
+                    }else if(item.action === 'cancelar'){
+                        listItem = (
+                            <ListItem alignItems="flex-start"sx={{bgcolor: 'lightgray', borderRadius: 2, margin:0.5}}>
+                            <ListItemAvatar>
+                                <Avatar alt={item.author.name} />
+                            </ListItemAvatar>
+                            <Tooltip disableFocusListener title="Comentario de cancelación" arrow>
+                            <ListItemText
+                            primary={
+                                <React.Fragment>
+                                <Typography
+                                    component="span"
+                                    variant="body1"
+                                    color="text.primary"
+                                >
+                                    {item.comment}
+                                </Typography>
+                                </React.Fragment>
+                            }
+                            secondary={
+                                <React.Fragment>
+                                <Typography
+                                    sx={{ display: 'inline' }}
+                                    component="span"
+                                    variant="body4"
+                                    color="text.secondary"
+                                >
+                                    {item.author.name + ' - ' + item.author.role}
+                                </Typography>
+                                <br></br>
+                                <Typography
+                                    sx={{ display: 'inline' }}
+                                    component="span"
+                                    variant="body6"
+                                    color="text.secondary"
+                                >
+                                    {item.date}
+                                </Typography>
+                                </React.Fragment>
+                            }
+                            
+                            />
+                            </Tooltip>
+                        </ListItem>)
+                    }
+                    return (
+                        <>
+                        {listItem}
                          <Divider variant="inset" component="li" />
                          </>
                     )
                 })}
             </List>
         )
+
+    let disableComments = false
+    if(appointmentData.state){
+        if(appointmentData.state === 'finalized' || appointmentData.state === 'cancelled'){
+            disableComments = true
+        }
+    }
 
       return (
     <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
@@ -414,14 +564,22 @@ const Content = (({
         </StyledGrid>
         <Grid item xs={10}>
           <span style={{fontWeight: 'bold'}}>Paciente: </span>
-          <span>{appointmentData.patient.name}</span>
+          <Chip
+                avatar={<Avatar alt={appointmentData.patient.name} src="/" />}
+                label={appointmentData.patient.name}
+                variant="outlined"
+            />
         </Grid>
         <StyledGrid item xs={2} className={classes.textCenter}>
           <StyledProfessional className={classes.icon} />
         </StyledGrid>
         <Grid item xs={10}>
           <span style={{fontWeight: 'bold'}}>Profesional: </span>
-          <span>{appointmentData.professional.name}</span>
+            <Chip
+                avatar={<Avatar alt={appointmentData.professional.name} src="/" />}
+                label={appointmentData.professional.name}
+                variant="outlined"
+            />
         </Grid>
       </Grid>
       <Divider variant="middle" sx={{mt: 2, mb: 2}}/>
@@ -452,10 +610,11 @@ const Content = (({
                 inputRef={commentRef}
                 placeholder="Agregar comentario"
                 inputProps={{ "aria-label": "Agregar comentario" }}
+                disabled={disableComments}
             />
             </FormControl>
             <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-            <IconButton color="primary" sx={{ p: "10px" }} aria-label="directions" onClick={() => hanldeSubmitComment(appointmentData)}>
+            <IconButton color="primary" sx={{ p: "10px" }} aria-label="directions" onClick={() => hanldeSubmitComment(appointmentData)} disabled={disableComments}>
                 <SendIcon/>
             </IconButton>
         </Paper>

@@ -415,12 +415,13 @@ const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
     >
 
       <Autocomplete
+        multiple
         disablePortal
         id="combo-box-demo"
         options={patients}
         fullWidth
         sx={{mt:1}}
-        value={appointmentData.patient || null}
+        value={appointmentData.patient || []}
         onChange={onPatientFieldChange}
         getOptionLabel={(option) => option.name || ''}
         isOptionEqualToValue ={(option, value) => option.id === value.id}
@@ -428,12 +429,13 @@ const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
       />
 
       <Autocomplete
+        multiple
         disablePortal
         id="combo-box-demo"
         options={professionals}
         fullWidth
         sx={{mt:2}}
-        value={appointmentData.professional || null}
+        value={appointmentData.professional || []}
         onChange={onProfessionalFieldChange}
         getOptionLabel={(option) => option.name || ''}
         isOptionEqualToValue ={(option, value) => option.id === value.id}
@@ -469,8 +471,8 @@ export default function AdminCalendar(){
   }
 
   const handleCommitChanges = (action) => {
-    console.log('commit');
-    if(action.added){
+    console.log('commit ',action);
+   if(action.added){
       dispatch(addAppointment(action));
       console.log(action)
     }
@@ -478,6 +480,7 @@ export default function AdminCalendar(){
       dispatch(editAppointment(action));
     }
     if(action.deleted)dispatch(deleteAppointment(action));
+
   }
 
   const handleLoading = () => {

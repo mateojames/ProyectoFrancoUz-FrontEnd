@@ -26,6 +26,7 @@ import { loadLocations, loadTherapies } from "../store/actions/resources.js";
 import IconButton from '@mui/material/IconButton';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Link, useHistory } from "react-router-dom";
+import { Avatar, Chip } from "@mui/material";
 
 const getRowId = row => row.id;
 
@@ -50,12 +51,14 @@ const ViewOnCalendarCell = (props) => {
     </Table.Cell>);
 };
 
+
 const Cell = (props) => {
   const { column } = props;
   if (column.name === 'link') {
     return <ViewOnCalendarCell {...props} disabled={false}/>
   }
-  return <Table.Cell {...props} />;
+  return (
+  <Table.Cell {...props} />);
 };
 
 const FilterCell = (props) => {
@@ -70,8 +73,8 @@ export default function SessionsGrid(props) {
   const [columns] = useState([
     { name: 'title', title: 'Titulo' },
     { name: 'therapy', title: 'Terapia' },
-    { name: 'patient', title: 'Paciente' },
-    { name: 'professional', title: 'Profesional' },
+    { name: 'patient', title: 'Paciente/s' },
+    { name: 'professional', title: 'Profesional/es' },
     { name: 'location', title: 'Ubicación' },
     { name: 'date', title: 'Fecha de inicio' },
     { name: 'isRecurrent', title: '¿Es recurrente?' },
@@ -112,12 +115,14 @@ export default function SessionsGrid(props) {
       return appointments.map((appointment) => {
       const therapy = therapies.find((therapy)=> therapy.id == appointment.therapy)
       const location = locations.find((location)=> location.id == appointment.location)
+      const patients = appointment.patients.map((item)=> item.name)
+      const professionals = appointment.professionals.map((item)=> item.name)
       return {
         ...appointment,
         therapy: therapy ? therapy.name : 'No encontrada',
         location: location ? location.name : 'No encontrada',
-        patient: appointment.patient.name,
-        professional: appointment.professional.name
+        patient: patients,
+        professional: professionals
       }
     })
   })

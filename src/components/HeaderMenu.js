@@ -1,18 +1,11 @@
 import React, { useState } from "react"
-import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import Divider from '@mui/material/Divider';
 import DomainVerificationIcon from '@mui/icons-material/DomainVerification';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
-import Logout from '@mui/icons-material/Logout';
-import GroupIcon from '@mui/icons-material/Group';
+
 import { Link, useHistory } from "react-router-dom"
-import { auth } from "../firebase"
-import {
-    signOut
-  } from "firebase/auth";
 import { MenuList } from "@mui/material";
 
 export default function HeaderMenu(props) {
@@ -38,7 +31,7 @@ export default function HeaderMenu(props) {
         </MenuItem>
         </MenuList>)
 
-    if(props.role === 'profesional' && new Date() > new Date(props.appointment.endDate)){
+    if(new Date() > new Date(props.appointment.endDate)){
         items = (<MenuList>
             <MenuItem onClick={handleHeaderFinalizarClicked}>
               <ListItemIcon>

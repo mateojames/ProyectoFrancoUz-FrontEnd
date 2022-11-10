@@ -31,6 +31,7 @@ function AuthSwitch(props) {
         <Switch>
             <Route exact path="/Calendar" component={PatientCalendar} />
             <Route exact path="/perfil" component={Profile}/>
+            <Route exact path="/sesiones" component={SessionsGrid}/>
             <Route path="/" component={Home} />
         </Switch>
     );

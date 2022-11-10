@@ -200,10 +200,10 @@ const Appointment = ({
             if(restProps.data.state === 'finalized'){
                 state = (
                     <Typography
-                        component="span"
-                        variant="body1"
-                        color="white"
-                        style={{margin: '5px'}}
+                      component="span"
+                      variant="body2"
+                      color="white"
+                      style={{margin: '5px'}}
                     >
                         FINALIZADA
                     </Typography>
@@ -212,7 +212,7 @@ const Appointment = ({
                 state = (
                     <Typography
                         component="span"
-                        variant="body1"
+                        variant="body2"
                         color="white"
                         style={{margin: '5px'}}
                     >
@@ -239,7 +239,7 @@ const Appointment = ({
     },
   }));
 
-const Header = (({
+  const Header = (({
     children, appointmentData, ...restProps
   }) => {
         const commentRef = useRef()
@@ -247,7 +247,10 @@ const Header = (({
         const [anchorHeaderMenu, setAnchorHeaderMenu] = useState(null);
         const openHeaderMenu = Boolean(anchorHeaderMenu);
         const [open, setOpen] = React.useState(false);
+        const appointments = useSelector(state => state.calendar.appointments);
         const [openCancelar, setOpenCancelar] = React.useState(false);
+        let currentAppointment = appointments.find(appointment => appointment.id === appointmentData.id)
+        currentAppointment = currentAppointment ? currentAppointment : appointmentData
         const dispatch = useDispatch()
         const handleClickOpen = () => {
           setOpen(true);
@@ -272,10 +275,9 @@ const Header = (({
             setOpenCancelar(true)
         }
         const handleSubmitAction = (appointment, action) => {
-            const authorData = appointment.patient.id === currentUser.uid ? { role: 'paciente', ...appointment.patient} : { role: 'profesional', ...appointment.professional}
             const comment = {
                 id: new Date().valueOf().toString(),
-                author: authorData,
+                author: currentUser.uid,
                 comment: commentRef.current.value,
                 date: new Date().toLocaleDateString('en-GB').concat(' ', new Date().toLocaleTimeString()),
                 action: action
@@ -294,17 +296,18 @@ const Header = (({
         return (
             <StyledAppointmentTooltipHeader
             {...restProps}
-            className={classNames(getClassByLocation(classes, appointmentData.location), classes.header)}
-            appointmentData={appointmentData}
+            className={classNames(getClassByLocation(classes, currentAppointment.location), classes.header)}
+            appointmentData={currentAppointment}
             >
             <StyledIconButton
             onClick={handleHeaderMenuClick}
             className={classes.commandButton}
+            disabled={new Date() > new Date(appointmentData.endDate) || appointmentData.state === 'finalized' || appointmentData.state === 'cancelled'}
             size="large"
             >
             <MoreIcon />
             </StyledIconButton>
-            <HeaderMenu open={openHeaderMenu} handleClose={handleHeaderMenuClose} handleClick={handleHeaderMenuClick} anchorEl={anchorHeaderMenu} role={'paciente'} handleFinalizar={handleFinalizarClicked} handleCancelar={handleCancelarClicked} appointment={appointmentData}/>
+            <HeaderMenu open={openHeaderMenu} handleClose={handleHeaderMenuClose} handleClick={handleHeaderMenuClick} anchorEl={anchorHeaderMenu} role={'profesional'} handleFinalizar={handleFinalizarClicked} handleCancelar={handleCancelarClicked} appointment={currentAppointment}/>
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Finalizar Sesión</DialogTitle>
                 <DialogContent>
@@ -326,7 +329,7 @@ const Header = (({
                 </DialogContent>
                 <DialogActions>
                 <Button onClick={handleClose}>Cancelar</Button>
-                <Button onClick={() => handleSubmitAction(appointmentData, 'finalizar')}>Finalizar</Button>
+                <Button onClick={() => handleSubmitAction(currentAppointment, 'finalizar')}>Finalizar</Button>
                 </DialogActions>
             </Dialog>
             <Dialog open={openCancelar} onClose={handleClose}>
@@ -350,7 +353,7 @@ const Header = (({
                 </DialogContent>
                 <DialogActions>
                 <Button onClick={handleClose}>Atrás</Button>
-                <Button onClick={() => handleSubmitAction(appointmentData, 'cancelar')}>Enviar</Button>
+                <Button onClick={() => handleSubmitAction(currentAppointment, 'cancelar')}>Enviar</Button>
                 </DialogActions>
             </Dialog>
             </StyledAppointmentTooltipHeader>
@@ -383,15 +386,10 @@ const Content = (({
         };
       }, []);
 
-    const hanldeSubmitComment = (appointment) => {
-        //console.log('comentario: ', commentRef.current.value)
-        console.log('appointment, ', appointment)
-        //console.log('user, ', currentUser)
-        const authorData = appointment.patient.id === currentUser.uid ? { role: 'paciente', ...appointment.patient} : { role: 'profesional', ...appointment.professional}
-       //console.log('author, ', authorData)
+      const hanldeSubmitComment = (appointment) => {
         const comment = {
             id: new Date().valueOf().toString(),
-            author: authorData,
+            author: currentUser.uid,
             comment: commentRef.current.value,
             date: new Date().toLocaleDateString('en-GB').concat(' ', new Date().toLocaleTimeString())
         }
@@ -550,21 +548,21 @@ const Content = (({
         )
 
     let disableComments = false
-    if(appointmentData.state){
-        if(appointmentData.state === 'finalized' || appointmentData.state === 'cancelled'){
+    if(currentAppointment.state){
+        if(currentAppointment.state === 'finalized' || currentAppointment.state === 'cancelled'){
             disableComments = true
         }
     }
 
       return (
-    <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
+    <AppointmentTooltip.Content {...restProps} appointmentData={currentAppointment}>
       <Grid container alignItems="center" rowSpacing={1}>
       <StyledGrid item xs={2} className={classes.textCenter}>
         <StyledPatient className={classes.icon} />
       </StyledGrid>
       <Grid item xs={10}>
         <span style={{fontWeight: 'bold'}}>Paciente/s: </span>
-          {appointmentData.patients.map((item) => {
+          {currentAppointment.patients.map((item) => {
             return (<Chip
               avatar={<Avatar alt={item.name} src="/" />}
               label={item.name}
@@ -577,7 +575,7 @@ const Content = (({
       </StyledGrid>
       <Grid item xs={10}>
         <span style={{fontWeight: 'bold'}}>Profesional/es: </span>
-        {appointmentData.professionals.map((item) => {
+        {currentAppointment.professionals.map((item) => {
             return (<Chip
               avatar={<Avatar alt={item.name} src="/" />}
               label={item.name}
@@ -618,7 +616,7 @@ const Content = (({
             />
             </FormControl>
             <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-            <IconButton color="primary" sx={{ p: "10px" }} aria-label="directions" onClick={() => hanldeSubmitComment(appointmentData)} disabled={disableComments}>
+            <IconButton color="primary" sx={{ p: "10px" }} aria-label="directions" onClick={() => hanldeSubmitComment(currentAppointment)} disabled={disableComments}>
                 <SendIcon/>
             </IconButton>
         </Paper>

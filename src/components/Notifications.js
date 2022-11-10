@@ -34,7 +34,7 @@ export default function NotificationsMenu(props) {
         )
 
     if(notifications.length > 0){
-        let orderedNotifications = [...notifications].reverse()
+        const orderedNotifications = [...notifications]
         notificationsList = (
             <MenuList sx={{maxWidth: {xs: windowSize.innerWidth / 1.8, md: windowSize.innerWidth / 3, lg:windowSize.innerWidth / 5}, maxHeight: windowSize.innerHeight / 2.2, overflow:'auto'}}>
                 {orderedNotifications.map((item) => {

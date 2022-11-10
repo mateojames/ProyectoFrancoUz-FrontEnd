@@ -20,7 +20,7 @@ import {
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { Autocomplete, Chip } from '@mui/material';
+import { Autocomplete, Chip, Tooltip } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { ViewState, EditingState} from '@devexpress/dx-react-scheduler';
 import Diversity2Icon from '@mui/icons-material/Diversity2';
@@ -57,6 +57,15 @@ import Avatar from '@mui/material/Avatar';
 import FormControl from '@mui/material/FormControl';
 import { addComment } from "../store/actions/addComment";
 import Badge from '@mui/material/Badge';
+import MoreIcon from '@mui/icons-material/MoreVert';
+import HeaderMenu from "./HeaderMenu";
+import Button from "./Button"
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+
 const PREFIX = 'FrancoUz';
 
 const classes = {
@@ -174,28 +183,194 @@ function getWindowSize() {
 
 const Appointment = ({
   children, style, ...restProps
-}) => (
+}) => {
+  
+  console.log('APPOINTMENT ', restProps)
+
+  let dinamicStyle = {
+      ...style,
+      borderRadius: '8px'
+    }
+  let state = (
+      <Typography
+          component="span"
+          variant="body1"
+          color="white"
+          style={{margin: '5px'}}
+      >
+          
+      </Typography>
+  )
+
+  if(restProps.data.state){
+      if(restProps.data.state === 'finalized' || restProps.data.state === 'cancelled'){
+          dinamicStyle = {
+              ...style,
+              borderRadius: '8px',
+              backgroundColor: 'lightgrey'
+            }
+          if(restProps.data.state === 'finalized'){
+              state = (
+                  <Typography
+                      component="span"
+                      variant="body2"
+                      color="white"
+                      style={{margin: '5px'}}
+                  >
+                      FINALIZADA
+                  </Typography>
+              )
+          }else if(restProps.data.state === 'cancelled'){
+              state = (
+                  <Typography
+                      component="span"
+                      variant="body2"
+                      color="white"
+                      style={{margin: '5px'}}
+                  >
+                      CANCELADA
+                  </Typography>
+              )
+          }
+      }
+  }
+
+  return (
   <Appointments.Appointment
     {...restProps}
-    style={{
-      ...style,
-      borderRadius: '8px',
-    }}
+    style={dinamicStyle}
   >
+  {state}
     {children}
   </Appointments.Appointment>
-);
+)};
+
+const StyledIconButton = styled(IconButton)(() => ({
+  [`&.${classes.commandButton}`]: {
+    backgroundColor: 'rgba(255,255,255,0.65)',
+  },
+}));
 
 const Header = (({
   children, appointmentData, ...restProps
-}) => (
-  <StyledAppointmentTooltipHeader
-    {...restProps}
-    className={classNames(getClassByLocation(classes, appointmentData.location), classes.header)}
-    appointmentData={appointmentData}
-  >
-  </StyledAppointmentTooltipHeader>
-));
+}) => {
+      const commentRef = useRef()
+      const currentUser = useSelector(state => state.auth.currentUser);
+      const [anchorHeaderMenu, setAnchorHeaderMenu] = useState(null);
+      const openHeaderMenu = Boolean(anchorHeaderMenu);
+      const [open, setOpen] = React.useState(false);
+      const appointments = useSelector(state => state.calendar.appointments);
+      const [openCancelar, setOpenCancelar] = React.useState(false);
+      let currentAppointment = appointments.find(appointment => appointment.id === appointmentData.id)
+      currentAppointment = currentAppointment ? currentAppointment : appointmentData
+      const dispatch = useDispatch()
+      const handleClickOpen = () => {
+        setOpen(true);
+      };
+
+      const handleClose = () => {
+        setOpen(false);
+        setOpenCancelar(false)
+      };
+      const handleHeaderMenuClick = (event) => {
+          setAnchorHeaderMenu(event.currentTarget);
+      };
+      const handleHeaderMenuClose = () => {
+          setAnchorHeaderMenu(null);
+      };
+      const handleFinalizarClicked = () =>{
+          console.log('FINALIZAR')
+          handleClickOpen()
+      }
+      const handleCancelarClicked = () =>{
+          console.log('CANCELAR')
+          setOpenCancelar(true)
+      }
+      const handleSubmitAction = (appointment, action) => {
+          const comment = {
+              id: new Date().valueOf().toString(),
+              author: currentUser.uid,
+              comment: commentRef.current.value,
+              date: new Date().toLocaleDateString('en-GB').concat(' ', new Date().toLocaleTimeString()),
+              action: action
+          }
+          const commentActionData = {
+              appointment: appointment.id,
+              comment: comment
+          }
+          console.log('object comment, ', commentActionData)
+          dispatch(addComment(commentActionData))
+          console.log('action ', commentActionData)
+          handleClose()
+          commentRef.current.value = ''
+      }
+
+      return (
+          <StyledAppointmentTooltipHeader
+          {...restProps}
+          className={classNames(getClassByLocation(classes, currentAppointment.location), classes.header)}
+          appointmentData={currentAppointment}
+          >
+          <StyledIconButton
+          onClick={handleHeaderMenuClick}
+          className={classes.commandButton}
+          disabled={currentAppointment.state === 'finalized' || currentAppointment.state === 'cancelled'}
+          size="large"
+          >
+          <MoreIcon />
+          </StyledIconButton>
+          <HeaderMenu open={openHeaderMenu} handleClose={handleHeaderMenuClose} handleClick={handleHeaderMenuClick} anchorEl={anchorHeaderMenu} role={'profesional'} handleFinalizar={handleFinalizarClicked} handleCancelar={handleCancelarClicked} appointment={currentAppointment}/>
+          <Dialog open={open} onClose={handleClose}>
+              <DialogTitle>Finalizar Sesión</DialogTitle>
+              <DialogContent>
+              <DialogContentText>
+                  Para finalizar la sesión por favor deje un comentario dando un breve resumen de la misma
+              </DialogContentText>
+              <FormControl fullWidth>
+                  <TextField
+                      autoFocus
+                      margin="dense"
+                      label="Agregue un comentario"
+                      type="text"
+                      fullWidth
+                      variant="standard"
+                      inputRef={commentRef}
+                      multiline
+                  />
+              </FormControl>
+              </DialogContent>
+              <DialogActions>
+              <Button onClick={handleClose}>Cancelar</Button>
+              <Button onClick={() => handleSubmitAction(currentAppointment, 'finalizar')}>Finalizar</Button>
+              </DialogActions>
+          </Dialog>
+          <Dialog open={openCancelar} onClose={handleClose}>
+              <DialogTitle>Cancelar Sesión</DialogTitle>
+              <DialogContent>
+              <DialogContentText>
+                  Para cancelar la sesión por favor deje un comentario con el motivo de la cancelación
+              </DialogContentText>
+              <FormControl fullWidth>
+                  <TextField
+                      autoFocus
+                      margin="dense"
+                      label="Agregue un comentario"
+                      type="text"
+                      fullWidth
+                      variant="standard"
+                      inputRef={commentRef}
+                      multiline
+                  />
+              </FormControl>
+              </DialogContent>
+              <DialogActions>
+              <Button onClick={handleClose}>Atrás</Button>
+              <Button onClick={() => handleSubmitAction(currentAppointment, 'cancelar')}>Enviar</Button>
+              </DialogActions>
+          </Dialog>
+          </StyledAppointmentTooltipHeader>
+      )});
+
 
 const Content = (({
   children, appointmentData, ...restProps
@@ -224,7 +399,7 @@ const Content = (({
       };
     }, []);
 
-  const hanldeSubmitComment = (appointment) => {
+    const hanldeSubmitComment = (appointment) => {
       const comment = {
           id: new Date().valueOf().toString(),
           author: currentUser.uid,
@@ -239,16 +414,60 @@ const Content = (({
       dispatch(addComment(commentActionData))
       commentRef.current.value = ''
   }
+  const commentsToDisplay = [...currentAppointment.comments].reverse()
 
   const commentsList = (
-          <List sx={{bgcolor: 'background.paper', maxHeight: windowSize.innerHeight / 4, overflow:'auto'}}>
-              {currentAppointment.comments.map((item) => {
-                  return (
-                      <>
+          <List sx={{bgcolor: 'background.paper', maxHeight: windowSize.innerHeight / 4,overflow:'auto'}}>
+              {commentsToDisplay.map((item) => {
+                  let listItem = (
                       <ListItem alignItems="flex-start">
+                      <ListItemAvatar>
+                          <Avatar alt={item.author.name} />
+                      </ListItemAvatar>
+                      <ListItemText
+                      primary={
+                          <React.Fragment>
+                          <Typography
+                              component="span"
+                              variant="body1"
+                              color="text.primary"
+                          >
+                              {item.comment}
+                          </Typography>
+                          </React.Fragment>
+                      }
+                      secondary={
+                          <React.Fragment>
+                          <Typography
+                              sx={{ display: 'inline' }}
+                              component="span"
+                              variant="body4"
+                              color="text.secondary"
+                          >
+                              {item.author.name + ' - ' + item.author.role}
+                          </Typography>
+                          <br></br>
+                          <Typography
+                              sx={{ display: 'inline' }}
+                              component="span"
+                              variant="body6"
+                              color="text.secondary"
+                          >
+                              {item.date}
+                          </Typography>
+                          </React.Fragment>
+                      }
+                      
+                      />
+                  </ListItem>
+                  )
+                  if(item.action === 'finalizar'){
+                      listItem = (
+                          <ListItem alignItems="flex-start" sx={{bgcolor: 'lightgray', borderRadius: 2, margin:0.5}}>
                           <ListItemAvatar>
                               <Avatar alt={item.author.name} />
                           </ListItemAvatar>
+                          <Tooltip disableFocusListener title="Comentario de finalización" arrow>
                           <ListItemText
                           primary={
                               <React.Fragment>
@@ -284,7 +503,56 @@ const Content = (({
                           }
                           
                           />
-                      </ListItem>
+                          </Tooltip>
+                      </ListItem>)
+                  }else if(item.action === 'cancelar'){
+                      listItem = (
+                          <ListItem alignItems="flex-start"sx={{bgcolor: 'lightgray', borderRadius: 2, margin:0.5}}>
+                          <ListItemAvatar>
+                              <Avatar alt={item.author.name} />
+                          </ListItemAvatar>
+                          <Tooltip disableFocusListener title="Comentario de cancelación" arrow>
+                          <ListItemText
+                          primary={
+                              <React.Fragment>
+                              <Typography
+                                  component="span"
+                                  variant="body1"
+                                  color="text.primary"
+                              >
+                                  {item.comment}
+                              </Typography>
+                              </React.Fragment>
+                          }
+                          secondary={
+                              <React.Fragment>
+                              <Typography
+                                  sx={{ display: 'inline' }}
+                                  component="span"
+                                  variant="body4"
+                                  color="text.secondary"
+                              >
+                                  {item.author.name + ' - ' + item.author.role}
+                              </Typography>
+                              <br></br>
+                              <Typography
+                                  sx={{ display: 'inline' }}
+                                  component="span"
+                                  variant="body6"
+                                  color="text.secondary"
+                              >
+                                  {item.date}
+                              </Typography>
+                              </React.Fragment>
+                          }
+                          
+                          />
+                          </Tooltip>
+                      </ListItem>)
+                  }
+                  return (
+                      <>
+                      {listItem}
                        <Divider variant="inset" component="li" />
                        </>
                   )
@@ -292,36 +560,43 @@ const Content = (({
           </List>
       )
 
+  let disableComments = false
+  if(currentAppointment.state){
+      if(currentAppointment.state === 'finalized' || currentAppointment.state === 'cancelled'){
+          disableComments = true
+      }
+  }
+
     return (
-  <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
+  <AppointmentTooltip.Content {...restProps} appointmentData={currentAppointment}>
     <Grid container alignItems="center" rowSpacing={1}>
-      <StyledGrid item xs={2} className={classes.textCenter}>
-        <StyledPatient className={classes.icon} />
-      </StyledGrid>
-      <Grid item xs={10}>
-        <span style={{fontWeight: 'bold'}}>Paciente/s: </span>
-          {appointmentData.patients.map((item) => {
-            return (<Chip
-              avatar={<Avatar alt={item.name} src="/" />}
-              label={item.name}
-              variant="outlined"
-          />)
-          })}
-      </Grid>
-      <StyledGrid item xs={2} className={classes.textCenter}>
-        <StyledProfessional className={classes.icon} />
-      </StyledGrid>
-      <Grid item xs={10}>
-        <span style={{fontWeight: 'bold'}}>Profesional/es: </span>
-        {appointmentData.professionals.map((item) => {
-            return (<Chip
-              avatar={<Avatar alt={item.name} src="/" />}
-              label={item.name}
-              variant="outlined"
-          />)
-          })}
-      </Grid>
+    <StyledGrid item xs={2} className={classes.textCenter}>
+      <StyledPatient className={classes.icon} />
+    </StyledGrid>
+    <Grid item xs={10}>
+      <span style={{fontWeight: 'bold'}}>Paciente/s: </span>
+        {currentAppointment.patients.map((item) => {
+          return (<Chip
+            avatar={<Avatar alt={item.name} src="/" />}
+            label={item.name}
+            variant="outlined"
+        />)
+        })}
     </Grid>
+    <StyledGrid item xs={2} className={classes.textCenter}>
+      <StyledProfessional className={classes.icon} />
+    </StyledGrid>
+    <Grid item xs={10}>
+      <span style={{fontWeight: 'bold'}}>Profesional/es: </span>
+      {currentAppointment.professionals.map((item) => {
+          return (<Chip
+            avatar={<Avatar alt={item.name} src="/" />}
+            label={item.name}
+            variant="outlined"
+        />)
+        })}
+    </Grid>
+  </Grid>
     <Divider variant="middle" sx={{mt: 2, mb: 2}}/>
   <Accordion onChange={() => setExpanded((previousState) => !previousState)} expanded={expanded}>
       <AccordionSummary
@@ -350,10 +625,11 @@ const Content = (({
               inputRef={commentRef}
               placeholder="Agregar comentario"
               inputProps={{ "aria-label": "Agregar comentario" }}
+              disabled={disableComments}
           />
           </FormControl>
           <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-          <IconButton color="primary" sx={{ p: "10px" }} aria-label="directions" onClick={() => hanldeSubmitComment(appointmentData)}>
+          <IconButton color="primary" sx={{ p: "10px" }} aria-label="directions" onClick={() => hanldeSubmitComment(currentAppointment)} disabled={disableComments}>
               <SendIcon/>
           </IconButton>
       </Paper>

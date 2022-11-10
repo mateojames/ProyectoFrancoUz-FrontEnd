@@ -3,7 +3,7 @@ export const EDITAPPOINTMENT = 'EDITAPPOINTMENT';
 export const LOADAPPOINTMENTS = 'LOADAPPOINTMENTS';
 
 export const editAppointment = (event) => {
-    console.log("editAppointment");
+    console.log("editAppointment, ", event);
     return (dispatch, getState) => {
         const appointmentId = Object.keys(event.changed)[0];
         getState().auth.currentUser.getIdToken(true)

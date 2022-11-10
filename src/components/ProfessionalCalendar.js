@@ -272,10 +272,9 @@ const Header = (({
             setOpenCancelar(true)
         }
         const handleSubmitAction = (appointment, action) => {
-            const authorData = appointment.patient.id === currentUser.uid ? { role: 'paciente', ...appointment.patient} : { role: 'profesional', ...appointment.professional}
             const comment = {
                 id: new Date().valueOf().toString(),
-                author: authorData,
+                author: currentUser.uid,
                 comment: commentRef.current.value,
                 date: new Date().toLocaleDateString('en-GB').concat(' ', new Date().toLocaleTimeString()),
                 action: action
@@ -384,14 +383,9 @@ const Content = (({
       }, []);
 
     const hanldeSubmitComment = (appointment) => {
-        //console.log('comentario: ', commentRef.current.value)
-        console.log('appointment, ', appointment)
-        //console.log('user, ', currentUser)
-        const authorData = appointment.patient.id === currentUser.uid ? { role: 'paciente', ...appointment.patient} : { role: 'profesional', ...appointment.professional}
-       //console.log('author, ', authorData)
         const comment = {
             id: new Date().valueOf().toString(),
-            author: authorData,
+            author: currentUser.uid,
             comment: commentRef.current.value,
             date: new Date().toLocaleDateString('en-GB').concat(' ', new Date().toLocaleTimeString())
         }
@@ -559,29 +553,33 @@ const Content = (({
       return (
     <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
       <Grid container alignItems="center" rowSpacing={1}>
-        <StyledGrid item xs={2} className={classes.textCenter}>
-          <StyledPatient className={classes.icon} />
-        </StyledGrid>
-        <Grid item xs={10}>
-          <span style={{fontWeight: 'bold'}}>Paciente: </span>
-          <Chip
-                avatar={<Avatar alt={appointmentData.patient.name} src="/" />}
-                label={appointmentData.patient.name}
-                variant="outlined"
-            />
-        </Grid>
-        <StyledGrid item xs={2} className={classes.textCenter}>
-          <StyledProfessional className={classes.icon} />
-        </StyledGrid>
-        <Grid item xs={10}>
-          <span style={{fontWeight: 'bold'}}>Profesional: </span>
-            <Chip
-                avatar={<Avatar alt={appointmentData.professional.name} src="/" />}
-                label={appointmentData.professional.name}
-                variant="outlined"
-            />
-        </Grid>
+      <StyledGrid item xs={2} className={classes.textCenter}>
+        <StyledPatient className={classes.icon} />
+      </StyledGrid>
+      <Grid item xs={10}>
+        <span style={{fontWeight: 'bold'}}>Paciente/s: </span>
+          {appointmentData.patients.map((item) => {
+            return (<Chip
+              avatar={<Avatar alt={item.name} src="/" />}
+              label={item.name}
+              variant="outlined"
+          />)
+          })}
       </Grid>
+      <StyledGrid item xs={2} className={classes.textCenter}>
+        <StyledProfessional className={classes.icon} />
+      </StyledGrid>
+      <Grid item xs={10}>
+        <span style={{fontWeight: 'bold'}}>Profesional/es: </span>
+        {appointmentData.professionals.map((item) => {
+            return (<Chip
+              avatar={<Avatar alt={item.name} src="/" />}
+              label={item.name}
+              variant="outlined"
+          />)
+          })}
+      </Grid>
+    </Grid>
       <Divider variant="middle" sx={{mt: 2, mb: 2}}/>
     <Accordion onChange={() => setExpanded((previousState) => !previousState)} expanded={expanded}>
         <AccordionSummary

@@ -1,20 +1,21 @@
 
-export const EDITAPPOINTMENT = 'EDITAPPOINTMENT';
-export const LOADAPPOINTMENTS = 'LOADAPPOINTMENTS';
+export const EDITUSER = 'EDITUSER';
 
-export const deleteAppointment = (event) => {
-    console.log("editAppointment");
-    console.log(event.deleted);
+export const updateUserProfile = (data) => {
+    console.log("editProfile, ", data);
     return (dispatch, getState) => {
-        const appointmentId = event.deleted;
+        const uid = data.id
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch(`https://back-red-team.vercel.app/deleteSession/${appointmentId}`, {
+                fetch(`https://back-red-team.vercel.app/updateProfile/${uid}`, {
                     method: 'PUT',
                     headers: {
                     "Content-Type": "application/json",
                     "Authorization": idToken
                     },
+                    body: JSON.stringify({
+                    user: data.profile
+                    })
                 })
                 .then((response) => {
                     console.log('RESPONSE');
@@ -27,8 +28,8 @@ export const deleteAppointment = (event) => {
                     return response.json();
                 })
                 .then((myJson) => {
-                    console.log(myJson);
-                    dispatch({type:LOADAPPOINTMENTS, appointments: myJson.appointments});
+                    console.log('RESPONSE', myJson);
+                    dispatch({type:EDITUSER, user: myJson.user});
                 })
             })
             .catch(err => console.log(err));

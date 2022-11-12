@@ -20,7 +20,8 @@ import {
   PagingPanel,
   Toolbar,
   SearchPanel,
-  TableFilterRow
+  TableFilterRow,
+  TableColumnResizing
 } from '@devexpress/dx-react-grid-material-ui';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
@@ -36,6 +37,9 @@ import { Loading } from './Loading/Loading.js';
 import { styled } from '@mui/material/styles';
 import { loadUsers } from '../store/actions/loadUsers';
 import { editRole } from "../store/actions/editRole";
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { Link, useHistory } from "react-router-dom";
+import MainBox from "./MainBox.js";
 
 
 const PREFIX = 'Demo';
@@ -59,27 +63,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     position: 'absolute !important',
   },
 }));
-
-const dummyData = [
-    {
-        "id": 0,
-        "email": "bartolome@gmail.com",
-        "isVerified": false,
-        "role": "Sin asignar"
-    },
-    {
-        "id": 1,
-        "email": "mateojames@gmail.com",
-        "isVerified": true,
-        "role": "Sin asignar"
-    },
-    {
-        "id": 2,
-        "email": "bartolome.meritello@gmail.com",
-        "isVerified": true,
-        "role": "profesional"
-    }
-];
 
 const AddButton = ({ onExecute }) => (
   <div style={{ textAlign: 'center' }}>
@@ -174,13 +157,52 @@ const LookupEditCell = ({
   </StyledTableCell>
 );
 
+const VisitPerfilCell = (props) => {
+  const history = useHistory()
+    return (
+    <Table.Cell {...props} style={{display: 'flex', alignContent: 'center' }}>
+        <IconButton
+          onClick={() => {
+            history.push({
+              pathname: "/perfil",
+              state: props.row
+            })
+          }}
+          title="Visitar Perfil"
+          size="large"
+          disabled={props.disabled}
+        >
+          <OpenInNewIcon/>
+        </IconButton>
+    </Table.Cell>);
+};
+
 const EditCell = (props) => {
   const { column } = props;
   const availableColumnValues = availableValues[column.name];
   if (availableColumnValues) {
     return <LookupEditCell {...props} availableColumnValues={availableColumnValues} />;
   }
+  if (column.name === 'link') {
+    return <VisitPerfilCell {...props} disabled={true}/>;
+  }
   return <TableEditRow.Cell {...props} />;
+};
+
+const Cell = (props) => {
+  const { column } = props;
+  if (column.name === 'link') {
+    return <VisitPerfilCell {...props} disabled={false}/>
+  }
+  return <Table.Cell {...props} />;
+};
+
+const FilterCell = (props) => {
+  const { column } = props;
+  if (column.name === 'link') {
+    return <></>;
+  }
+  return <TableFilterRow.Cell {...props} />;
 };
 
 
@@ -190,9 +212,11 @@ export default function UsersGrid(props) {
   const [columns] = useState([
     { name: 'email', title: 'Correo' },
     { name: 'isVerified', title: 'Cuenta verificada?' },
-    { name: 'role', title: 'Rol' }
+    { name: 'role', title: 'Rol' },
+    { name: 'link', title: 'Perfil' }
   ]);
   const rows = useSelector(state => state.user.users);
+  const currentUser = useSelector(state => state.auth.currentUser);
   const [editingStateColumnExtensions] = useState([
     { columnName: 'email', editingEnabled: false },
     { columnName: 'isVerified', editingEnabled: false }
@@ -224,16 +248,39 @@ export default function UsersGrid(props) {
     dispatch(loadUsers(handleLoading))
   }, []);
 
+  const [columnWidths, setColumnWidths] = useState([
+    { columnName: 'email', width: window.innerWidth/columns.length },
+    { columnName: 'isVerified', width: window.innerWidth/columns.length },
+    { columnName: 'role', width: window.innerWidth/columns.length },
+    { columnName: 'link', width: window.innerWidth/(columns.length * 2) }
+  ])
+
   /*useEffect(() => {
     setRows(data);
     console.log('setRows')
     setLoading(false)
   }, [data]);*/
 
+  useEffect(() => {
+    function handleWindowResize() {
+      setColumnWidths(
+        { columnName: 'email', width: window.innerWidth/columns.length },
+        { columnName: 'isVerified', width: window.innerWidth/columns.length },
+        { columnName: 'role', width: window.innerWidth/columns.length },
+        { columnName: 'link', width: window.innerWidth/(columns.length * 2) });
+    }
+
+    window.addEventListener('resize', handleWindowResize);
+
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, []);
+
   return (
     <Paper>
       <Grid
-        rows={rows}
+        rows={rows ? rows.filter((user) => user.id != currentUser.uid) : []}
         locale='es-ES'
         columns={columns}
         getRowId={getRowId}
@@ -255,7 +302,13 @@ export default function UsersGrid(props) {
           defaultSorting={[]}
         />
         <IntegratedSorting />
-        <Table />
+        <Table 
+          cellComponent={Cell}
+        />
+        <TableColumnResizing
+          columnWidths={columnWidths}
+          onColumnWidthsChange={setColumnWidths}
+        />
         <TableHeaderRow showSortingControls />
         <TableEditRow
           cellComponent={EditCell}
@@ -270,7 +323,9 @@ export default function UsersGrid(props) {
           pageSizes={pageSizes}
         />
         <SearchPanel />
-        <TableFilterRow />
+        <TableFilterRow
+          cellComponent={FilterCell}
+        />
       </Grid>
       {loading && <Loading />}
     </Paper>

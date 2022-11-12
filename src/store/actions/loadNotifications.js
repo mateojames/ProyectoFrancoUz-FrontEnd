@@ -1,20 +1,15 @@
+export const LOADNOTIFICATIONS = 'LOADNOTIFICATIONS';
 
-export const EDITAPPOINTMENT = 'EDITAPPOINTMENT';
-export const LOADAPPOINTMENTS = 'LOADAPPOINTMENTS';
-
-export const deleteAppointment = (event) => {
-    console.log("editAppointment");
-    console.log(event.deleted);
+export const loadNotifications = () => {
     return (dispatch, getState) => {
-        const appointmentId = event.deleted;
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch(`https://back-red-team.vercel.app/deleteSession/${appointmentId}`, {
-                    method: 'PUT',
+                fetch('https://back-red-team.vercel.app/notifications', {
+                    method: 'GET',
                     headers: {
                     "Content-Type": "application/json",
                     "Authorization": idToken
-                    },
+                    }
                 })
                 .then((response) => {
                     console.log('RESPONSE');
@@ -28,7 +23,7 @@ export const deleteAppointment = (event) => {
                 })
                 .then((myJson) => {
                     console.log(myJson);
-                    dispatch({type:LOADAPPOINTMENTS, appointments: myJson.appointments});
+                    dispatch({type:LOADNOTIFICATIONS, notifications: myJson.notifications});
                 })
             })
             .catch(err => console.log(err));

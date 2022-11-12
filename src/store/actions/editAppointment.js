@@ -3,12 +3,12 @@ export const EDITAPPOINTMENT = 'EDITAPPOINTMENT';
 export const LOADAPPOINTMENTS = 'LOADAPPOINTMENTS';
 
 export const editAppointment = (event) => {
-    console.log("editAppointment");
+    console.log("editAppointment, ", event);
     return (dispatch, getState) => {
         const appointmentId = Object.keys(event.changed)[0];
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch(`http://localhost:8080/session/${appointmentId}`, {
+                fetch(`https://back-red-team.vercel.app/session/${appointmentId}`, {
                     method: 'PUT',
                     headers: {
                     "Content-Type": "application/json",

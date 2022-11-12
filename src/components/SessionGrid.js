@@ -17,41 +17,68 @@ import {
   PagingPanel,
   Toolbar,
   SearchPanel,
-  TableFilterRow
+  TableFilterRow,
+  TableColumnResizing
 } from '@devexpress/dx-react-grid-material-ui';
 import { Loading } from './Loading/Loading.js';
 import { loadAppointments } from "../store/actions/loadAppointments";
 import { loadLocations, loadTherapies } from "../store/actions/resources.js";
-
+import IconButton from '@mui/material/IconButton';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
+import { Avatar, Chip } from "@mui/material";
 
 const getRowId = row => row.id;
 
+const ViewOnCalendarCell = (props) => {
+  console.log('PROPS ',props)
+  const history = useHistory()
+    return (
+    <Table.Cell {...props} style={{display: 'flex', alignContent: 'center' }}>
+        <IconButton
+          onClick={() => {
+            history.push({
+              pathname: "/calendar",
+              state: {...props.row}
+            })
+          }}
+          title="Ver en Calendario"
+          size="large"
+          disabled={props.disabled}
+        >
+          <OpenInNewIcon/>
+        </IconButton>
+    </Table.Cell>);
+};
+
+
 const Cell = (props) => {
-  console.log('Cel ', props)
   const { column } = props;
   if (column.name === 'link') {
-    return <Link
-    to={{
-      pathname: "/calendar",
-      state: props.row
-    }}
-  ><OpenInNewIcon/></Link>;
+    return <ViewOnCalendarCell {...props} disabled={false}/>
   }
-  return <Table.Cell {...props} />;
+  return (
+  <Table.Cell {...props} />);
+};
+
+const FilterCell = (props) => {
+  const { column } = props;
+  if (column.name === 'link') {
+    return <></>;
+  }
+  return <TableFilterRow.Cell {...props} />;
 };
 
 export default function SessionsGrid(props) {
   const [columns] = useState([
     { name: 'title', title: 'Titulo' },
     { name: 'therapy', title: 'Terapia' },
-    { name: 'patient', title: 'Paciente' },
-    { name: 'professional', title: 'Profesional' },
+    { name: 'patient', title: 'Paciente/s' },
+    { name: 'professional', title: 'Profesional/es' },
     { name: 'location', title: 'Ubicación' },
     { name: 'date', title: 'Fecha de inicio' },
     { name: 'isRecurrent', title: '¿Es recurrente?' },
-    { name: 'link', title: 'Link'}
+    { name: 'link', title: 'Ver en Calendario'}
   ]);
   const [rows, setRows] = useState([]);
   const appointments = useSelector(state => state.calendar.appointments);
@@ -61,6 +88,17 @@ export default function SessionsGrid(props) {
   const [pageSizes] = useState([5, 10, 0]);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+
+  const [columnWidths, setColumnWidths] = useState([
+    { columnName: 'title', width: window.innerWidth/columns.length },
+    { columnName: 'therapy', width: window.innerWidth/columns.length},
+    { columnName: 'patient', width: window.innerWidth/columns.length },
+    { columnName: 'professional', width: window.innerWidth/columns.length },
+    { columnName: 'location', width: window.innerWidth/columns.length },
+    { columnName: 'date', width: window.innerWidth/columns.length },
+    { columnName: 'isRecurrent', width: window.innerWidth/columns.length },
+    { columnName: 'link', width: window.innerWidth/(columns.length )}
+  ])
 
 
   const handleLoading = () => {
@@ -77,12 +115,14 @@ export default function SessionsGrid(props) {
       return appointments.map((appointment) => {
       const therapy = therapies.find((therapy)=> therapy.id == appointment.therapy)
       const location = locations.find((location)=> location.id == appointment.location)
+      const patients = appointment.patients.map((item)=> item.name)
+      const professionals = appointment.professionals.map((item)=> item.name)
       return {
         ...appointment,
         therapy: therapy ? therapy.name : 'No encontrada',
         location: location ? location.name : 'No encontrada',
-        patient: appointment.patient.name,
-        professional: appointment.professional.name
+        patient: patients,
+        professional: professionals
       }
     })
   })
@@ -101,6 +141,25 @@ export default function SessionsGrid(props) {
     handleAppointmentsToRows()
   }, [appointments, locations, therapies]);
 
+  useEffect(() => {
+    function handleWindowResize() {
+      setColumnWidths(
+        { columnName: 'title', width: window.innerWidth/columns.length },
+        { columnName: 'therapy', width: window.innerWidth/columns.length},
+        { columnName: 'patient', width: window.innerWidth/columns.length },
+        { columnName: 'professional', width: window.innerWidth/columns.length },
+        { columnName: 'location', width: window.innerWidth/columns.length },
+        { columnName: 'date', width: window.innerWidth/columns.length },
+        { columnName: 'isRecurrent', width: window.innerWidth/columns.length },
+        { columnName: 'link', width: window.innerWidth/(columns.length * 2)});
+    }
+
+    window.addEventListener('resize', handleWindowResize);
+
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, []);
 
   return (
     <Paper>
@@ -125,13 +184,19 @@ export default function SessionsGrid(props) {
         <Table
           cellComponent={Cell}
         />
+        <TableColumnResizing
+          columnWidths={columnWidths}
+          onColumnWidthsChange={setColumnWidths}
+        />
         <TableHeaderRow showSortingControls />
         <Toolbar />
         <PagingPanel
           pageSizes={pageSizes}
         />
         <SearchPanel />
-        <TableFilterRow />
+        <TableFilterRow
+          cellComponent={FilterCell}
+        />
       </Grid>
       {loading && <Loading />}
     </Paper>

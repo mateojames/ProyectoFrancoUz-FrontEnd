@@ -1,29 +1,53 @@
 import React from "react"
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
-import Dashboard from "./Dashboard"
 import Home from "./Home"
-import Calendar from "./Calendar"
-import Calendarr from "./Calendar1"
-import Calendarrr from "./Calendar2"
-import UpdateProfile from "./UpdateProfile"
+import AdminCalendar from "./AdminCalendar"
 import { useSelector } from 'react-redux'
 import UsersGrid from './Grid'
 import SessionsGrid from "./SessionGrid"
+import Profile from "./Profile"
+import {auth} from '../firebase'
+import PatientCalendar from "./PatientCalendar"
+import ProfessionalCalendar from "./ProfessionalCalendar"
+import NotAsignedHome from "./NotAsignedHome"
 
-function AuthSwitch() {
+
+
+function AuthSwitch(props) {
 
     const currentUser = useSelector(state => state.auth.currentUser);
-
-    const authRoutes = (
+    
+    const authAdminRoutes = (
         <Switch>
-            <Route exact path="/Calendar" component={Calendar} />
-            <Route exact path="/Calendar1" component={Calendarr} />
-            <Route exact path="/Calendar2" component={Calendarrr} />
-            <Route path="/inicio" component={Dashboard}/>
-            <Route path="/update-profile" component={UpdateProfile}/>
-            <Route path="/usuarios" component={UsersGrid}/>
-            <Route path="/sesiones" component={SessionsGrid}/>
+            <Route exact path="/Calendar" component={AdminCalendar} />
+            <Route exact path="/perfil" component={Profile}/>
+            <Route exact path="/usuarios" component={UsersGrid}/>
+            <Route exact path="/sesiones" component={SessionsGrid}/>
             <Route path="/" component={Home} />
+        </Switch>
+    );
+
+    const authPatientRoutes = (
+        <Switch>
+            <Route exact path="/Calendar" component={PatientCalendar} />
+            <Route exact path="/perfil" component={Profile}/>
+            <Route exact path="/sesiones" component={SessionsGrid}/>
+            <Route path="/" component={Home} />
+        </Switch>
+    );
+
+    const authProfessionalRoutes = (
+        <Switch>
+            <Route exact path="/Calendar" component={ProfessionalCalendar} />
+            <Route exact path="/perfil" component={Profile}/>
+            <Route exact path="/sesiones" component={SessionsGrid}/>
+            <Route path="/" component={Home} />
+        </Switch>
+    );
+
+    const authUndefinedRoutes = (
+        <Switch>
+            <Route path="/" component={NotAsignedHome} />
         </Switch>
     );
 
@@ -32,9 +56,30 @@ function AuthSwitch() {
             <Route path="/" component={Home} />
         </Switch>
     );
+    
+    var routes = externalRoutes;
+    if(currentUser){
+        if(props.role){
+            switch (props.role) {
+                case 'paciente':
+                    routes = authPatientRoutes
+                    break;
+                case 'profesional':
+                    routes = authProfessionalRoutes
+                    break;
+                case 'admin':
+                    routes = authAdminRoutes
+                    break;
+                default:
+                    routes = authUndefinedRoutes
+              }
+        }
+    }
+
+    console.log('rolSwitch ', props.role)
 
 
-     return (currentUser ? authRoutes : externalRoutes)
+     return (routes)
 }
 
 export default AuthSwitch;

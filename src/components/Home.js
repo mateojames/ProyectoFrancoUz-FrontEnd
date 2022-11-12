@@ -1,5 +1,4 @@
 import React, {useState, useEffect  } from "react"
-import { Modal} from "react-bootstrap"
 import ProductHero from "../views/ProductHero"
 import Login from "./Login"
 import Signup from "./Signup"
@@ -7,6 +6,7 @@ import ForgotPassword from "./ForgotPassword"
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { hideModal } from '../store/actions/modal';
+import FullBModal from "./BoostrapModal"
 
 
 export default function Home() {
@@ -16,7 +16,8 @@ export default function Home() {
 
   const show = useSelector(state => state.modal.show);
   const dispatch = useDispatch();
-
+  const title = 'Por una mirada feliz'
+  const description = 'Nuestro propósito es brindar un espacio en el que la persona con diagnóstico de TGD-TEA se encuentre contenido a la vez que lleve a cabo su tratamiento.'
   const handleModalClose = () => {
     dispatch(hideModal())
     setShowLogin(true);
@@ -62,12 +63,8 @@ export default function Home() {
 
   return (
     <>     
-      <ProductHero />
-      <Modal show={show} centered onHide={handleModalClose}>
-        <Modal.Body>
-          {form}
-        </Modal.Body>
-      </Modal>
+      <ProductHero title={title} description={description} showConozcanos={true} />
+      <FullBModal form={form} handleModalClose={handleModalClose}/>
     </>
   )
 }

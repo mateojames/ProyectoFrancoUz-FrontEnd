@@ -1,10 +1,5 @@
 import React from "react"
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
-import Dashboard from "./Dashboard"
-import Home from "./Home"
-import Calendar from "./Calendar"
-import PrivateRoute from "./PrivateRoute"
-import UpdateProfile from "./UpdateProfile"
 import withRoot from "../withRoot"
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
@@ -14,6 +9,7 @@ import calendarReducer from '../store/reducers/calendar';
 import authReducer from '../store/reducers/auth';
 import userReducer from '../store/reducers/user';
 import resourceReducer from '../store/reducers/resource';
+import notificationReducer from '../store/reducers/notification';
 import AppContent from "./AppContent"
 
 const rootReducer = combineReducers({
@@ -21,7 +17,8 @@ const rootReducer = combineReducers({
   calendar: calendarReducer,
   auth: authReducer,
   user: userReducer,
-  resource: resourceReducer
+  resource: resourceReducer,
+  notification: notificationReducer
 });
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 

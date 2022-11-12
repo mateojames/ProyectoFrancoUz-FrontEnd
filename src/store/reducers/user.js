@@ -14,7 +14,7 @@ const initialState = {
 export default (state = initialState, action) => {
     switch(action.type){
         case EDITUSER:
-            const updated = state.users.map((item) => item.id == action.user.id ? action.user : item );
+            const updated = state.users.map((item) => item.id == action.user.id ? {...item, ...action.user} : item );
             return {...state, users: updated};
         case LOADUSERS:
             return {...state, users: action.users};

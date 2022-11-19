@@ -66,6 +66,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { addCommentToRecurrent } from "../store/actions/addCommenToRecurrent";
+import { emptyCurrentAppointment } from "../store/actions/emptyCurrentAppoinment";
 
 const PREFIX = 'FrancoUz';
 
@@ -263,8 +264,11 @@ const Header = (({
       const [open, setOpen] = React.useState(false);
       const appointments = useSelector(state => state.calendar.appointments);
       const [openCancelar, setOpenCancelar] = React.useState(false);
-      let currentAppointment = appointments.find(appointment => appointment.id === appointmentData.id)
+      const addedAppointment = useSelector(state => state.calendar.currentAppointment);
+
+      let currentAppointment = addedAppointment ? addedAppointment : appointments.find(appointment => appointment.id === appointmentData.id)
       currentAppointment = currentAppointment ? currentAppointment : appointmentData
+      console.log('appointment ', currentAppointment)
       const dispatch = useDispatch()
       const handleClickOpen = () => {
         setOpen(true);
@@ -312,6 +316,10 @@ const Header = (({
           handleClose()
           commentRef.current.value = ''
       }
+
+      useEffect(() => {
+        dispatch(emptyCurrentAppointment())
+      }, []);
 
       return (
           <StyledAppointmentTooltipHeader
@@ -390,10 +398,10 @@ const Content = (({
   const currentUser = useSelector(state => state.auth.currentUser);
   const dispatch = useDispatch();
   const appointments = useSelector(state => state.calendar.appointments);
+  const addedAppointment = useSelector(state => state.calendar.currentAppointment);
   
-  let currentAppointmentTemp = appointments.find(appointment => appointment.id === appointmentData.id)
-  currentAppointmentTemp = currentAppointmentTemp ? currentAppointmentTemp : appointmentData
-  const [currentAppointment, setCurrentAppointment] = useState(currentAppointmentTemp)
+  let currentAppointment = addedAppointment ? addedAppointment : appointments.find(appointment => appointment.id === appointmentData.id)
+  currentAppointment = currentAppointment ? currentAppointment : appointmentData
   console.log('appointment ', currentAppointment)
 
   useEffect(() => {
@@ -421,14 +429,6 @@ const Content = (({
           comment: comment,
           exDate: exDate
       }
-      console.log('object comment, ', commentActionData)
-      setCurrentAppointment((prevState)=> {
-        console.log('PREVSTATE, ',prevState)
-        return {
-          ...prevState,
-          comments: prevState.comments.concat([comment])
-        }
-      })
       if(commentActionData.exDate){
         dispatch(addCommentToRecurrent(commentActionData))
       }else{

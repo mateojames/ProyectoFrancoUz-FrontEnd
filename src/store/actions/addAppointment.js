@@ -1,12 +1,11 @@
 
-export const ADDAPPOINTMENT = 'ADDAPPOINTMENT';
-export const LOADAPPOINTMENTS = 'LOADAPPOINTMENTS';
+export const ADDAPPOINTMENT = 'ADDAPPOINTMENT';;
 
 export const addAppointment = (appointment) => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('https://back-red-team.vercel.app/session', {
+                fetch('http://localhost:8080/session', {
                     method: 'POST',
                     headers: {
                     "Content-Type": "application/json",
@@ -28,7 +27,7 @@ export const addAppointment = (appointment) => {
                 })
                 .then((myJson) => {
                     console.log(myJson);
-                    dispatch({type:LOADAPPOINTMENTS, appointments: myJson.appointments});
+                    dispatch({type:ADDAPPOINTMENT, appointment: myJson.appointment});
                 })
             })
             .catch(err => console.log(err));

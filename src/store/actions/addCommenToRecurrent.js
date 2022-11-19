@@ -1,5 +1,5 @@
 
-export const LOADAPPOINTMENTS = 'LOADAPPOINTMENTS';
+export const LOADRAPPOINTMENTS = 'LOADRAPPOINTMENTS';
 
 export const addCommentToRecurrent = (commentData) => {
     console.log("editAppointment");
@@ -29,7 +29,7 @@ export const addCommentToRecurrent = (commentData) => {
                 })
                 .then((myJson) => {
                     console.log('RCOMMENT ', myJson);
-                    dispatch({type:LOADAPPOINTMENTS, appointments: myJson.appointments});
+                    dispatch({type:LOADRAPPOINTMENTS, appointmentToUpdate: myJson.appointments.updated, appointmentToAdd: myJson.appointments.added});
                 })
             })
             .catch(err => console.log(err));

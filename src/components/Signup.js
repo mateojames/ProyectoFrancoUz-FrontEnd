@@ -31,9 +31,38 @@ export default function Signup(props) {
   async function handleSubmit(e) {
     e.preventDefault()
 
+    const uppercaseRegExp   = /(?=.*?[A-Z])/;
+    const lowercaseRegExp   = /(?=.*?[a-z])/;
+    const digitsRegExp      = /(?=.*?[0-9])/;
+    const specialCharRegExp = /(?=.*?[#?!@$%^&*-])/;
+    const minLengthRegExp   = /.{8,}/;
+    const passwordLength =      passwordRef.current.value.length;
+    const uppercasePassword =   uppercaseRegExp.test(passwordRef.current.value);
+    const lowercasePassword =   lowercaseRegExp.test(passwordRef.current.value);
+    const digitsPassword =      digitsRegExp.test(passwordRef.current.value);
+    const specialCharPassword = specialCharRegExp.test(passwordRef.current.value);
+    const minLengthPassword =   minLengthRegExp.test(passwordRef.current.value);
+    let errMsg ="";
     if (passwordRef.current.value !== passwordConfirmRef.current.value) {
-      return setError("Las contraseñas no coinciden")
-    }
+            errMsg="Las contraseñas no coinciden";
+    }else if(passwordLength===0){
+            errMsg="La contraseña esta vacía";
+    }else if(!uppercasePassword){
+            errMsg="La contraseña debe poseer una letra mayúscula";
+    }else if(!lowercasePassword){
+            errMsg="La contraseña debe poseer una letra mínimo";
+    }else if(!digitsPassword){
+            errMsg="La contraseña debe poseer un dígito";
+    }else if(!specialCharPassword){
+            errMsg="La contraseña debe poseer al menos un caracter especial";
+    }else if(!minLengthPassword){
+            errMsg="La contraseña debe poseer al menos 8 caracteres";
+    }else{
+        errMsg="";
+    };
+    if(errMsg != ""){return setError(errMsg)};
+    
+    
 
     try {
       setError("")
@@ -44,8 +73,10 @@ export default function Signup(props) {
         pathname: "/",
         state: {success: true}
       })
-    } catch {
-      setError("Error al crear la cuenta")
+    } catch (e) {
+      //if(e.message.includes("Firebase: Error (auth/email-already-in-use).")){setError("El email ya es utilizado por otra cuenta")}
+      setError("Error al crear la cuenta");
+      
     }
 
     setLoading(false)

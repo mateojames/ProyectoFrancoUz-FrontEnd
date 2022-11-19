@@ -855,8 +855,59 @@ export default function AdminCalendar(){
     handleSessionFocus()
   },[dataSession])
 
+  const appointmentFormMessages = {
+    detailsLabel: "Detalles",
+    titleLabel: "Título",
+    commitCommand: "Guardar",
+    moreInformationLabel: "Más información",
+    repeatLabel: "Repetir",
+    notesLabel: "Notas",
+    never: "Nunca",
+    daily: "Diariamente",
+    weekly: "Semanalmente",
+    monthly: "Mensualmente",
+    yearly: "Anualmente",
+    repeatEveryLabel: "Repetir cada",
+    daysLabel: "día(s)",
+    endRepeatLabel: "Terminar repetición",
+    onLabel: "En",
+    afterLabel: "El día",
+    occurrencesLabel: "ocurrencia(s)",
+    weeksOnLabel: "semana(s)",
+    monthsLabel: "mes(es)",
+    ofEveryMonthLabel: "de todos los meses",
+    theLabel: "El",
+    firstLabel: "Primer",
+    secondLabel: "Segundo",
+    thirdLabel: "Tercer",
+    fourthLabel: "Cuarto",
+    lastLabel: "Último",
+    yearsLabel: "año(s)",
+    ofLabel: "de",
+    everyLabel: "Todos los",
+  };
 
+  const editRecurrenceMenuMessages = {
+    current: 'Esta sesión',
+    currentAndFollowing:'Esta y las próximas sesiones',
+    all: 'Todas las sesiones',
+    menuEditingTitle: 'Editar sesión recurrente',
+    menuDeletingTitle: 'Borrar sesión recurrente',
+    cancelButton: 'Cancelar',
+    commitButton: 'OK'
+  }
 
+  const confirmationDialogMessages = {
+    discardButton: "Descartar",
+    deleteButton: "Eliminar",
+    cancelButton: "Cancelar",
+    confirmDeleteMessage: "¿Esta seguro que desea eliminar esta sesión?",
+    confirmCancelMessage: "¿Esta seguro que desea cancelar esta sesión?"
+  }
+
+  const todayButtonMessages = {
+    today: "hoy"
+  }
 
   return (
       <Paper>
@@ -876,16 +927,17 @@ export default function AdminCalendar(){
           <WeekView
             startDayHour={8}
             endDayHour={20}
+            name="Semana"
           />
-          <DayView />
-          <MonthView />
+          <DayView name="Día"/>
+          <MonthView name="Mes"/>
 
-          <EditRecurrenceMenu />
-          <ConfirmationDialog />
+          <EditRecurrenceMenu messages={editRecurrenceMenuMessages}/>
+          <ConfirmationDialog messages={confirmationDialogMessages}/>
 
           <Toolbar />
           <DateNavigator />
-          <TodayButton />
+          <TodayButton messages={todayButtonMessages}/>
           <ViewSwitcher />
 
           <Appointments appointmentComponent={Appointment}/>
@@ -903,6 +955,7 @@ export default function AdminCalendar(){
             textEditorComponent={TextEditor}
             booleanEditorComponent={BooleanEditor}
             dateEditorComponent={DateEditor}
+            messages={appointmentFormMessages}
           />
           <Resources
             data={resources}

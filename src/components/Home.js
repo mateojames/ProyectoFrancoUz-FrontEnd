@@ -6,13 +6,21 @@ import ForgotPassword from "./ForgotPassword"
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { hideModal } from '../store/actions/modal';
+import Snackbar from '@mui/material/Snackbar';
 import FullBModal from "./BoostrapModal"
+import { useLocation } from "react-router-dom"
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Button from '@mui/material/Button';
+import { Alert } from "@mui/material"
 
 
 export default function Home() {
   const [showLogin, setShowLogin] = useState(true)
   const [showSingUp, setShowSingUp] = useState(false)
   const [showForgot, setShowForgot] = useState(false)
+  const [openSuccess, setOpenSuccess] = useState(false);
+  const locationData = useLocation();
 
   const show = useSelector(state => state.modal.show);
   const dispatch = useDispatch();
@@ -43,11 +51,22 @@ export default function Home() {
     setShowForgot(false);
   }
 
+  const handleCloseSuccess = () => {
+    setOpenSuccess(false);
+  };
+
   useEffect(() => {
     //Runs only on the first render
     dispatch(hideModal())
   }, []);
 
+  useEffect(() => {
+    if(locationData.state){
+      if(locationData.state.success){
+        setOpenSuccess(true);
+      }
+    }
+  }, [locationData]);
 
   var form = <></>;
 
@@ -64,6 +83,11 @@ export default function Home() {
   return (
     <>     
       <ProductHero title={title} description={description} showConozcanos={true} />
+      <Snackbar open={openSuccess} autoHideDuration={20000} onClose={handleCloseSuccess}>
+        <Alert onClose={handleCloseSuccess} severity="success" sx={{ width: '100%' , fontSize: 20}}>
+          ¡Su cuenta fue creada con éxito!
+        </Alert>
+      </Snackbar>
       <FullBModal form={form} handleModalClose={handleModalClose}/>
     </>
   )

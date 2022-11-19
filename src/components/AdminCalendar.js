@@ -637,7 +637,6 @@ const Content = (({
       </AccordionDetails>
     </Accordion>
     <Paper
-      component="form"
       sx={{ p: "2px 4px", display: "flex", alignItems: "center", mt: 1}}
       >
           <IconButton color="primary" sx={{ p: "10px" }} disabled>
@@ -652,7 +651,7 @@ const Content = (({
           />
           </FormControl>
           <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-          <IconButton color="primary" sx={{ p: "10px" }} aria-label="directions" onClick={() => hanldeSubmitComment(appointmentData)} disabled={disableComments}>
+          <IconButton color="primary" sx={{ p: "10px" }} aria-label="directions" onClick={() => hanldeSubmitComment(currentAppointment)} disabled={disableComments}>
               <SendIcon/>
           </IconButton>
       </Paper>

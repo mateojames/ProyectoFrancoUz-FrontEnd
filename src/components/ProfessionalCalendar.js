@@ -602,7 +602,6 @@ const Content = (({
         </AccordionDetails>
       </Accordion>
       <Paper
-        component="form"
         sx={{ p: "2px 4px", display: "flex", alignItems: "center", mt: 1}}
         >
             <IconButton color="primary" sx={{ p: "10px" }} disabled>

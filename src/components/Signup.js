@@ -40,7 +40,10 @@ export default function Signup(props) {
       setLoading(true)
       await signup(nameRef.current.value, emailRef.current.value, passwordRef.current.value)
       await signOut(auth)
-      history.push("/")
+      history.push({
+        pathname: "/",
+        state: {success: true}
+      })
     } catch {
       setError("Error al crear la cuenta")
     }

@@ -115,8 +115,8 @@ export default function SessionsGrid(props) {
       return appointments.map((appointment) => {
       const therapy = therapies.find((therapy)=> therapy.id == appointment.therapy)
       const location = locations.find((location)=> location.id == appointment.location)
-      const patients = appointment.patients.map((item)=> item.name)
-      const professionals = appointment.professionals.map((item)=> item.name)
+      const patients = (appointment.patients.map((item)=> item.name)).join(', ')
+      const professionals = (appointment.professionals.map((item)=> item.name)).join(', ')
       return {
         ...appointment,
         therapy: therapy ? therapy.name : 'No encontrada',

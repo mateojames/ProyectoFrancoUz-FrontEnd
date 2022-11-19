@@ -65,6 +65,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { addCommentToRecurrent } from "../store/actions/addCommenToRecurrent";
 
 const PREFIX = 'FrancoUz';
 
@@ -254,6 +255,7 @@ const StyledIconButton = styled(IconButton)(() => ({
 const Header = (({
   children, appointmentData, ...restProps
 }) => {
+      console.log('HEADER, ',{children, appointmentData,restProps})
       const commentRef = useRef()
       const currentUser = useSelector(state => state.auth.currentUser);
       const [anchorHeaderMenu, setAnchorHeaderMenu] = useState(null);
@@ -294,13 +296,19 @@ const Header = (({
               date: new Date().toLocaleDateString('en-GB').concat(' ', new Date().toLocaleTimeString()),
               action: action
           }
+          console.log('DATEEE ', appointment)
+          let exDate = appointment.isRecurrent === 'Si' ? appointment.startDate.toISOString().replaceAll('-', '').replaceAll(':', '').replace('.000', '') : null
           const commentActionData = {
-              appointment: appointment.id,
-              comment: comment
+              appointment: appointment,
+              comment: comment,
+              exDate: exDate
           }
           console.log('object comment, ', commentActionData)
-          dispatch(addComment(commentActionData))
-          console.log('action ', commentActionData)
+          if(commentActionData.exDate){
+            dispatch(addCommentToRecurrent(commentActionData))
+          }else{
+            dispatch(addComment(commentActionData))
+          }
           handleClose()
           commentRef.current.value = ''
       }
@@ -341,7 +349,7 @@ const Header = (({
               </DialogContent>
               <DialogActions>
               <Button onClick={handleClose}>Cancelar</Button>
-              <Button onClick={() => handleSubmitAction(currentAppointment, 'finalizar')}>Finalizar</Button>
+              <Button onClick={() => handleSubmitAction(appointmentData, 'finalizar')}>Finalizar</Button>
               </DialogActions>
           </Dialog>
           <Dialog open={openCancelar} onClose={handleClose}>
@@ -365,7 +373,7 @@ const Header = (({
               </DialogContent>
               <DialogActions>
               <Button onClick={handleClose}>Atrás</Button>
-              <Button onClick={() => handleSubmitAction(currentAppointment, 'cancelar')}>Enviar</Button>
+              <Button onClick={() => handleSubmitAction(appointmentData, 'cancelar')}>Enviar</Button>
               </DialogActions>
           </Dialog>
           </StyledAppointmentTooltipHeader>
@@ -375,7 +383,7 @@ const Header = (({
 const Content = (({
   children, appointmentData, ...restProps
 }) => {
-
+  console.log('CONTENT, ',{children, appointmentData,restProps})
   const [expanded, setExpanded] = useState(false);
   const [windowSize, setWindowSize] = useState(getWindowSize());
   const commentRef = useRef()
@@ -383,8 +391,9 @@ const Content = (({
   const dispatch = useDispatch();
   const appointments = useSelector(state => state.calendar.appointments);
   
-  let currentAppointment = appointments.find(appointment => appointment.id === appointmentData.id)
-  currentAppointment = currentAppointment ? currentAppointment : appointmentData
+  let currentAppointmentTemp = appointments.find(appointment => appointment.id === appointmentData.id)
+  currentAppointmentTemp = currentAppointmentTemp ? currentAppointmentTemp : appointmentData
+  const [currentAppointment, setCurrentAppointment] = useState(currentAppointmentTemp)
   console.log('appointment ', currentAppointment)
 
   useEffect(() => {
@@ -406,12 +415,26 @@ const Content = (({
           comment: commentRef.current.value,
           date: new Date().toLocaleDateString('en-GB').concat(' ', new Date().toLocaleTimeString())
       }
+      let exDate = appointment.isRecurrent === 'Si' ? appointment.startDate.toISOString().replaceAll('-', '').replaceAll(':', '').replace('.000', '') : null
       const commentActionData = {
-          appointment: appointment.id,
-          comment: comment
+          appointment: appointment,
+          comment: comment,
+          exDate: exDate
       }
       console.log('object comment, ', commentActionData)
-      dispatch(addComment(commentActionData))
+      setCurrentAppointment((prevState)=> {
+        console.log('PREVSTATE, ',prevState)
+        return {
+          ...prevState,
+          comments: prevState.comments.concat([comment])
+        }
+      })
+      if(commentActionData.exDate){
+        dispatch(addCommentToRecurrent(commentActionData))
+      }else{
+        dispatch(addComment(commentActionData))
+      }
+     //console.log('exDate, ', commentActionData.appointment.startDate.toISOString().replaceAll('-', '').replaceAll(':', '').replaceAll('.', ''))
       commentRef.current.value = ''
   }
   const commentsToDisplay = [...currentAppointment.comments].reverse()
@@ -629,7 +652,7 @@ const Content = (({
           />
           </FormControl>
           <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-          <IconButton color="primary" sx={{ p: "10px" }} aria-label="directions" onClick={() => hanldeSubmitComment(currentAppointment)} disabled={disableComments}>
+          <IconButton color="primary" sx={{ p: "10px" }} aria-label="directions" onClick={() => hanldeSubmitComment(appointmentData)} disabled={disableComments}>
               <SendIcon/>
           </IconButton>
       </Paper>

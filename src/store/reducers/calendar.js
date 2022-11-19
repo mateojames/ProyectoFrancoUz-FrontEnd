@@ -4,6 +4,7 @@ import { LOADAPPOINTMENTS } from "../actions/loadAppointments";
 
 const initialState = {
     appointments: [],
+    currentAppointment: null
 };
 
 export default (state = initialState, action) => {

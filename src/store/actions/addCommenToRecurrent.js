@@ -1,13 +1,13 @@
 
-export const EDITAPPOINTMENT = 'EDITAPPOINTMENT';
+export const LOADAPPOINTMENTS = 'LOADAPPOINTMENTS';
 
-export const addComment = (commentData) => {
+export const addCommentToRecurrent = (commentData) => {
     console.log("editAppointment");
     return (dispatch, getState) => {
         const appointmentId = commentData.appointment.id;
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch(`http://localhost:8080/addComment/${appointmentId}`, {
+                fetch(`http://localhost:8080/addRComment/${appointmentId}`, {
                     method: 'PUT',
                     headers: {
                     "Content-Type": "application/json",
@@ -28,8 +28,8 @@ export const addComment = (commentData) => {
                     return response.json();
                 })
                 .then((myJson) => {
-                    console.log(myJson);
-                    dispatch({type:EDITAPPOINTMENT, appointment: myJson});
+                    console.log('RCOMMENT ', myJson);
+                    dispatch({type:LOADAPPOINTMENTS, appointments: myJson.appointments});
                 })
             })
             .catch(err => console.log(err));

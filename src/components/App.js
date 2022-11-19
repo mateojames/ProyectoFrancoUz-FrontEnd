@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect} from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import withRoot from "../withRoot"
 import { createStore, combineReducers, applyMiddleware } from 'redux';
@@ -23,6 +23,10 @@ const rootReducer = combineReducers({
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 
 function App() {
+  useEffect(() => {
+    document.title = "Asociacion Franco Uz";  
+  }, []);
+
   return (
         <Router>
           <Provider store={store}>

@@ -4,6 +4,7 @@ import { LOADAPPOINTMENTS } from "../actions/loadAppointments";
 import { LOADRAPPOINTMENTS } from "../actions/addCommenToRecurrent";
 import { ADDAPPOINTMENT } from "../actions/addAppointment";
 import { EMPTYCAPPOINTMENT } from '../actions/emptyCurrentAppoinment';
+import { USERLOGOUT } from "../actions/userLogout";
 
 
 const initialState = {
@@ -26,6 +27,8 @@ export default (state = initialState, action) => {
             const updatedAppointments = state.appointments.map((item) => item.id == action.appointmentToUpdate.id ? action.appointmentToUpdate : item );
             updatedAppointments.push(action.appointmentToAdd)
             return {...state, appointments: updatedAppointments, currentAppointment: action.appointmentToAdd};
+        case USERLOGOUT:
+            return initialState
     }
     return state;
 };

@@ -25,6 +25,10 @@ export default function Profile() {
 
   console.log('LOCATION DATA',locationData)
 
+  if(locationData.state === undefined || locationData.state.role === undefined){
+    history.push("/")
+  }
+
   const dispatch = useDispatch()
 
   function handleSubmit(e) {
@@ -36,7 +40,7 @@ export default function Profile() {
         //setEditing(false)
         //setLoading(true)
         let data = {}
-        if(locationData.state.role === 'profesional'){
+        if(locationData.state && locationData.state.role && locationData.state.role === 'profesional'){
           data = {
             id: locationData.state.id,
             profile: {
@@ -56,6 +60,16 @@ export default function Profile() {
       }else{
         setEditing(true)
       }
+  }
+
+  const handlerCancelarClicked = () => {
+    if(locationData.state && locationData.state.role && locationData.state.role === 'profesional'){
+      nameRef.current.value= locationData.state.name
+      professionRef.current.value= locationData.state.profession
+    }else{
+      nameRef.current.value= locationData.state.name
+    }
+    setEditing(false)
   }
 
   function getWindowSize() {
@@ -82,10 +96,16 @@ export default function Profile() {
       <Form.Control
         type="name"
         ref={professionRef}
-        defaultValue={locationData.state.profession ? locationData.state.profession : ''}
+        defaultValue={(locationData.state && locationData.state.profession) ? locationData.state.profession : ''}
         disabled={!editing}
       />
   </Form.Group>);  
+
+  const cancelarButton = (
+    <Button className="w-100 text-center mt-2"  variant="outlined" color="secondary" onClick={handlerCancelarClicked}>
+      Cancelar
+     </Button>
+  )
 
   console.log('location ',locationData)
   return (
@@ -103,14 +123,14 @@ export default function Profile() {
           <Box>
             <Card sx={{width: 0.5*windowSize.innerWidth}}>
             <CardContent>
-              <h2 className="text-center mb-4">{locationData.state.role}</h2>
+              <h2 className="text-center mb-4">{(locationData.state && locationData.state.role) ? locationData.state.role : ''}</h2>
               {error && <Alert variant="danger">{error}</Alert>}
               <Form onSubmit={handleSubmit}>
                 <Form.Group id="email">
                   <Form.Label>Email</Form.Label>
                   <Form.Control
                     type="email"
-                    defaultValue={locationData.state.email}
+                    defaultValue={(locationData.state && locationData.state.email) ? locationData.state.email : ''}
                     disabled
                   />
                 </Form.Group>
@@ -119,17 +139,18 @@ export default function Profile() {
                   <Form.Control
                     type="name"
                     ref={nameRef}
-                    defaultValue={locationData.state.name}
+                    defaultValue={(locationData.state && locationData.state.name) ? locationData.state.name : ''}
                     disabled={!editing}
                   />
                 </Form.Group>
-                {locationData.state.role === 'profesional' ? professionField : <></>}
-                <Button disabled={loading} className="w-100" type="submit" variant="contained" color="primary">
+                {(locationData.state && locationData.state.role && locationData.state.role === 'profesional') ? professionField : <></>}
+                <Button disabled={loading || (locationData.state === undefined || locationData.state.role === undefined)} className="w-100" type="submit" variant="contained" color="primary">
                   {editing ? 'Actualizar' : 'Editar'}
                </Button>
               </Form>
             </CardContent>
           </Card>
+          {editing ? cancelarButton : <></>}
           </Box>
         </Paper>
     </Box>

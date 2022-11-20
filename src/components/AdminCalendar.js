@@ -67,6 +67,12 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { addCommentToRecurrent } from "../store/actions/addCommenToRecurrent";
 import { emptyCurrentAppointment } from "../store/actions/emptyCurrentAppoinment";
+import { 
+  todayButtonMessages,
+  editRecurrenceMenuMessages,
+  appointmentFormMessages,
+  confirmationDialogMessages
+} from "./Locale";
 
 const PREFIX = 'FrancoUz';
 
@@ -186,8 +192,6 @@ function getWindowSize() {
 const Appointment = ({
   children, style, ...restProps
 }) => {
-  
-  console.log('APPOINTMENT ', restProps)
 
   let dinamicStyle = {
       ...style,
@@ -256,7 +260,6 @@ const StyledIconButton = styled(IconButton)(() => ({
 const Header = (({
   children, appointmentData, ...restProps
 }) => {
-      console.log('HEADER, ',{children, appointmentData,restProps})
       const commentRef = useRef()
       const currentUser = useSelector(state => state.auth.currentUser);
       const [anchorHeaderMenu, setAnchorHeaderMenu] = useState(null);
@@ -268,7 +271,6 @@ const Header = (({
 
       let currentAppointment = addedAppointment ? addedAppointment : appointments.find(appointment => appointment.id === appointmentData.id)
       currentAppointment = currentAppointment ? currentAppointment : appointmentData
-      console.log('appointment ', currentAppointment)
       const dispatch = useDispatch()
       const handleClickOpen = () => {
         setOpen(true);
@@ -301,7 +303,7 @@ const Header = (({
               action: action
           }
           console.log('DATEEE ', appointment)
-          let exDate = appointment.isRecurrent === 'Si' ? appointment.startDate.toISOString().replaceAll('-', '').replaceAll(':', '').replace('.000', '') : null
+          let exDate = appointment.rRule ? appointment.startDate.toISOString().replaceAll('-', '').replaceAll(':', '').replace('.000', '') : null
           const commentActionData = {
               appointment: appointment,
               comment: comment,
@@ -335,7 +337,7 @@ const Header = (({
           >
           <MoreIcon />
           </StyledIconButton>
-          <HeaderMenu open={openHeaderMenu} handleClose={handleHeaderMenuClose} handleClick={handleHeaderMenuClick} anchorEl={anchorHeaderMenu} role={'profesional'} handleFinalizar={handleFinalizarClicked} handleCancelar={handleCancelarClicked} appointment={currentAppointment}/>
+          <HeaderMenu open={openHeaderMenu} handleClose={handleHeaderMenuClose} handleClick={handleHeaderMenuClick} anchorEl={anchorHeaderMenu} role={'profesional'} handleFinalizar={handleFinalizarClicked} handleCancelar={handleCancelarClicked} appointment={appointmentData}/>
           <Dialog open={open} onClose={handleClose}>
               <DialogTitle>Finalizar Sesión</DialogTitle>
               <DialogContent>
@@ -423,7 +425,7 @@ const Content = (({
           comment: commentRef.current.value,
           date: new Date().toLocaleDateString('en-GB').concat(' ', new Date().toLocaleTimeString())
       }
-      let exDate = appointment.isRecurrent === 'Si' ? appointment.startDate.toISOString().replaceAll('-', '').replaceAll(':', '').replace('.000', '') : null
+      let exDate = appointment.rRule ? appointment.startDate.toISOString().replaceAll('-', '').replaceAll(':', '').replace('.000', '') : null
       const commentActionData = {
           appointment: appointment,
           comment: comment,
@@ -431,7 +433,9 @@ const Content = (({
       }
       if(commentActionData.exDate){
         dispatch(addCommentToRecurrent(commentActionData))
+        console.log('RECURRENTCOMMENT')
       }else{
+        console.log('COMMENT')
         dispatch(addComment(commentActionData))
       }
      //console.log('exDate, ', commentActionData.appointment.startDate.toISOString().replaceAll('-', '').replaceAll(':', '').replaceAll('.', ''))
@@ -637,6 +641,7 @@ const Content = (({
       </AccordionDetails>
     </Accordion>
     <Paper
+
       sx={{ p: "2px 4px", display: "flex", alignItems: "center", mt: 1}}
       >
           <IconButton color="primary" sx={{ p: "10px" }} disabled>
@@ -651,7 +656,7 @@ const Content = (({
           />
           </FormControl>
           <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-          <IconButton color="primary" sx={{ p: "10px" }} aria-label="directions" onClick={() => hanldeSubmitComment(currentAppointment)} disabled={disableComments}>
+          <IconButton color="primary" sx={{ p: "10px" }} aria-label="directions" onClick={() => hanldeSubmitComment(appointmentData)} disabled={disableComments}>
               <SendIcon/>
           </IconButton>
       </Paper>
@@ -817,7 +822,7 @@ export default function AdminCalendar(){
   }
 
   const handleSessionFocus = () => {
-    if(dataSession.state != undefined){
+    if(dataSession != undefined && dataSession.state != undefined && dataSession.state.date != undefined){
       const date = dataSession.state.date;
       console.log("Session info1 -->", date);
 
@@ -855,59 +860,8 @@ export default function AdminCalendar(){
     handleSessionFocus()
   },[dataSession])
 
-  const appointmentFormMessages = {
-    detailsLabel: "Detalles",
-    titleLabel: "Título",
-    commitCommand: "Guardar",
-    moreInformationLabel: "Más información",
-    repeatLabel: "Repetir",
-    notesLabel: "Notas",
-    never: "Nunca",
-    daily: "Diariamente",
-    weekly: "Semanalmente",
-    monthly: "Mensualmente",
-    yearly: "Anualmente",
-    repeatEveryLabel: "Repetir cada",
-    daysLabel: "día(s)",
-    endRepeatLabel: "Terminar repetición",
-    onLabel: "En",
-    afterLabel: "El día",
-    occurrencesLabel: "ocurrencia(s)",
-    weeksOnLabel: "semana(s)",
-    monthsLabel: "mes(es)",
-    ofEveryMonthLabel: "de todos los meses",
-    theLabel: "El",
-    firstLabel: "Primer",
-    secondLabel: "Segundo",
-    thirdLabel: "Tercer",
-    fourthLabel: "Cuarto",
-    lastLabel: "Último",
-    yearsLabel: "año(s)",
-    ofLabel: "de",
-    everyLabel: "Todos los",
-  };
 
-  const editRecurrenceMenuMessages = {
-    current: 'Esta sesión',
-    currentAndFollowing:'Esta y las próximas sesiones',
-    all: 'Todas las sesiones',
-    menuEditingTitle: 'Editar sesión recurrente',
-    menuDeletingTitle: 'Borrar sesión recurrente',
-    cancelButton: 'Cancelar',
-    commitButton: 'OK'
-  }
 
-  const confirmationDialogMessages = {
-    discardButton: "Descartar",
-    deleteButton: "Eliminar",
-    cancelButton: "Cancelar",
-    confirmDeleteMessage: "¿Esta seguro que desea eliminar esta sesión?",
-    confirmCancelMessage: "¿Esta seguro que desea cancelar esta sesión?"
-  }
-
-  const todayButtonMessages = {
-    today: "hoy"
-  }
 
   return (
       <Paper>

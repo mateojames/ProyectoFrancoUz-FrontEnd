@@ -6,12 +6,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { MenuList } from "@mui/material";
 import Typography from "./Typography";
 import { notificationRead } from "../store/actions/notificationRead";
+import { loadAppointments } from "../store/actions/loadAppointments";
 
 
 export default function NotificationsMenu(props) {
     const history = useHistory()
     const [windowSize, setWindowSize] = useState(getWindowSize());
     const dispatch = useDispatch()
+    const currentUser = useSelector(state => state.auth.currentUser);
     const notifications = useSelector(state => state.notification.notifications);
     const appointments = useSelector(state => state.calendar.appointments)
     const handleNotificationClicked = (data) => {
@@ -34,7 +36,7 @@ export default function NotificationsMenu(props) {
         )
 
     if(notifications.length > 0){
-        const orderedNotifications = [...notifications]
+        const orderedNotifications = [...notifications].reverse()
         notificationsList = (
             <MenuList sx={{maxWidth: {xs: windowSize.innerWidth / 1.8, md: windowSize.innerWidth / 3, lg:windowSize.innerWidth / 5}, maxHeight: windowSize.innerHeight / 2.2, overflow:'auto'}}>
                 {orderedNotifications.map((item) => {
@@ -43,7 +45,7 @@ export default function NotificationsMenu(props) {
                     return (
                         <MenuItem divider style={{whiteSpace: "normal", display: 'flex', flexDirection: 'column', backgroundColor: backgroungColor, }} onClick={() => handleNotificationClicked({...item, appointment: appointment})}>
                             <Typography  gutterBottom={false}>
-                            <span style={{fontStyle:'italic'}}>{item.trigger.name}</span>
+                            <span style={{fontStyle:'italic'}}>{item.trigger ? item.trigger.name : ''}</span>
                             <span >{item.description}</span>
                             <span style={{fontWeight:'bold'}}>{(appointment ? appointment.title : '')}</span>
                             </Typography>
@@ -70,7 +72,17 @@ export default function NotificationsMenu(props) {
             return () => {
               window.removeEventListener('resize', handleWindowResize);
             };
-          }, []);    
+          }, []); 
+
+          const handleLoading = () => {
+            
+          };
+
+          useEffect(() => {
+            if(currentUser && appointments.length === 0){
+              dispatch(loadAppointments(handleLoading));
+            }
+          }, []);
     
 
     return (

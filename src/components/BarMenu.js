@@ -14,10 +14,13 @@ import {
     signOut
   } from "firebase/auth";
 import { MenuList } from "@mui/material";
+import { useDispatch } from "react-redux";
+import { userLogout } from "../store/actions/userLogout";
 
 export default function BarMenu(props) {
     const [error, setError] = useState("")
     const history = useHistory()
+    const dispatch = useDispatch()
 
     const logout = () => signOut(auth);
 
@@ -26,6 +29,7 @@ export default function BarMenu(props) {
 
         try {
         await logout()
+        dispatch(userLogout())
         history.push("/")
         } catch {
         setError("Error al cerrar sesión")

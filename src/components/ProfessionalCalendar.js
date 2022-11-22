@@ -54,6 +54,11 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { 
+  todayButtonMessages
+} from "./Locale";
+import { addCommentToRecurrent } from "../store/actions/addCommenToRecurrent";
+import { emptyCurrentAppointment } from "../store/actions/emptyCurrentAppoinment";
 
 const PREFIX = 'FrancoUz';
 
@@ -249,7 +254,9 @@ const Header = (({
         const [open, setOpen] = React.useState(false);
         const appointments = useSelector(state => state.calendar.appointments);
         const [openCancelar, setOpenCancelar] = React.useState(false);
-        let currentAppointment = appointments.find(appointment => appointment.id === appointmentData.id)
+        const addedAppointment = useSelector(state => state.calendar.currentAppointment);
+
+        let currentAppointment = addedAppointment ? addedAppointment : appointments.find(appointment => appointment.id === appointmentData.id)
         currentAppointment = currentAppointment ? currentAppointment : appointmentData
         const dispatch = useDispatch()
         const handleClickOpen = () => {
@@ -275,23 +282,31 @@ const Header = (({
             setOpenCancelar(true)
         }
         const handleSubmitAction = (appointment, action) => {
-            const comment = {
-                id: new Date().valueOf().toString(),
-                author: currentUser.uid,
-                comment: commentRef.current.value,
-                date: new Date().toLocaleDateString('en-GB').concat(' ', new Date().toLocaleTimeString()),
-                action: action
-            }
-            const commentActionData = {
-                appointment: appointment.id,
-                comment: comment
-            }
-            console.log('object comment, ', commentActionData)
+          const comment = {
+              id: new Date().valueOf().toString(),
+              author: currentUser.uid,
+              comment: commentRef.current.value,
+              date: new Date().toLocaleDateString('en-GB').concat(' ', new Date().toLocaleTimeString()),
+              action: action
+          }
+          let exDate = appointment.rRule ? appointment.startDate.toISOString().replaceAll('-', '').replaceAll(':', '').replace('.000', '') : null
+          const commentActionData = {
+              appointment: appointment,
+              comment: comment,
+              exDate: exDate
+          }
+          if(commentActionData.exDate){
+            dispatch(addCommentToRecurrent(commentActionData))
+          }else{
             dispatch(addComment(commentActionData))
-            console.log('action ', commentActionData)
-            handleClose()
-            commentRef.current.value = ''
-        }
+          }
+          handleClose()
+          commentRef.current.value = ''
+      }
+
+      useEffect(() => {
+        dispatch(emptyCurrentAppointment())
+      }, []);
 
         return (
             <StyledAppointmentTooltipHeader
@@ -307,7 +322,7 @@ const Header = (({
             >
             <MoreIcon />
             </StyledIconButton>
-            <HeaderMenu open={openHeaderMenu} handleClose={handleHeaderMenuClose} handleClick={handleHeaderMenuClick} anchorEl={anchorHeaderMenu} role={'profesional'} handleFinalizar={handleFinalizarClicked} handleCancelar={handleCancelarClicked} appointment={currentAppointment}/>
+            <HeaderMenu open={openHeaderMenu} handleClose={handleHeaderMenuClose} handleClick={handleHeaderMenuClick} anchorEl={anchorHeaderMenu} role={'profesional'} handleFinalizar={handleFinalizarClicked} handleCancelar={handleCancelarClicked} appointment={appointmentData}/>
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Finalizar Sesión</DialogTitle>
                 <DialogContent>
@@ -329,7 +344,7 @@ const Header = (({
                 </DialogContent>
                 <DialogActions>
                 <Button onClick={handleClose}>Cancelar</Button>
-                <Button onClick={() => handleSubmitAction(currentAppointment, 'finalizar')}>Finalizar</Button>
+                <Button onClick={() => handleSubmitAction(appointmentData, 'finalizar')}>Finalizar</Button>
                 </DialogActions>
             </Dialog>
             <Dialog open={openCancelar} onClose={handleClose}>
@@ -353,7 +368,7 @@ const Header = (({
                 </DialogContent>
                 <DialogActions>
                 <Button onClick={handleClose}>Atrás</Button>
-                <Button onClick={() => handleSubmitAction(currentAppointment, 'cancelar')}>Enviar</Button>
+                <Button onClick={() => handleSubmitAction(appointmentData, 'cancelar')}>Enviar</Button>
                 </DialogActions>
             </Dialog>
             </StyledAppointmentTooltipHeader>
@@ -368,11 +383,11 @@ const Content = (({
     const commentRef = useRef()
     const currentUser = useSelector(state => state.auth.currentUser);
     const dispatch = useDispatch();
-    const appointments = useSelector(state => state.calendar.appointments);
-    
-    let currentAppointment = appointments.find(appointment => appointment.id === appointmentData.id)
+    const appointments = useSelector(state => state.calendar.appointments); 
+    const addedAppointment = useSelector(state => state.calendar.currentAppointment);
+  
+    let currentAppointment = addedAppointment ? addedAppointment : appointments.find(appointment => appointment.id === appointmentData.id)
     currentAppointment = currentAppointment ? currentAppointment : appointmentData
-    console.log('appointment ', currentAppointment)
 
     useEffect(() => {
         function handleWindowResize() {
@@ -386,20 +401,24 @@ const Content = (({
         };
       }, []);
 
-    const hanldeSubmitComment = (appointment, event) => {
-      event.preventDefault()
+      const hanldeSubmitComment = (appointment) => {
         const comment = {
             id: new Date().valueOf().toString(),
             author: currentUser.uid,
             comment: commentRef.current.value,
             date: new Date().toLocaleDateString('en-GB').concat(' ', new Date().toLocaleTimeString())
         }
+        let exDate = appointment.rRule ? appointment.startDate.toISOString().replaceAll('-', '').replaceAll(':', '').replace('.000', '') : null
         const commentActionData = {
-            appointment: appointment.id,
-            comment: comment
+            appointment: appointment,
+            comment: comment,
+            exDate: exDate
         }
-        console.log('object comment, ', commentActionData)
-        dispatch(addComment(commentActionData))
+        if(commentActionData.exDate){
+          dispatch(addCommentToRecurrent(commentActionData))
+        }else{
+          dispatch(addComment(commentActionData))
+        }
         commentRef.current.value = ''
     }
     const commentsToDisplay = [...currentAppointment.comments].reverse()
@@ -602,7 +621,6 @@ const Content = (({
         </AccordionDetails>
       </Accordion>
       <Paper
-        component="form"
         sx={{ p: "2px 4px", display: "flex", alignItems: "center", mt: 1}}
         >
             <IconButton color="primary" sx={{ p: "10px" }} disabled>
@@ -618,7 +636,7 @@ const Content = (({
             />
             </FormControl>
             <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-            <IconButton color="primary" sx={{ p: "10px" }} aria-label="directions" onClick={(e) => hanldeSubmitComment(currentAppointment,e)} disabled={disableComments}>
+            <IconButton color="primary" sx={{ p: "10px" }} aria-label="directions" onClick={() => hanldeSubmitComment(appointmentData)} disabled={disableComments}>
                 <SendIcon/>
             </IconButton>
         </Paper>
@@ -677,7 +695,7 @@ export default function ProfessionalCalendar(){
   }
 
   const handleSessionFocus = () => {
-    if(dataSession.state != undefined){
+    if(dataSession != undefined && dataSession.state != undefined && dataSession.state.date != undefined){
       const date = dataSession.state.date;
       console.log("Session info1 -->", date);
 
@@ -735,14 +753,15 @@ export default function ProfessionalCalendar(){
 
           <WeekView
             startDayHour={8}
-            endDayHour={20}
+            endDayHour={23}
+            name="Semana"
           />
-          <DayView />
-          <MonthView />
+          <DayView name="Día"/>
+          <MonthView name="Mes"/>
 
           <Toolbar />
           <DateNavigator />
-          <TodayButton />
+          <TodayButton messages={todayButtonMessages}/>
           <ViewSwitcher />
 
           <Appointments appointmentComponent={Appointment}/>

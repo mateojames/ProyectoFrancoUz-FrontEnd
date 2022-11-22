@@ -199,7 +199,6 @@ const ResponsiveAppBar = (props) => {
                                     variant="h6"
                                     noWrap
                                     component="a"
-                                    href="/"
                                     sx={{
                                     display: { xs: 'none', md: 'flex' },
                                     mr: 2,
@@ -208,6 +207,7 @@ const ResponsiveAppBar = (props) => {
                                     color: 'inherit',
                                     textDecoration: 'none',
                                     }}
+                                    onClick={() => history.push("/")}
                                 >
                                     Asociación Franco Uz
                                 </Typography>

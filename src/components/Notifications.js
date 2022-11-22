@@ -6,12 +6,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { MenuList } from "@mui/material";
 import Typography from "./Typography";
 import { notificationRead } from "../store/actions/notificationRead";
+import { loadAppointments } from "../store/actions/loadAppointments";
 
 
 export default function NotificationsMenu(props) {
     const history = useHistory()
     const [windowSize, setWindowSize] = useState(getWindowSize());
     const dispatch = useDispatch()
+    const currentUser = useSelector(state => state.auth.currentUser);
     const notifications = useSelector(state => state.notification.notifications);
     const appointments = useSelector(state => state.calendar.appointments)
     const handleNotificationClicked = (data) => {
@@ -24,6 +26,13 @@ export default function NotificationsMenu(props) {
           })
     }
 
+    function sort_by_key(array, key){
+         return array.sort(function(a, b){
+          var x = a[key]; var y = b[key];
+          return ((x > y) ? -1 : ((x < y) ? 1 : 0));
+        });
+    }
+
     let notificationsList = (
             <MenuList sx={{maxWidth: {xs: windowSize.innerWidth / 1.8, md: windowSize.innerWidth / 3, lg:windowSize.innerWidth / 5}, maxHeight: windowSize.innerHeight / 2.2, overflow:'auto'}}>
                         <MenuItem style={{whiteSpace: "normal", display: 'flex', flexDirection: 'column'}}>
@@ -33,8 +42,13 @@ export default function NotificationsMenu(props) {
              </MenuList>
         )
 
+    const dateNotifications = notifications.map(x => {
+      return {...x, date: new Date(x.date)}
+    })
+
+        
     if(notifications.length > 0){
-        const orderedNotifications = [...notifications]
+        const orderedNotifications = sort_by_key(dateNotifications,'date')
         notificationsList = (
             <MenuList sx={{maxWidth: {xs: windowSize.innerWidth / 1.8, md: windowSize.innerWidth / 3, lg:windowSize.innerWidth / 5}, maxHeight: windowSize.innerHeight / 2.2, overflow:'auto'}}>
                 {orderedNotifications.map((item) => {
@@ -43,11 +57,12 @@ export default function NotificationsMenu(props) {
                     return (
                         <MenuItem divider style={{whiteSpace: "normal", display: 'flex', flexDirection: 'column', backgroundColor: backgroungColor, }} onClick={() => handleNotificationClicked({...item, appointment: appointment})}>
                             <Typography  gutterBottom={false}>
-                            <span style={{fontStyle:'italic'}}>{item.trigger.name}</span>
+                            <span style={{fontStyle:'italic'}}>{item.trigger ? item.trigger.name : ''}</span>
                             <span >{item.description}</span>
                             <span style={{fontWeight:'bold'}}>{(appointment ? appointment.title : '')}</span>
                             </Typography>
-                            <Typography sx={{fontStyle: 'italic', ml:10}}>{item.date}</Typography>
+                            <Typography sx={{fontStyle: 'italic', ml:10}}>{item.date.toLocaleDateString('en-GB').concat(' ', item.date.toLocaleTimeString())
+}</Typography>
                         </MenuItem>
                     )
                 })}
@@ -70,7 +85,17 @@ export default function NotificationsMenu(props) {
             return () => {
               window.removeEventListener('resize', handleWindowResize);
             };
-          }, []);    
+          }, []); 
+
+          const handleLoading = () => {
+            
+          };
+
+          useEffect(() => {
+            if(currentUser && appointments.length === 0){
+              dispatch(loadAppointments(handleLoading));
+            }
+          }, []);
     
 
     return (

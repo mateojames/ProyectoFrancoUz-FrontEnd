@@ -3,6 +3,7 @@ import { EDITUSER } from "../actions/editRole";
 import { LOADPATIENTS } from "../actions/loadPatients";
 import { LOADPROFESSIONALS } from "../actions/loadProfessionals";
 import { LOADUSERS } from "../actions/loadUsers";
+import { USERLOGOUT } from "../actions/userLogout";
 
 const initialState = {
     users: [],
@@ -24,6 +25,8 @@ export default (state = initialState, action) => {
             return {...state, patients: action.users};
         case LOADPROFESSIONALS:
             return {...state, professionals: action.users};
+        case USERLOGOUT:
+            return initialState
     }
     return state;
 };

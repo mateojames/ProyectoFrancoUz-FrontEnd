@@ -1,6 +1,5 @@
 
-export const ADDAPPOINTMENT = 'ADDAPPOINTMENT';
-export const LOADAPPOINTMENTS = 'LOADAPPOINTMENTS';
+export const ADDAPPOINTMENT = 'ADDAPPOINTMENT';;
 
 export const addAppointment = (appointment) => {
     return (dispatch, getState) => {
@@ -28,7 +27,7 @@ export const addAppointment = (appointment) => {
                 })
                 .then((myJson) => {
                     console.log(myJson);
-                    dispatch({type:LOADAPPOINTMENTS, appointments: myJson.appointments});
+                    dispatch({type:ADDAPPOINTMENT, appointment: myJson.appointment});
                 })
             })
             .catch(err => console.log(err));

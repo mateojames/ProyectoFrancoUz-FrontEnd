@@ -115,8 +115,8 @@ export default function SessionsGrid(props) {
       return appointments.map((appointment) => {
       const therapy = therapies.find((therapy)=> therapy.id == appointment.therapy)
       const location = locations.find((location)=> location.id == appointment.location)
-      const patients = appointment.patients.map((item)=> item.name)
-      const professionals = appointment.professionals.map((item)=> item.name)
+      const patients = (appointment.patients.map((item)=> item.name)).join(', ')
+      const professionals = (appointment.professionals.map((item)=> item.name)).join(', ')
       return {
         ...appointment,
         therapy: therapy ? therapy.name : 'No encontrada',
@@ -144,14 +144,14 @@ export default function SessionsGrid(props) {
   useEffect(() => {
     function handleWindowResize() {
       setColumnWidths(
-        { columnName: 'title', width: window.innerWidth/columns.length },
+        [{ columnName: 'title', width: window.innerWidth/columns.length },
         { columnName: 'therapy', width: window.innerWidth/columns.length},
         { columnName: 'patient', width: window.innerWidth/columns.length },
         { columnName: 'professional', width: window.innerWidth/columns.length },
         { columnName: 'location', width: window.innerWidth/columns.length },
         { columnName: 'date', width: window.innerWidth/columns.length },
         { columnName: 'isRecurrent', width: window.innerWidth/columns.length },
-        { columnName: 'link', width: window.innerWidth/(columns.length * 2)});
+        { columnName: 'link', width: window.innerWidth/(columns.length * 2)}]);
     }
 
     window.addEventListener('resize', handleWindowResize);

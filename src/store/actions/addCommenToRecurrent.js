@@ -1,13 +1,13 @@
 
-export const EDITAPPOINTMENT = 'EDITAPPOINTMENT';
+export const LOADRAPPOINTMENTS = 'LOADRAPPOINTMENTS';
 
-export const addComment = (commentData) => {
+export const addCommentToRecurrent = (commentData) => {
     console.log("editAppointment");
     return (dispatch, getState) => {
         const appointmentId = commentData.appointment.id;
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch(`https://back-red-team.vercel.app/addComment/${appointmentId}`, {
+                fetch(`https://back-red-team.vercel.app/addRComment/${appointmentId}`, {
                     method: 'PUT',
                     headers: {
                     "Content-Type": "application/json",
@@ -28,8 +28,8 @@ export const addComment = (commentData) => {
                     return response.json();
                 })
                 .then((myJson) => {
-                    console.log(myJson);
-                    dispatch({type:EDITAPPOINTMENT, appointment: myJson});
+                    console.log('RCOMMENT ', myJson);
+                    dispatch({type:LOADRAPPOINTMENTS, appointmentToUpdate: myJson.appointments.updated, appointmentToAdd: myJson.appointments.added});
                 })
             })
             .catch(err => console.log(err));

@@ -750,7 +750,7 @@ export default function PatientCalendar(){
 
           <WeekView
             startDayHour={8}
-            endDayHour={20}
+            endDayHour={23}
             name="Semana"
           />
           <DayView name="Día"/>

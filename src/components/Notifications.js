@@ -26,6 +26,13 @@ export default function NotificationsMenu(props) {
           })
     }
 
+    function sort_by_key(array, key){
+         return array.sort(function(a, b){
+          var x = a[key]; var y = b[key];
+          return ((x > y) ? -1 : ((x < y) ? 1 : 0));
+        });
+    }
+
     let notificationsList = (
             <MenuList sx={{maxWidth: {xs: windowSize.innerWidth / 1.8, md: windowSize.innerWidth / 3, lg:windowSize.innerWidth / 5}, maxHeight: windowSize.innerHeight / 2.2, overflow:'auto'}}>
                         <MenuItem style={{whiteSpace: "normal", display: 'flex', flexDirection: 'column'}}>
@@ -35,8 +42,13 @@ export default function NotificationsMenu(props) {
              </MenuList>
         )
 
+    const dateNotifications = notifications.map(x => {
+      return {...x, date: new Date(x.date)}
+    })
+
+        
     if(notifications.length > 0){
-        const orderedNotifications = [...notifications].reverse()
+        const orderedNotifications = sort_by_key(dateNotifications,'date')
         notificationsList = (
             <MenuList sx={{maxWidth: {xs: windowSize.innerWidth / 1.8, md: windowSize.innerWidth / 3, lg:windowSize.innerWidth / 5}, maxHeight: windowSize.innerHeight / 2.2, overflow:'auto'}}>
                 {orderedNotifications.map((item) => {
@@ -49,7 +61,8 @@ export default function NotificationsMenu(props) {
                             <span >{item.description}</span>
                             <span style={{fontWeight:'bold'}}>{(appointment ? appointment.title : '')}</span>
                             </Typography>
-                            <Typography sx={{fontStyle: 'italic', ml:10}}>{item.date}</Typography>
+                            <Typography sx={{fontStyle: 'italic', ml:10}}>{item.date.toLocaleDateString('en-GB').concat(' ', item.date.toLocaleTimeString())
+}</Typography>
                         </MenuItem>
                     )
                 })}

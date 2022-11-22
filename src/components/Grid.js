@@ -263,11 +263,11 @@ export default function UsersGrid(props) {
 
   useEffect(() => {
     function handleWindowResize() {
-      setColumnWidths(
+      setColumnWidths([
         { columnName: 'email', width: window.innerWidth/columns.length },
         { columnName: 'isVerified', width: window.innerWidth/columns.length },
         { columnName: 'role', width: window.innerWidth/columns.length },
-        { columnName: 'link', width: window.innerWidth/(columns.length * 2) });
+        { columnName: 'link', width: window.innerWidth/(columns.length * 2) }]);
     }
 
     window.addEventListener('resize', handleWindowResize);

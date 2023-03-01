@@ -17,6 +17,9 @@ import {
   TodayButton,
   ConfirmationDialog
 } from '@devexpress/dx-react-scheduler-material-ui';
+
+import Notification from './NotificationToast'
+
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -865,6 +868,7 @@ export default function AdminCalendar(){
 
   return (
       <Paper>
+        <Notification/>
         <Scheduler
           data={data}
           locale='es-ES'

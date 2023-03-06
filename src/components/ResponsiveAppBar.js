@@ -4,7 +4,6 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
@@ -23,10 +22,8 @@ import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
 import Badge from '@mui/material/Badge';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import BarMenu from "./BarMenu";
-import CalendarMenu from "./CalendarMenu";
 import NotificationsMenu from "./Notifications";
 import { loadNotifications } from "../store/actions/loadNotifications";
-import { FlashOffOutlined } from "@mui/icons-material";
 
 const drawerWidth = 240;
 
@@ -41,10 +38,6 @@ const ResponsiveAppBar = (props) => {
      const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
         console.log(mobileOpen)
-    };
-
-    const handlePerfilClicked = () => {
-        history.push("/perfil")
     };
 
     const handleCalendarClicked = () => {
@@ -63,15 +56,6 @@ const ResponsiveAppBar = (props) => {
     };
     const handleMenuClose = () => {
         setAnchorMenu(null);
-    };
-
-    const [anchorCalendarMenu, setAnchorCalendarMenu] = useState(null);
-    const openCalendarMenu = Boolean(anchorCalendarMenu);
-    const handleCalendarMenuClick = (event) => {
-        setAnchorCalendarMenu(event.currentTarget);
-    };
-    const handleCalendarMenuClose = () => {
-        setAnchorCalendarMenu(null);
     };
 
     const [anchorNotificationsMenu, setAnchorNotificationsMenu] = useState(null);
@@ -116,7 +100,7 @@ const ResponsiveAppBar = (props) => {
                             </IconButton>
                          </Tooltip>
                         <Tooltip title="Calendario">
-                            <IconButton onClick={handleCalendarMenuClick} color="inherit" sx={{ mr: 2 }}>
+                            <IconButton onClick={handleCalendarClicked} color="inherit" sx={{ mr: 2 }}>
                                 <InsertInvitationIcon />
                             </IconButton>
                         </Tooltip>
@@ -237,7 +221,6 @@ const ResponsiveAppBar = (props) => {
                 </Box>
             </Box>
             <BarMenu open={openMenu} handleClose={handleMenuClose} handleClick={handleMenuClick} anchorEl={anchorMenu} role={props.role}/>
-            <CalendarMenu open={openCalendarMenu} handleClose={handleCalendarMenuClose} handleClick={handleCalendarClicked} anchorEl={anchorCalendarMenu} role={props.role}/>
             <NotificationsMenu open={openNotificationsMenu} handleClose={handleNotficationsMenuClose} handleClick={handleNotificationsMenuClick} anchorEl={anchorNotificationsMenu} role={props.role}/>
         </>
     );

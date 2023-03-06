@@ -37,9 +37,7 @@ import { Loading } from './Loading/Loading.js';
 import { styled } from '@mui/material/styles';
 import { loadUsers } from '../store/actions/loadUsers';
 import { editRole } from "../store/actions/editRole";
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import { Link, useHistory } from "react-router-dom";
-import MainBox from "./MainBox.js";
+
 
 
 const PREFIX = 'Demo';
@@ -86,7 +84,7 @@ const DeleteButton = ({ onExecute }) => (
   <IconButton
     onClick={() => {
       // eslint-disable-next-line
-      if (window.confirm('Are you sure you want to delete this row?')) {
+      if (window.confirm('Esta seguro que desea eliminar este usuario?')) {
         onExecute();
       }
     }}
@@ -156,7 +154,7 @@ const LookupEditCell = ({
     </Select>
   </StyledTableCell>
 );
-
+/*
 const VisitPerfilCell = (props) => {
   const history = useHistory()
     return (
@@ -175,7 +173,7 @@ const VisitPerfilCell = (props) => {
           <OpenInNewIcon/>
         </IconButton>
     </Table.Cell>);
-};
+};*/
 
 const EditCell = (props) => {
   const { column } = props;
@@ -183,25 +181,28 @@ const EditCell = (props) => {
   if (availableColumnValues) {
     return <LookupEditCell {...props} availableColumnValues={availableColumnValues} />;
   }
+  /*
   if (column.name === 'link') {
     return <VisitPerfilCell {...props} disabled={true}/>;
-  }
+  }*/
   return <TableEditRow.Cell {...props} />;
 };
 
 const Cell = (props) => {
   const { column } = props;
+  /*
   if (column.name === 'link') {
     return <VisitPerfilCell {...props} disabled={false}/>
-  }
+  }*/
   return <Table.Cell {...props} />;
 };
 
 const FilterCell = (props) => {
   const { column } = props;
+  /*
   if (column.name === 'link') {
     return <></>;
-  }
+  }*/
   return <TableFilterRow.Cell {...props} />;
 };
 
@@ -213,8 +214,9 @@ export default function UsersGrid(props) {
     { name: 'email', title: 'Correo' },
     { name: 'isVerified', title: 'Cuenta verificada?' },
     { name: 'role', title: 'Rol' },
-    { name: 'link', title: 'Perfil' }
   ]);
+  //perfil column was named 'link'
+
   const rows = useSelector(state => state.user.users);
   const currentUser = useSelector(state => state.auth.currentUser);
   const [editingStateColumnExtensions] = useState([
@@ -251,8 +253,7 @@ export default function UsersGrid(props) {
   const [columnWidths, setColumnWidths] = useState([
     { columnName: 'email', width: window.innerWidth/columns.length },
     { columnName: 'isVerified', width: window.innerWidth/columns.length },
-    { columnName: 'role', width: window.innerWidth/columns.length },
-    { columnName: 'link', width: window.innerWidth/(columns.length * 2) }
+    { columnName: 'role', width: window.innerWidth/columns.length }
   ])
 
   /*useEffect(() => {
@@ -266,8 +267,7 @@ export default function UsersGrid(props) {
       setColumnWidths([
         { columnName: 'email', width: window.innerWidth/columns.length },
         { columnName: 'isVerified', width: window.innerWidth/columns.length },
-        { columnName: 'role', width: window.innerWidth/columns.length },
-        { columnName: 'link', width: window.innerWidth/(columns.length * 2) }]);
+        { columnName: 'role', width: window.innerWidth/columns.length }]);
     }
 
     window.addEventListener('resize', handleWindowResize);

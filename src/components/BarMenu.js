@@ -1,14 +1,11 @@
 import React, { useState } from "react"
-import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Divider from '@mui/material/Divider';
-import PersonAdd from '@mui/icons-material/PersonAdd';
-import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
 import GroupIcon from '@mui/icons-material/Group';
-import { Link, useHistory } from "react-router-dom"
+import { useHistory } from "react-router-dom"
 import { auth } from "../firebase"
 import {
     signOut
@@ -41,10 +38,6 @@ export default function BarMenu(props) {
     }
 
     var items = (<MenuList>
-        <MenuItem>
-          <Avatar /> Perfil
-        </MenuItem>
-        <Divider />
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>
             <Logout fontSize="small" />
@@ -55,22 +48,13 @@ export default function BarMenu(props) {
 
     if(props.role === 'admin'){
         items = (<MenuList>
-            <MenuItem>
-              <Avatar /> Perfil
-            </MenuItem>
-            <Divider />
             <MenuItem onClick={handleAdminUsers}>
               <ListItemIcon>
                 <GroupIcon fontSize="small" />
               </ListItemIcon>
               Administar Usuarios
             </MenuItem>
-            <MenuItem>
-              <ListItemIcon>
-                <Settings fontSize="small" />
-              </ListItemIcon>
-              Configuración
-            </MenuItem>
+            <Divider />
             <MenuItem onClick={handleLogout}>
               <ListItemIcon>
                 <Logout fontSize="small" />

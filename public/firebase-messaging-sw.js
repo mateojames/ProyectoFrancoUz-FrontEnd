@@ -1,38 +1,29 @@
-// This a service worker file for receiving push notifitications.
-// See `Access registration token section` @ https://firebase.google.com/docs/cloud-messaging/js/client#retrieve-the-current-registration-token
-
-// Scripts for firebase and firebase messaging
-importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-messaging-compat.js');
 
 
-// Initialize the Firebase app in the service worker by passing the generated config
-const firebaseConfig = {
-    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-    databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
-    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.REACT_APP_FIREBASE_APP_ID,
-    measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
-  }
+importScripts("https://www.gstatic.com/firebasejs/9.9.3/firebase-app-compat.js")
+importScripts("https://www.gstatic.com/firebasejs/9.9.3/firebase-messaging-compat.js")
+importScripts('swenv.js'); // this file should have all the vars declared
+console.log('VARIABLE',process.env.FB_API_KEY)
+
+//ADD HERE THE FIREBASE CONFIG
+const firebaseConfig = {};
+
+const app = firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging(app);
 
 
-firebase.initializeApp(firebaseConfig);
+messaging.onBackgroundMessage(payload => {
+    console.log("Recibiste mensaje mientras estabas ausente");
+// previo a mostrar notificación
+    const notificationTitle= payload.notification.title;
+    const notificationOptions = {
+        body: payload.notification.body,
+        icon: "/logo192.png"
+    }
 
-// Retrieve firebase messaging
-const messaging = firebase.messaging();
 
-// Handle incoming messages while the app is not in focus (i.e in the background, hidden behind other tabs, or completely closed).
-messaging.onBackgroundMessage(function(payload) {
-  console.log('Received background message ', payload);
-
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
-    body: payload.notification.body,
-  };
-
-  self.registration.showNotification(notificationTitle,
-    notificationOptions);
-});
+    return self.registration.showNotification(
+        notificationTitle, 
+        notificationOptions
+    )
+})

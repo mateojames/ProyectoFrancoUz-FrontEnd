@@ -20,14 +20,14 @@ const Notification = () => {
     }
     console.log(notification)
   }, [notification])
-
+/*
   requestForToken();
 
   onMessageListener()
     .then((payload) => {
       setNotification({title: payload?.notification?.title, body: payload?.notification?.body});     
     })
-    .catch((err) => console.log('failed: ', err));
+    .catch((err) => console.log('failed: ', err));*/
 
   return (
      <Toaster/>

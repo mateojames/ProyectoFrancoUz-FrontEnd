@@ -73,6 +73,9 @@ import {
   appointmentFormMessages,
   confirmationDialogMessages
 } from "./Locale";
+import Box from '@mui/material/Box';
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
 
 const PREFIX = 'FrancoUz';
 
@@ -328,6 +331,7 @@ const Header = (({
           {...restProps}
           className={classNames(getClassByLocation(classes, currentAppointment.location), classes.header)}
           appointmentData={currentAppointment}
+          showOpenButton={currentAppointment ? ((currentAppointment.state === 'finalized' || currentAppointment.state === 'cancelled') ? false : true) : true}
           >
           <StyledIconButton
           onClick={handleHeaderMenuClick}
@@ -701,6 +705,7 @@ const TextEditor = (props) => {
 };
 
 const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
+  console.log('BASICLAYOUt ',restProps)
   const patients = useSelector(state => state.user.patients);
   const professionals = useSelector(state => state.user.professionals);
   const onPatientFieldChange = (event, newValue) => {
@@ -768,6 +773,7 @@ export default function AdminCalendar(){
   const locations = useSelector(state => state.resource.locations);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [formVisibility, setFormVisibility] = useState(false);
   const handleCurrentDateChange = (currentDate) => {
     setCurrentDate(currentDate)
   }
@@ -835,6 +841,10 @@ export default function AdminCalendar(){
 
       handleCurrentDateChange(newDate);
     }
+  }
+
+  const handleAddClicked = () => {
+    setFormVisibility(true)
   }
   
 
@@ -910,6 +920,8 @@ export default function AdminCalendar(){
             booleanEditorComponent={BooleanEditor}
             dateEditorComponent={DateEditor}
             messages={appointmentFormMessages}
+            visible={formVisibility}
+            onVisibilityChange={(e) => setFormVisibility(e)}
           />
           <Resources
             data={resources}
@@ -917,6 +929,11 @@ export default function AdminCalendar(){
           />
           <DragDropProvider />        
         </Scheduler>
+        <Box sx={{ '& > :not(style)': { m: 1 }, position: 'fixed', bottom: 16, right:16}}>
+        <Fab color="primary" aria-label="add" onClick={handleAddClicked}>
+            <AddIcon/>
+        </Fab>
+        </Box>
         {loading && <Loading />}
       </Paper>
     )

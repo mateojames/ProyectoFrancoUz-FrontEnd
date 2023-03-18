@@ -1,19 +1,19 @@
+export const UPDATELOCATION = 'UPDATELOCATION';
 
-export const ADDAPPOINTMENT = 'ADDAPPOINTMENT';
-export const LOCATIONNOTAVAILABLE = 'LOCATIONNOTAVAILABLE'
+export const updateLocationRate = (data , handleLoading) => {
 
-export const addAppointment = (appointment) => {
     return (dispatch, getState) => {
+        const id = Object.keys(data)[0];
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('https://back-red-team.vercel.app/session', {
-                    method: 'POST',
+                fetch(`http://localhost:8080/updateLocationRate/${id}`, {
+                    method: 'PUT',
                     headers: {
                     "Content-Type": "application/json",
                     "Authorization": idToken
                     },
                     body: JSON.stringify({
-                    appointment: appointment.added
+                        location: data
                     })
                 })
                 .then((response) => {
@@ -27,13 +27,9 @@ export const addAppointment = (appointment) => {
                     return response.json();
                 })
                 .then((myJson) => {
-                    console.log(myJson);
-                    if(myJson.success){
-                        dispatch({type:ADDAPPOINTMENT, appointment: myJson.appointment});
-                    } else {
-                        dispatch({type:LOCATIONNOTAVAILABLE, available_locations: myJson.available_locations});
-                    }
-                    
+                    console.log('RESPONSE', myJson);
+                    dispatch({type: UPDATELOCATION, location: myJson});
+                    if(handleLoading){handleLoading()}
                 })
             })
             .catch(err => console.log(err));

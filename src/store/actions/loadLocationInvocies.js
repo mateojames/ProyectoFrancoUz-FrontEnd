@@ -1,20 +1,15 @@
+export const LOADLOCATIONINVOICES = 'LOADLOCATIONINVOICES';
 
-export const ADDAPPOINTMENT = 'ADDAPPOINTMENT';
-export const LOCATIONNOTAVAILABLE = 'LOCATIONNOTAVAILABLE'
-
-export const addAppointment = (appointment) => {
+export const loadLocationInvocies = (handleLoading) => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('https://back-red-team.vercel.app/session', {
-                    method: 'POST',
+                fetch('http://localhost:8080/locationInvoices', {
+                    method: 'GET',
                     headers: {
                     "Content-Type": "application/json",
                     "Authorization": idToken
-                    },
-                    body: JSON.stringify({
-                    appointment: appointment.added
-                    })
+                    }
                 })
                 .then((response) => {
                     console.log('RESPONSE');
@@ -27,13 +22,8 @@ export const addAppointment = (appointment) => {
                     return response.json();
                 })
                 .then((myJson) => {
-                    console.log(myJson);
-                    if(myJson.success){
-                        dispatch({type:ADDAPPOINTMENT, appointment: myJson.appointment});
-                    } else {
-                        dispatch({type:LOCATIONNOTAVAILABLE, available_locations: myJson.available_locations});
-                    }
-                    
+                    dispatch({type:LOADLOCATIONINVOICES, invoices: myJson.invoices});
+                    handleLoading()
                 })
             })
             .catch(err => console.log(err));

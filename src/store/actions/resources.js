@@ -31,7 +31,7 @@ export const loadTherapies = () => {
 };
 
 
-export const loadLocations = () => {
+export const loadLocations = (handleLoading) => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
@@ -54,6 +54,7 @@ export const loadLocations = () => {
                 })
                 .then((myJson) => {
                     dispatch({type:LOADLOCATIONS, locations: myJson.locations});
+                    if(handleLoading){handleLoading()};
                 })
             })
             .catch(err => console.log(err));

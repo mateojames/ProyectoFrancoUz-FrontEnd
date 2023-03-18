@@ -76,10 +76,15 @@ import {
 import Box from '@mui/material/Box';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import FilterMenu from "./FilterMenu";
+import { connectProps } from '@devexpress/dx-react-core';
+import CloseIcon from '@mui/icons-material/Close';
 
 const PREFIX = 'FrancoUz';
 
 const classes = {
+  flexibleSpace: `${PREFIX}-flexibleSpace`,
   icon: `${PREFIX}-icon`,
   textCenter: `${PREFIX}-SalaMusicoterapia`,
   firstRoom: `${PREFIX}-SalaPsicoterapia`,
@@ -145,6 +150,42 @@ const StyledAppointmentTooltipCommandButton = styled(AppointmentTooltip.CommandB
     backgroundColor: 'rgba(255,255,255,0.65)',
   },
 }));
+
+const StyledToolbarFlexibleSpace = styled(Toolbar.FlexibleSpace)(() => ({
+  [`&.${classes.flexibleSpace}`]: {
+    margin: '0 auto 0 0',
+  },
+}));
+
+const FlexibleSpace = (({
+  onFilterChange, filters, setFilters, patients, professionals, restProps
+}) => {
+  const [anchorMenu, setAnchorMenu] = useState(null);
+    const openMenu = Boolean(anchorMenu);
+    const handleMenuClick = (event) => {
+        setAnchorMenu(event.currentTarget);
+    };
+    const handleMenuClose = () => {
+        setAnchorMenu(null);
+    };
+
+  return (
+  <StyledToolbarFlexibleSpace {...restProps} className={classes.flexibleSpace} sx={{display: 'flex'}}>
+    <IconButton onClick={handleMenuClick}  aria-label="delete">
+      <FilterAltIcon/>
+    </IconButton>
+    {filters.map((item) => {
+          return (<Chip
+            avatar={<IconButton  aria-label={item}>
+                      <CloseIcon/>
+                    </IconButton>}
+            label={item}
+            variant="outlined"
+        />)
+        })}
+    <FilterMenu onFilterChange={onFilterChange} setNewFilter={setFilters} professionals={professionals} patients={patients} open={openMenu} handleClose={handleMenuClose} handleClick={handleMenuClick} anchorEl={anchorMenu} />
+  </StyledToolbarFlexibleSpace>
+)});
 
 const getClassByLocation = (classes, location) => {
   if (location === 'Room 1') return classes.firstRoom; //la location esta en el appointment, la cambiamos ahi
@@ -765,10 +806,12 @@ const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
 export default function AdminCalendar(){
   const [currentDate, setCurrentDate] = useState(new Date())
   const data = useSelector(state => state.calendar.appointments);
+  const [filteredData, setFilteredData] = useState([])
   const [resources, setResources] = useState([
     {fieldName: 'therapy', title: 'Tipo de terapia',instances: []},
     {fieldName: 'location', title: 'Ubicación',instances: []}
   ]);
+  const [filters, setFilters] = useState(['test','test2','test3'])
   const therapies = useSelector(state => state.resource.therapies);
   const locations = useSelector(state => state.resource.locations);
   const dispatch = useDispatch();
@@ -777,6 +820,8 @@ export default function AdminCalendar(){
   const handleCurrentDateChange = (currentDate) => {
     setCurrentDate(currentDate)
   }
+  const patients = useSelector(state => state.user.patients);
+  const professionals = useSelector(state => state.user.professionals);
 
   const dataSession = useLocation();
 
@@ -870,13 +915,33 @@ export default function AdminCalendar(){
     handleSessionFocus()
   },[dataSession])
 
+  useEffect(()=>{
+    setFilteredData(data)
+  },[data])
+
+  const flexibleSpace = connectProps(FlexibleSpace, () => {
+
+    return {
+      appoimentData: data,
+      patients: patients,
+      professionals: professionals,
+      filters:filters,
+      setFilters: setFilters,
+      onFilterChange: setFilteredData
+    };
+  });
+
+
+  useEffect(() => {
+    flexibleSpace.update()
+  })
 
 
 
   return (
       <Paper>
         <Scheduler
-          data={data}
+          data={filteredData}
           locale='es-ES'
           height={870}
         >
@@ -899,7 +964,7 @@ export default function AdminCalendar(){
           <EditRecurrenceMenu messages={editRecurrenceMenuMessages}/>
           <ConfirmationDialog messages={confirmationDialogMessages}/>
 
-          <Toolbar />
+          <Toolbar flexibleSpaceComponent={flexibleSpace}/>
           <DateNavigator />
           <TodayButton messages={todayButtonMessages}/>
           <ViewSwitcher />

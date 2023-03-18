@@ -25,7 +25,6 @@ import {
 } from '@devexpress/dx-react-grid-material-ui';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -80,21 +79,6 @@ const EditButton = ({ onExecute }) => (
   </IconButton>
 );
 
-const DeleteButton = ({ onExecute }) => (
-  <IconButton
-    onClick={() => {
-      // eslint-disable-next-line
-      if (window.confirm('Esta seguro que desea eliminar este usuario?')) {
-        onExecute();
-      }
-    }}
-    title="Delete row"
-    size="large"
-  >
-    <DeleteIcon />
-  </IconButton>
-);
-
 const CommitButton = ({ onExecute }) => (
   <IconButton onClick={onExecute} title="Save changes" size="large">
     <SaveIcon />
@@ -110,7 +94,6 @@ const CancelButton = ({ onExecute }) => (
 const commandComponents = {
   add: AddButton,
   edit: EditButton,
-  delete: DeleteButton,
   commit: CommitButton,
   cancel: CancelButton,
 };
@@ -315,7 +298,6 @@ export default function UsersGrid(props) {
         />
         <TableEditColumn
             showEditCommand
-            showDeleteCommand
             commandComponent={Command}
         />
         <Toolbar />

@@ -1,21 +1,23 @@
 import React, { useState } from "react"
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import Divider from '@mui/material/Divider';
-import Logout from '@mui/icons-material/Logout';
-import GroupIcon from '@mui/icons-material/Group';
-import { useHistory } from "react-router-dom"
 import { MenuList } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
 import { Autocomplete } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { useEffect } from "react";
-import { filterData } from "../store/actions/filterData";
+
 
 
 const categorys = [{ id: 1, name: 'Profesional' },
 { id: 2, name: 'Paciente' },
+{ id: 3, name: 'Sala' },
+{ id: 4, name: 'Terapia' },
+{ id: 5, name: 'Estado'}
+]
+
+const states = [{ id: 'active', name: 'Activa' },
+{ id: 'cancelled', name: 'Cancelada' },
+{ id: 'finalized', name: 'Finalizada' }
 ]
 
 export default function FilterMenu(props) {
@@ -50,7 +52,7 @@ export default function FilterMenu(props) {
     }, []);
 
     useEffect(() => {
-        if (optionSelected) {
+        if (optionSelected && !props.filters.map(f => f.id).includes(optionSelected.id)) {
             props.setFilters((previousState) => previousState.concat({...optionSelected, category: category.name}))
         }
     }, [optionSelected]);
@@ -61,6 +63,12 @@ export default function FilterMenu(props) {
                 setCategoryOptions(props.professionals)
             } else if (category.name === 'Paciente') {
                 setCategoryOptions(props.patients)
+            } else if (category.name === 'Sala') {
+                setCategoryOptions(props.locations)
+            } else if (category.name === 'Terapia') {
+                setCategoryOptions(props.therapies)
+            } else if (category.name === 'Estado') {
+                setCategoryOptions(states)
             }
         } else {
             setCategoryOptions([])

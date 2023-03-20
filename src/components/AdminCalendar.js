@@ -158,7 +158,7 @@ const StyledToolbarFlexibleSpace = styled(Toolbar.FlexibleSpace)(() => ({
 }));
 
 const FlexibleSpace = (({
-  filters, setFilters, patients, professionals, restProps
+  filters, setFilters, therapies, locations, patients, professionals, restProps
 }) => {
   const [anchorMenu, setAnchorMenu] = useState(null);
     const openMenu = Boolean(anchorMenu);
@@ -188,7 +188,7 @@ const FlexibleSpace = (({
             variant="outlined"
         />)
         })}
-    <FilterMenu setFilters={setFilters} professionals={professionals} patients={patients} open={openMenu} handleClose={handleMenuClose} handleClick={handleMenuClick} anchorEl={anchorMenu} />
+    <FilterMenu filters={filters} setFilters={setFilters} therapies={therapies} locations={locations} professionals={professionals} patients={patients} open={openMenu} handleClose={handleMenuClose} handleClick={handleMenuClick} anchorEl={anchorMenu} />
   </StyledToolbarFlexibleSpace>
 )});
 
@@ -900,7 +900,13 @@ export default function AdminCalendar(){
       filteredAppointments = filteredAppointments.filter((appoinment) => appoinment.professionals.map(p => p.id).includes(filter.id))
     } else if (filter.category === 'Paciente') {
       filteredAppointments = filteredAppointments.filter((appoinment) => appoinment.patients.map(p => p.id).includes(filter.id))
-    }
+    } else if (filter.category === 'Sala') {
+      filteredAppointments = filteredAppointments.filter((appoinment) => appoinment.location === filter.id)
+  } else if (filter.category === 'Terapia') {
+    filteredAppointments = filteredAppointments.filter((appoinment) => appoinment.therapy === filter.id)
+  } else if (filter.category === 'Estado') {
+    filteredAppointments = filteredAppointments.filter((appoinment) => appoinment.state === filter.id)
+  }
     return filteredAppointments
   }
 
@@ -950,6 +956,8 @@ export default function AdminCalendar(){
       patients: patients,
       professionals: professionals,
       filters:filters,
+      therapies: therapies,
+      locations: locations,
       setFilters: setFilters,
     };
   });

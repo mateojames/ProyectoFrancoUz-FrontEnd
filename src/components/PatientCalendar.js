@@ -59,6 +59,10 @@ import { addCommentToRecurrent } from "../store/actions/addCommenToRecurrent";
 import { 
     todayButtonMessages
   } from "./Locale";
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import FilterMenu from "./FilterMenu";
+import { connectProps } from '@devexpress/dx-react-core';
+import CloseIcon from '@mui/icons-material/Close';
 
 const PREFIX = 'FrancoUz';
 
@@ -72,6 +76,7 @@ const classes = {
   header: `${PREFIX}-header`,
   layout: `${PREFIX}-layout`,
   commandButton: `${PREFIX}-commandButton`,
+  flexibleSpace: `${PREFIX}-flexibleSpace`
 };
 
 const StyledAppointmentTooltipHeader = styled(AppointmentTooltip.Header)(() => ({
@@ -135,6 +140,48 @@ const getClassByLocation = (classes, location) => {
   if (location === 'La Bombonera') return classes.bomboneraRoom;
   return classes.thirdRoom;
 };
+
+const StyledToolbarFlexibleSpace = styled(Toolbar.FlexibleSpace)(() => ({
+  [`&.${classes.flexibleSpace}`]: {
+    margin: '0 auto 0 0',
+  },
+}));
+
+
+const FlexibleSpace = (({
+  filters, setFilters, therapies, locations, patients, professionals, restProps
+}) => {
+  const [anchorMenu, setAnchorMenu] = useState(null);
+    const openMenu = Boolean(anchorMenu);
+    const handleMenuClick = (event) => {
+        setAnchorMenu(event.currentTarget);
+    };
+    const handleMenuClose = () => {
+        setAnchorMenu(null);
+    };
+
+    const deleteFilter = (item) => {
+        setFilters((previousState) => previousState.filter((filter => filter.id !== item.id)))
+    }
+
+  return (
+  <StyledToolbarFlexibleSpace {...restProps} className={classes.flexibleSpace} sx={{display: 'flex'}}>
+    <IconButton onClick={handleMenuClick}  aria-label="delete">
+      <FilterAltIcon/>
+    </IconButton>
+    {filters.map((item) => {
+      console.log('CHIP ',item)
+          return (<Chip
+            avatar={<IconButton onClick={() => deleteFilter(item)} aria-label={item.name}>
+                      <CloseIcon/>
+                    </IconButton>}
+            label={item.name}
+            variant="outlined"
+        />)
+        })}
+    <FilterMenu filters={filters} setFilters={setFilters} therapies={therapies} locations={locations} professionals={professionals} patients={patients} open={openMenu} handleClose={handleMenuClose} handleClick={handleMenuClick} anchorEl={anchorMenu} />
+  </StyledToolbarFlexibleSpace>
+)});
 
 const StyledAppointmentTooltipLayout = styled(AppointmentTooltip.Layout)((props) => ({
     [`&.${classes.layout}`]: {
@@ -660,6 +707,10 @@ export default function PatientCalendar(){
   const locations = useSelector(state => state.resource.locations);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [filteredData, setFilteredData] = useState([])
+  const [filters, setFilters] = useState([])
+  const patients = useSelector(state => state.user.patients);
+  const professionals = useSelector(state => state.user.professionals);
   const handleCurrentDateChange = (currentDate) => {
     setCurrentDate(currentDate)
   }
@@ -710,6 +761,52 @@ export default function PatientCalendar(){
   const handleLoading = () => {
     setLoading(false)
   };
+
+  const applyFilter = (appointments, filter) => {
+    let filteredAppointments = appointments
+    if (filter.category === 'Profesional') {
+      filteredAppointments = filteredAppointments.filter((appoinment) => appoinment.professionals.map(p => p.id).includes(filter.id))
+    } else if (filter.category === 'Paciente') {
+      filteredAppointments = filteredAppointments.filter((appoinment) => appoinment.patients.map(p => p.id).includes(filter.id))
+    } else if (filter.category === 'Sala') {
+      filteredAppointments = filteredAppointments.filter((appoinment) => appoinment.location === filter.id)
+  } else if (filter.category === 'Terapia') {
+    filteredAppointments = filteredAppointments.filter((appoinment) => appoinment.therapy === filter.id)
+  } else if (filter.category === 'Estado') {
+    filteredAppointments = filteredAppointments.filter((appoinment) => appoinment.state === filter.id)
+  }
+    return filteredAppointments
+  }
+
+  useEffect(()=>{
+    let filteredAppointments = data
+    for (const filter of filters) {
+      filteredAppointments = applyFilter(filteredAppointments, filter)
+    }
+    setFilteredData(filteredAppointments)
+  },[filters])
+
+  useEffect(()=>{
+    setFilteredData(data)
+  },[data])
+
+const flexibleSpace = connectProps(FlexibleSpace, () => {
+
+    return {
+      filteredData: filteredData,
+      patients: patients,
+      professionals: professionals,
+      filters:filters,
+      therapies: therapies,
+      locations: locations,
+      setFilters: setFilters,
+    };
+  });
+
+
+  useEffect(() => {
+    flexibleSpace.update()
+  })
   
 
   useEffect(() => {
@@ -739,7 +836,7 @@ export default function PatientCalendar(){
   return (
       <Paper>
         <Scheduler
-          data={data}
+          data={filteredData}
           locale='es-ES'
           height={870}
         >
@@ -756,7 +853,7 @@ export default function PatientCalendar(){
           <DayView name="Día"/>
           <MonthView name="Mes"/>
 
-          <Toolbar />
+          <Toolbar flexibleSpaceComponent={flexibleSpace}/>
           <DateNavigator />
           <TodayButton messages={todayButtonMessages}/>
           <ViewSwitcher />

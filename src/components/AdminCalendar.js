@@ -158,7 +158,7 @@ const StyledToolbarFlexibleSpace = styled(Toolbar.FlexibleSpace)(() => ({
 }));
 
 const FlexibleSpace = (({
-  onFilterChange, filters, setFilters, patients, professionals, restProps
+  filters, setFilters, patients, professionals, restProps
 }) => {
   const [anchorMenu, setAnchorMenu] = useState(null);
     const openMenu = Boolean(anchorMenu);
@@ -169,21 +169,26 @@ const FlexibleSpace = (({
         setAnchorMenu(null);
     };
 
+    const deleteFilter = (item) => {
+        setFilters((previousState) => previousState.filter((filter => filter.id !== item.id)))
+    }
+
   return (
   <StyledToolbarFlexibleSpace {...restProps} className={classes.flexibleSpace} sx={{display: 'flex'}}>
     <IconButton onClick={handleMenuClick}  aria-label="delete">
       <FilterAltIcon/>
     </IconButton>
     {filters.map((item) => {
+      console.log('CHIP ',item)
           return (<Chip
-            avatar={<IconButton  aria-label={item}>
+            avatar={<IconButton onClick={() => deleteFilter(item)} aria-label={item.name}>
                       <CloseIcon/>
                     </IconButton>}
-            label={item}
+            label={item.name}
             variant="outlined"
         />)
         })}
-    <FilterMenu onFilterChange={onFilterChange} setNewFilter={setFilters} professionals={professionals} patients={patients} open={openMenu} handleClose={handleMenuClose} handleClick={handleMenuClick} anchorEl={anchorMenu} />
+    <FilterMenu setFilters={setFilters} professionals={professionals} patients={patients} open={openMenu} handleClose={handleMenuClose} handleClick={handleMenuClick} anchorEl={anchorMenu} />
   </StyledToolbarFlexibleSpace>
 )});
 
@@ -811,7 +816,7 @@ export default function AdminCalendar(){
     {fieldName: 'therapy', title: 'Tipo de terapia',instances: []},
     {fieldName: 'location', title: 'Ubicación',instances: []}
   ]);
-  const [filters, setFilters] = useState(['test','test2','test3'])
+  const [filters, setFilters] = useState([])
   const therapies = useSelector(state => state.resource.therapies);
   const locations = useSelector(state => state.resource.locations);
   const dispatch = useDispatch();
@@ -888,6 +893,25 @@ export default function AdminCalendar(){
     }
   }
 
+  
+  const applyFilter = (appointments, filter) => {
+    let filteredAppointments = appointments
+    if (filter.category === 'Profesional') {
+      filteredAppointments = filteredAppointments.filter((appoinment) => appoinment.professionals.map(p => p.id).includes(filter.id))
+    } else if (filter.category === 'Paciente') {
+      filteredAppointments = filteredAppointments.filter((appoinment) => appoinment.patients.map(p => p.id).includes(filter.id))
+    }
+    return filteredAppointments
+  }
+
+  useEffect(()=>{
+    let filteredAppointments = data
+    for (const filter of filters) {
+      filteredAppointments = applyFilter(filteredAppointments, filter)
+    }
+    setFilteredData(filteredAppointments)
+  },[filters])
+
   const handleAddClicked = () => {
     setFormVisibility(true)
   }
@@ -922,12 +946,11 @@ export default function AdminCalendar(){
   const flexibleSpace = connectProps(FlexibleSpace, () => {
 
     return {
-      appoimentData: data,
+      filteredData: filteredData,
       patients: patients,
       professionals: professionals,
       filters:filters,
       setFilters: setFilters,
-      onFilterChange: setFilteredData
     };
   });
 

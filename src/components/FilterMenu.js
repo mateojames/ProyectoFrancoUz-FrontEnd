@@ -19,26 +19,17 @@ const categorys = [{ id: 1, name: 'Profesional' },
 ]
 
 export default function FilterMenu(props) {
-    const history = useHistory()
-    const dispatch = useDispatch()
     const [windowSize, setWindowSize] = useState(getWindowSize());
     const [category, setCategory] = useState(null);
     const [categoryOptions, setCategoryOptions] = useState([]);
     const [optionSelected, setOptionSelected] = useState(null);
-    const appoinments = useSelector(state => state.calendar.appointments);
 
     const onCategoryFieldChange = (event, newValue) => {
         setCategory(newValue || null);
-        if(!newValue && appoinments){
-            props.onFilterChange(appoinments)
-        }
     };
 
     const onOptionFieldChange = (event, newValue) => {
         setOptionSelected(newValue || null);
-        if(!newValue && appoinments){
-            props.onFilterChange(appoinments)
-        }
     };
 
     function getWindowSize() {
@@ -59,18 +50,8 @@ export default function FilterMenu(props) {
     }, []);
 
     useEffect(() => {
-        if (optionSelected && appoinments) {
-            console.log('DATA ', appoinments)
-            let data = appoinments
-            if (category.name === 'Profesional') {
-                data = data.filter((appoinment) => appoinment.professionals.map(p => p.id).includes(optionSelected.id))
-            } else if (category.name === 'Paciente') {
-                data = data.filter((appoinment) => appoinment.patients.map(p => p.id).includes(optionSelected.id))
-            }
-            console.log('DATA FILTERED ', data)
-            //dispatch(filterData(data))
-            props.onFilterChange(data)
-            props.setNewFilter((previousState) => previousState.concat(optionSelected.name))
+        if (optionSelected) {
+            props.setFilters((previousState) => previousState.concat({...optionSelected, category: category.name}))
         }
     }, [optionSelected]);
 

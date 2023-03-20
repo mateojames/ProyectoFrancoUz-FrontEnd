@@ -24,7 +24,7 @@ import {
     TableColumnResizing
 } from '@devexpress/dx-react-grid-material-ui';
 
-import { loadLocations } from "../store/actions/loadLocations"; 
+import { loadTherapies } from "../store/actions/loadTherapies.js"; 
 
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
@@ -33,9 +33,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 
-import { updateLocation } from "../store/actions/updateLocation.js";
-import { createLocation } from "../store/actions/createLocation.js"; 
-import { deleteLocation } from "../store/actions/deleteLocation.js"; 
+import { updateTherapy } from "../store/actions/updateTherapy.js";
+import { createTherapy } from "../store/actions/createTherapy.js"; 
+import { deleteTherapy } from "../store/actions/deleteTherapy.js"; 
 
 import { Alert, Snackbar } from "@mui/material";
 import { Loading } from "./Loading/Loading.js";
@@ -48,14 +48,14 @@ const AddButton = ({ onExecute }) => (
       onClick={onExecute}
       title="Create new row"
     >
-      Crear sala
+      Crear terapia
     </Button>
   </div>
 );
 
 
 const EditButton = ({ onExecute }) => (
-  <IconButton onClick={onExecute} title="Editar Sala" size="large">
+  <IconButton onClick={onExecute} title="Editar Terapia" size="large">
     <EditIcon />
   </IconButton>
 );
@@ -76,7 +76,7 @@ const DeleteButton = ({ onExecute }) => (
   <IconButton
     onClick={() => {
       // eslint-disable-next-line
-      if (window.confirm('Esta seguro que desea eliminar la sala?')) {
+      if (window.confirm('Esta seguro que desea eliminar la terapia?')) {
         onExecute();
       }
     }}
@@ -118,11 +118,11 @@ const FilterCell = (props) => {
 
 
 
-export default function LocationGrid(props) {
+export default function TherapyGrid(props) {
   const [columns] = useState([
-    { name: 'name', title: 'Sala' }
+    { name: 'name', title: 'Terapia' }
   ]);
-  const locations = useSelector(state => state.resource.locations); //<-----------------------------------
+  const therapies = useSelector(state => state.resource.therapies); //<-----------------------------------
   const [rows, setRows] = useState([])
   const [pageSize, setPageSize] = useState(0);
   const [pageSizes] = useState([5, 10, 0]);
@@ -142,32 +142,32 @@ export default function LocationGrid(props) {
   const commitChanges = ({changed, added, deleted}) => {
     if (changed) {
         setLoading(true)
-        dispatch(updateLocation(changed, handleLoading))
+        dispatch(updateTherapy(changed, handleLoading))
     }
     else if (added) {
         setLoading(true)
-        dispatch(createLocation(added[0], handleLoading))
+        dispatch(createTherapy(added[0], handleLoading))
     }
     else if (deleted) {
       const id = deleted[0]
       const data = {}
       data[id] = {deleted: true}
       setLoading(true)
-      dispatch(deleteLocation(data, handleLoading))
+      dispatch(deleteTherapy(data, handleLoading))
     }
   };
   
 
-  const handleLocationsToRows = () => {
-    /*const locationsToRender = locations.filter(x => x.deleted === false)
+  const handleTherapiesToRows = () => {
+    /*const therapiesToRender = therapies.filter(x => x.deleted === false)
     setRows(() => {
-        return locationsToRender.map((location) => { 
+        return therapiesToRender.map((therapy) => { 
             return {
-               ...location
+               ...therapy
             }
         })
     })*/
-    setRows(locations)
+    setRows(therapies)
   }
 
   const handleLoading = () => {
@@ -176,12 +176,12 @@ export default function LocationGrid(props) {
 
 
   useEffect(() => {
-    handleLocationsToRows()
-  }, [locations]);
+    handleTherapiesToRows()
+  }, [therapies]);
 
   useEffect(() => {
     setLoading(true)
-    dispatch(loadLocations(handleLoading))
+    dispatch(loadTherapies(handleLoading))
   }, []);
 
   useEffect(() => {

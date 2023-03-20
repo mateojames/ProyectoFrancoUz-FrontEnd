@@ -42,8 +42,8 @@ export default function BarMenu(props) {
         history.push("/usuarios")
     }
 
-    function handleCobros() {
-      history.push("/cobros")
+    function handleTerapias() {
+      history.push("/terapias")
     }
 
     function handleSalas() {
@@ -82,11 +82,11 @@ export default function BarMenu(props) {
               </ListItemIcon>
               Administrar Salas
             </MenuItem>
-            <MenuItem onClick={handleCobros}>
+            <MenuItem onClick={handleTerapias}>
               <ListItemIcon>
                 <ReceiptIcon fontSize="small" />
               </ListItemIcon>
-              Registro de Pagos
+              Administrar Terapias
             </MenuItem>
             <Divider />
             <MenuItem>

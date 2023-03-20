@@ -1,10 +1,10 @@
-export const LOADLOCATIONINVOICES = 'LOADLOCATIONINVOICES';
+export const LOADLOCATIONS = 'LOADLOCATIONS';
 
-export const loadLocationInvocies = (handleLoading) => {
+export const loadLocations = (handleLoading) => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('http://localhost:8080/locationInvoices', {
+                fetch('http://localhost:8080/locations', {
                     method: 'GET',
                     headers: {
                     "Content-Type": "application/json",
@@ -22,8 +22,8 @@ export const loadLocationInvocies = (handleLoading) => {
                     return response.json();
                 })
                 .then((myJson) => {
-                    dispatch({type:LOADLOCATIONINVOICES, invoices: myJson.invoices});
-                    handleLoading()
+                    dispatch({type:LOADLOCATIONS, locations: myJson.locations});
+                    if(handleLoading){handleLoading()};
                 })
             })
             .catch(err => console.log(err));

@@ -22,7 +22,8 @@ import {
 } from '@devexpress/dx-react-grid-material-ui';
 import { Loading } from './Loading/Loading.js';
 import { loadAppointments } from "../store/actions/loadAppointments";
-import { loadLocations, loadTherapies } from "../store/actions/resources.js";
+import { loadLocations} from "../store/actions/loadLocations";
+import { loadTherapies} from "../store/actions/loadTherapies";
 import IconButton from '@mui/material/IconButton';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Link, useHistory } from "react-router-dom";

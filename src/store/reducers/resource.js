@@ -1,30 +1,46 @@
-import { CREATELOCATION } from "../actions/createLocation";
-import { LOADLOCATIONINVOICES } from "../actions/loadLocationInvocies";
-import { LOADLOCATIONS, LOADTHERAPIES } from "../actions/resources";
-import { UPDATELOCATION } from "../actions/updateLocationRate";
 import { USERLOGOUT } from "../actions/userLogout";
+import { CREATELOCATION } from "../actions/createLocation";
+import { LOADLOCATIONS } from "../actions/loadLocations";
+import { UPDATELOCATION } from "../actions/updateLocation";
+import { DELETELOCATION } from "../actions/deleteLocation";
+
+import { CREATETHERAPY } from "../actions/createTherapy";
+import { LOADTHERAPIES } from "../actions/loadTherapies";
+import { UPDATETHERAPY } from "../actions/updateTherapy";
+import { DELETETHERAPY } from "../actions/deleteTherapy";
+
 
 const initialState = {
     therapies: [],
-    locations:[],
-    locationInvoices: []
+    locations:[]
 };
 
 export default (state = initialState, action) => {
     switch(action.type){
-        case LOADTHERAPIES:
-            return {...state, therapies: action.therapies};
-        case LOADLOCATIONS:
-            return {...state, locations: action.locations};
         case USERLOGOUT:
-            return initialState
-        case UPDATELOCATION:
-            const updated = state.locations.map((item) => item.id == action.location.id ? {...item, ...action.location} : item );
-            return {...state, locations: updated};
-        case LOADLOCATIONINVOICES:
-            return {...state, locationInvoices: action.invoices};
+            return initialState;
+
         case CREATELOCATION:
             return {...state, locations: state.locations.concat([action.location])};
-    }
+        case LOADLOCATIONS:
+            return {...state, locations: action.locations};
+        case UPDATELOCATION:
+            const updatedLocations = state.locations.map((item) => item.id == action.location.id ? {...item, ...action.location} : item );
+            return {...state, locations: updatedLocations};
+        case DELETELOCATION:
+            const locations = state.locations.filter((item) => item.id !== action.location.id);
+            return {...state, locations: locations};
+
+        case CREATETHERAPY:
+            return {...state, therapies: state.therapies.concat([action.therapy])};
+        case LOADTHERAPIES:
+            return {...state, therapies: action.therapies};
+        case UPDATETHERAPY:
+            const updatedTherapies = state.therapies.map((item) => item.id == action.therapy.id ? {...item, ...action.therapy} : item );
+            return {...state, therapies: updatedTherapies};
+        case DELETETHERAPY:
+            const therapies = state.therapies.filter((item) => item.id !== action.therapy.id);
+            return {...state, therapies: therapies};
+}
     return state;
 };

@@ -1,12 +1,11 @@
-export const UPDATELOCATION = 'UPDATELOCATION';
+export const DELETELOCATION = 'DELETELOCATION';
 
-export const updateLocationRate = (data , handleLoading) => {
-
+export const deleteLocation = (data , handleLoading) => {
     return (dispatch, getState) => {
         const id = Object.keys(data)[0];
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch(`http://localhost:8080/updateLocationRate/${id}`, {
+                fetch(`http://localhost:8080/deleteLocation/${id}`, {
                     method: 'PUT',
                     headers: {
                     "Content-Type": "application/json",
@@ -27,8 +26,8 @@ export const updateLocationRate = (data , handleLoading) => {
                     return response.json();
                 })
                 .then((myJson) => {
-                    console.log('RESPONSE', myJson);
-                    dispatch({type: UPDATELOCATION, location: myJson});
+                    console.log(myJson);
+                    dispatch({type:DELETELOCATION, location: myJson});
                     if(handleLoading){handleLoading()}
                 })
             })

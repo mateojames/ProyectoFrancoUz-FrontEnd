@@ -1,10 +1,10 @@
-export const LOADNOTIFICATIONS = 'LOADNOTIFICATIONS';
+export const LOADLOCATIONS = 'LOADLOCATIONS';
 
-export const loadNotifications = () => {
+export const loadLocations = (handleLoading) => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('http://localhost:8080/notifications', {
+                fetch('http://localhost:8080/locations', {
                     method: 'GET',
                     headers: {
                     "Content-Type": "application/json",
@@ -22,8 +22,8 @@ export const loadNotifications = () => {
                     return response.json();
                 })
                 .then((myJson) => {
-                    console.log(myJson);
-                    dispatch({type:LOADNOTIFICATIONS, notifications: myJson.notifications});
+                    dispatch({type:LOADLOCATIONS, locations: myJson.locations});
+                    if(handleLoading){handleLoading()};
                 })
             })
             .catch(err => console.log(err));

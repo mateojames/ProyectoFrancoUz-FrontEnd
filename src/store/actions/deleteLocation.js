@@ -1,15 +1,19 @@
-export const LOADNOTIFICATIONS = 'LOADNOTIFICATIONS';
+export const DELETELOCATION = 'DELETELOCATION';
 
-export const loadNotifications = () => {
+export const deleteLocation = (data , handleLoading) => {
     return (dispatch, getState) => {
+        const id = Object.keys(data)[0];
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('http://localhost:8080/notifications', {
-                    method: 'GET',
+                fetch(`http://localhost:8080/deleteLocation/${id}`, {
+                    method: 'PUT',
                     headers: {
                     "Content-Type": "application/json",
                     "Authorization": idToken
-                    }
+                    },
+                    body: JSON.stringify({
+                        location: data
+                    })
                 })
                 .then((response) => {
                     console.log('RESPONSE');
@@ -23,7 +27,8 @@ export const loadNotifications = () => {
                 })
                 .then((myJson) => {
                     console.log(myJson);
-                    dispatch({type:LOADNOTIFICATIONS, notifications: myJson.notifications});
+                    dispatch({type:DELETELOCATION, location: myJson});
+                    if(handleLoading){handleLoading()}
                 })
             })
             .catch(err => console.log(err));

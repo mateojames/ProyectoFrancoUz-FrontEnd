@@ -1,15 +1,20 @@
-export const LOADNOTIFICATIONS = 'LOADNOTIFICATIONS';
+export const UPDATETHERAPY = 'UPDATETHERAPY';
 
-export const loadNotifications = () => {
+export const updateTherapy = (data , handleLoading) => {
+
     return (dispatch, getState) => {
+        const id = Object.keys(data)[0];
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('http://localhost:8080/notifications', {
-                    method: 'GET',
+                fetch(`http://localhost:8080/updateTherapy/${id}`, {
+                    method: 'PUT',
                     headers: {
                     "Content-Type": "application/json",
                     "Authorization": idToken
-                    }
+                    },
+                    body: JSON.stringify({
+                        therapy: data
+                    })
                 })
                 .then((response) => {
                     console.log('RESPONSE');
@@ -22,8 +27,9 @@ export const loadNotifications = () => {
                     return response.json();
                 })
                 .then((myJson) => {
-                    console.log(myJson);
-                    dispatch({type:LOADNOTIFICATIONS, notifications: myJson.notifications});
+                    console.log('RESPONSE', myJson);
+                    dispatch({type: UPDATETHERAPY, therapy: myJson});
+                    if(handleLoading){handleLoading()}
                 })
             })
             .catch(err => console.log(err));

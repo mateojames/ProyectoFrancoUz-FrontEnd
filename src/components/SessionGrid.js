@@ -22,7 +22,8 @@ import {
 } from '@devexpress/dx-react-grid-material-ui';
 import { Loading } from './Loading/Loading.js';
 import { loadAppointments } from "../store/actions/loadAppointments";
-import { loadLocations, loadTherapies } from "../store/actions/resources.js";
+import { loadLocations} from "../store/actions/loadLocations";
+import { loadTherapies} from "../store/actions/loadTherapies";
 import IconButton from '@mui/material/IconButton';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Link, useHistory } from "react-router-dom";
@@ -31,7 +32,6 @@ import { Avatar, Chip } from "@mui/material";
 const getRowId = row => row.id;
 
 const ViewOnCalendarCell = (props) => {
-  console.log('PROPS ',props)
   const history = useHistory()
     return (
     <Table.Cell {...props} style={{display: 'flex', alignContent: 'center' }}>
@@ -106,10 +106,6 @@ export default function SessionsGrid(props) {
   };
 
   const handleAppointmentsToRows = () => {
-    console.log('terapias ', therapies)
-    console.log('locations ', locations)
-    console.log('sesiones ', appointments)
-
 
     setRows(() => {
       return appointments.map((appointment) => {

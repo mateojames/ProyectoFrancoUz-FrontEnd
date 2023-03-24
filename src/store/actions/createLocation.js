@@ -1,15 +1,18 @@
-export const LOADNOTIFICATIONS = 'LOADNOTIFICATIONS';
+export const CREATELOCATION = 'CREATELOCATION';
 
-export const loadNotifications = () => {
+export const createLocation = (data , handleLoading) => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('http://localhost:8080/notifications', {
-                    method: 'GET',
+                fetch('http://localhost:8080/createLocation', {
+                    method: 'POST',
                     headers: {
                     "Content-Type": "application/json",
                     "Authorization": idToken
-                    }
+                    },
+                    body: JSON.stringify({
+                        location: data
+                    })
                 })
                 .then((response) => {
                     console.log('RESPONSE');
@@ -23,7 +26,8 @@ export const loadNotifications = () => {
                 })
                 .then((myJson) => {
                     console.log(myJson);
-                    dispatch({type:LOADNOTIFICATIONS, notifications: myJson.notifications});
+                    dispatch({type:CREATELOCATION, location: myJson});
+                    if(handleLoading){handleLoading()}
                 })
             })
             .catch(err => console.log(err));

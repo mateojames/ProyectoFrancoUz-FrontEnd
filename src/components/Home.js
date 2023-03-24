@@ -9,9 +9,6 @@ import { hideModal } from '../store/actions/modal';
 import Snackbar from '@mui/material/Snackbar';
 import FullBModal from "./BoostrapModal"
 import { useLocation } from "react-router-dom"
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import Button from '@mui/material/Button';
 import { Alert } from "@mui/material"
 
 

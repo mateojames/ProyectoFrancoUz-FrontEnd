@@ -11,7 +11,7 @@ export const createTherapy = (data , handleLoading) => {
                     "Authorization": idToken
                     },
                     body: JSON.stringify({
-                        location: data
+                        therapy: data
                     })
                 })
                 .then((response) => {

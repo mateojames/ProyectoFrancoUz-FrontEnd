@@ -27,13 +27,7 @@ export const addAppointment = (appointment) => {
                     return response.json();
                 })
                 .then((myJson) => {
-                    console.log(myJson);
-                    if(myJson.success){
-                        dispatch({type:ADDAPPOINTMENT, appointment: myJson.appointment});
-                    } else {
-                        dispatch({type:LOCATIONNOTAVAILABLE, available_locations: myJson.available_locations});
-                    }
-                    
+                    dispatch({type:ADDAPPOINTMENT, appointment: myJson.appointment});
                 })
             })
             .catch(err => console.log(err));

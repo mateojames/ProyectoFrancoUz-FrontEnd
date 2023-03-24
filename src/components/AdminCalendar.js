@@ -17,6 +17,7 @@ import {
   TodayButton,
   ConfirmationDialog
 } from '@devexpress/dx-react-scheduler-material-ui';
+
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -38,7 +39,8 @@ import {deleteAppointment} from "../store/actions/deleteAppointment";
 import { Loading } from './Loading/Loading.js';
 import { loadPatients } from "../store/actions/loadPatients";
 import { loadProfessionals } from "../store/actions/loadProfessionals";
-import { loadLocations, loadTherapies } from "../store/actions/resources";
+import { loadLocations } from "../store/actions/loadLocations";
+import { loadTherapies } from "../store/actions/loadTherapies";
 import { useLocation } from "react-router-dom";
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';

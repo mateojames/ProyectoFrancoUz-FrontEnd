@@ -1,19 +1,17 @@
+export const CREATELOCATION = 'CREATELOCATION';
 
-export const ADDAPPOINTMENT = 'ADDAPPOINTMENT';
-export const LOCATIONNOTAVAILABLE = 'LOCATIONNOTAVAILABLE'
-
-export const addAppointment = (appointment) => {
+export const createLocation = (data , handleLoading) => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('http://localhost:8080/session', {
+                fetch('http://localhost:8080/createLocation', {
                     method: 'POST',
                     headers: {
                     "Content-Type": "application/json",
                     "Authorization": idToken
                     },
                     body: JSON.stringify({
-                    appointment: appointment.added
+                        location: data
                     })
                 })
                 .then((response) => {
@@ -27,7 +25,9 @@ export const addAppointment = (appointment) => {
                     return response.json();
                 })
                 .then((myJson) => {
-                    dispatch({type:ADDAPPOINTMENT, appointment: myJson.appointment});
+                    console.log(myJson);
+                    dispatch({type:CREATELOCATION, location: myJson});
+                    if(handleLoading){handleLoading()}
                 })
             })
             .catch(err => console.log(err));

@@ -1,19 +1,17 @@
+export const CREATETHERAPY = 'CREATETHERAPY';
 
-export const ADDAPPOINTMENT = 'ADDAPPOINTMENT';
-export const LOCATIONNOTAVAILABLE = 'LOCATIONNOTAVAILABLE'
-
-export const addAppointment = (appointment) => {
+export const createTherapy = (data , handleLoading) => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('http://localhost:8080/session', {
+                fetch('http://localhost:8080/createTherapy', {
                     method: 'POST',
                     headers: {
                     "Content-Type": "application/json",
                     "Authorization": idToken
                     },
                     body: JSON.stringify({
-                    appointment: appointment.added
+                        therapy: data
                     })
                 })
                 .then((response) => {
@@ -27,7 +25,9 @@ export const addAppointment = (appointment) => {
                     return response.json();
                 })
                 .then((myJson) => {
-                    dispatch({type:ADDAPPOINTMENT, appointment: myJson.appointment});
+                    console.log(myJson);
+                    dispatch({type:CREATETHERAPY, therapy: myJson});
+                    if(handleLoading){handleLoading()}
                 })
             })
             .catch(err => console.log(err));

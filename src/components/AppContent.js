@@ -3,6 +3,10 @@ import ResponsiveAppBar from "./ResponsiveAppBar"
 import AuthSwitch from "./Switch"
 import { setCurrentUser, setLoading } from "../store/actions/auth";
 import { auth } from "../firebase"
+import {getToken, onMessage} from "firebase/messaging";
+import {messaging} from "../firebase";
+import {ToastContainer, toast} from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
     onAuthStateChanged
 } from "firebase/auth";
@@ -21,6 +25,17 @@ function AppContent() {
             setRole(IdToken.claims.role)
         }
     }
+
+    const activarMensajes = async ()=> {
+        console.log('vapid ',process.env)
+        const token = await getToken(messaging,{
+          vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY
+        }).catch(error => console.log("Tuviste un error al generar el token, papá"));
+      
+      
+        if(token) console.log("tu token:",token);
+        if(!token) console.log("no tienes token, rey");
+    }
     
     useEffect(() => {
         dispatch(setLoading());
@@ -33,17 +48,27 @@ function AppContent() {
         return () => unsubuscribe();
     }, []);
 
+    useEffect(()=>{
+        onMessage(messaging, message=>{
+          console.log("tu mensaje:", message);
+          toast(message.notification.title);
+     })}, []);
+
     useEffect (() => {
         obtainClaims()
     }, [user])
 
     useEffect (() => {
         console.log('rol ',role)
+        if(role){
+            activarMensajes()
+        }
     }, [role])
 
     const authContent = (
         <>
             <ResponsiveAppBar role={role}/>
+            <ToastContainer />
             <AuthSwitch role={role}/>
         </>
     )

@@ -1,19 +1,18 @@
+export const DELETETHERAPY = 'DELETETHERAPY';
 
-export const ADDAPPOINTMENT = 'ADDAPPOINTMENT';
-export const LOCATIONNOTAVAILABLE = 'LOCATIONNOTAVAILABLE'
-
-export const addAppointment = (appointment) => {
+export const deleteTherapy = (data , handleLoading) => {
     return (dispatch, getState) => {
+        const id = Object.keys(data)[0];
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('http://localhost:8080/session', {
-                    method: 'POST',
+                fetch(`http://localhost:8080/deleteTherapy/${id}`, {
+                    method: 'PUT',
                     headers: {
                     "Content-Type": "application/json",
                     "Authorization": idToken
                     },
                     body: JSON.stringify({
-                    appointment: appointment.added
+                        therapy: data
                     })
                 })
                 .then((response) => {
@@ -27,7 +26,9 @@ export const addAppointment = (appointment) => {
                     return response.json();
                 })
                 .then((myJson) => {
-                    dispatch({type:ADDAPPOINTMENT, appointment: myJson.appointment});
+                    console.log(myJson);
+                    dispatch({type:DELETETHERAPY, therapy: myJson});
+                    if(handleLoading){handleLoading()}
                 })
             })
             .catch(err => console.log(err));

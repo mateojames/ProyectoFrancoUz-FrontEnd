@@ -2,7 +2,6 @@ import { USERLOGOUT } from "../actions/userLogout";
 import { CREATELOCATION } from "../actions/createLocation";
 import { LOADLOCATIONS } from "../actions/loadLocations";
 import { UPDATELOCATION } from "../actions/updateLocation";
-import { DELETELOCATION } from "../actions/deleteLocation";
 
 import { CREATETHERAPY } from "../actions/createTherapy";
 import { LOADTHERAPIES } from "../actions/loadTherapies";
@@ -27,9 +26,6 @@ export default (state = initialState, action) => {
         case UPDATELOCATION:
             const updatedLocations = state.locations.map((item) => item.id == action.location.id ? {...item, ...action.location} : item );
             return {...state, locations: updatedLocations};
-        case DELETELOCATION:
-            const locations = state.locations.filter((item) => item.id !== action.location.id);
-            return {...state, locations: locations};
 
         case CREATETHERAPY:
             return {...state, therapies: state.therapies.concat([action.therapy])};

@@ -869,7 +869,8 @@ export default function AdminCalendar(){
 
   const handleLocationsToResources = () => {
     if(locations.length > 0){
-      const locToRes = locations.map((location)=>{
+      const notDeletedLocations = locations.filter((location) => !location.deleted)
+      const locToRes = notDeletedLocations.map((location)=>{
         return {id:location.id, text: location.name}
       });
       setResources((previousState) => {

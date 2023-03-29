@@ -138,7 +138,7 @@ const handleEditLocation = (location) => {
   return (
     <>
     <Grid container sx={{display: 'flex', justifyContent: "center", alignItems: "center" }}>
-         <ImageList sx={{  width: {xs: windowSize.innerWidth, md: windowSize.innerWidth / 1.8, lg:windowSize.innerWidth / 2}, height: window.innerHeight/1.1, margin:2 }}>
+         <ImageList sx={{  width: {xs: windowSize.innerWidth, md: windowSize.innerWidth / 1.8, lg:windowSize.innerWidth / 2}, height: window.innerHeight/1.1, margin:2 }} cols={2}>
       {notDeletedLocations.map((item) => (
         <ImageListItem key={item.url} cols={1} rows={1} sx={{ maxWidth:windowSize.innerWidth / 2, maxHeight: window.innerHeight/ 2}}>
           <img

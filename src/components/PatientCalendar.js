@@ -66,6 +66,7 @@ import { connectProps } from '@devexpress/dx-react-core';
 import CloseIcon from '@mui/icons-material/Close';
 
 const PREFIX = 'FrancoUz';
+const DEFAULTBACKGROUND = 'https://js.devexpress.com/Demos/DXHotels/Content/Pictures/MeetingRoom-0.jpg'
 
 const classes = {
   icon: `${PREFIX}-icon`,
@@ -81,22 +82,10 @@ const classes = {
 };
 
 const StyledAppointmentTooltipHeader = styled(AppointmentTooltip.Header)(() => ({
-  [`&.${classes.firstRoom}`]: {
-    background: 'url(https://js.devexpress.com/Demos/DXHotels/Content/Pictures/Lobby-4.jpg)',
-  },
-  [`&.${classes.secondRoom}`]: {
-    background: 'url(https://js.devexpress.com/Demos/DXHotels/Content/Pictures/MeetingRoom-4.jpg)',
-  },
-  [`&.${classes.bomboneraRoom}`]: {
-    background: 'url(https://s3.amazonaws.com/arc-wordpress-client-uploads/infobae-wp/wp-content/uploads/2017/05/14174202/boca-river-cancha.jpg)',
-  },
-  [`&.${classes.thirdRoom}`]: {
-    background: 'url(https://js.devexpress.com/Demos/DXHotels/Content/Pictures/MeetingRoom-0.jpg)',
-  },
   [`&.${classes.header}`]: {
     height: '240px',
-    backgroundSize: 'cover',
-  },
+    backgroundSize: '100% 100%' //review in a future, maybe 'cover' is better
+  }
 }));
 
 const StyledGrid = styled(Grid)(() => ({
@@ -134,13 +123,6 @@ const StyledAppointmentTooltipCommandButton = styled(AppointmentTooltip.CommandB
     backgroundColor: 'rgba(255,255,255,0.65)',
   },
 }));
-
-const getClassByLocation = (classes, location) => {
-  if (location === 'Room 1') return classes.firstRoom; //la location esta en el appointment, la cambiamos ahi
-  if (location === 'Room 2') return classes.secondRoom;
-  if (location === 'La Bombonera') return classes.bomboneraRoom;
-  return classes.thirdRoom;
-};
 
 const StyledToolbarFlexibleSpace = styled(Toolbar.FlexibleSpace)(() => ({
   [`&.${classes.flexibleSpace}`]: {
@@ -299,7 +281,9 @@ const Appointment = ({
         const openHeaderMenu = Boolean(anchorHeaderMenu);
         const [open, setOpen] = React.useState(false);
         const appointments = useSelector(state => state.calendar.appointments);
-        const [openCancelar, setOpenCancelar] = React.useState(false);
+        const locations = useSelector(state => state.resource.locations);
+        const [openCancelar, setOpenCancelar] = useState(false);
+        const [backgorund, setBackground] = useState(null);
         const addedAppointment = useSelector(state => state.calendar.currentAppointment);
 
         let currentAppointment = addedAppointment ? addedAppointment : appointments.find(appointment => appointment.id === appointmentData.id)
@@ -351,13 +335,31 @@ const Appointment = ({
       }
 
       useEffect(() => {
+        if(locations.length > 0 && currentAppointment){
+           const currentLocation = locations.find((location) => location.id === currentAppointment.location)
+           console.log('currentlocation1 ', currentLocation, locations)
+           if(currentLocation){
+            console.log('currentlocation2 ', currentLocation)
+            setBackground(currentLocation.url)
+           }
+        }
+      }, [locations, currentAppointment]);
+
+
+      useEffect(() => {
+        console.log('BACKGROUND, ',backgorund)
+      }, [backgorund]);
+
+
+      useEffect(() => {
         dispatch(emptyCurrentAppointment())
       }, []);
 
         return (
             <StyledAppointmentTooltipHeader
             {...restProps}
-            className={classNames(getClassByLocation(classes, currentAppointment.location), classes.header)}
+            className={classes.header}
+            sx={{ background: `url(${backgorund ? backgorund : DEFAULTBACKGROUND})`}}
             appointmentData={currentAppointment}
             >
             <StyledIconButton

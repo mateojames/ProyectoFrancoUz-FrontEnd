@@ -103,7 +103,7 @@ const classes = {
 const StyledAppointmentTooltipHeader = styled(AppointmentTooltip.Header)(() => ({
   [`&.${classes.header}`]: {
     height: '260px',
-    backgroundSize: 'cover',
+    backgroundSize: '100% 100%' //review in a future, maybe 'cover' is better
   }
 }));
 

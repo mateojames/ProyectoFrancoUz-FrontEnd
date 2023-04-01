@@ -9,6 +9,7 @@ import ProfessionalCalendar from "./ProfessionalCalendar"
 import NotAsignedHome from "./NotAsignedHome"
 import TherapyGrid from "./TherapyGrid"
 import Locations from "./Locations"
+import LandingHome from "./LandingHome"
 
 
 
@@ -48,7 +49,7 @@ function AuthSwitch(props) {
 
     const externalRoutes = (
         <Switch>
-            <Route path="/" component={Home} />
+            <Route path="/" component={LandingHome} />
         </Switch>
     );
     

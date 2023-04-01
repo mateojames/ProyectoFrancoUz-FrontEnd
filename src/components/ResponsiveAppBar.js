@@ -160,7 +160,7 @@ const ResponsiveAppBar = (props) => {
     return (
         <>
             <Box sx={{ display: 'flex'}}>
-                <AppBar position="static">
+                <AppBar position="static" sx={{ backgroundColor: 'primary.main'}}>
                 <Container maxWidth="xxl">
                     <Toolbar disableGutters>
                         <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>

@@ -6,7 +6,7 @@ export const updateLocation = (data , handleLoading) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
                 const id = data.get('id')
-                axios.put(`http://localhost:8080/updateLocation/${id}`,data, { headers: {'Content-Type': 'multipart/form-data', "Authorization": idToken}})
+                axios.put(`https://backend-asociacion-franco-uz.vercel.app/updateLocation/${id}`,data, { headers: {'Content-Type': 'multipart/form-data', "Authorization": idToken}})
                 .then((response) => {
                     console.log('RESPONSE', response);
                     console.log(response.status);

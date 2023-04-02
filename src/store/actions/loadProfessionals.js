@@ -4,7 +4,7 @@ export const loadProfessionals = () => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('http://localhost:8080/usersByRole/profesional', {
+                fetch('https://backend-asociacion-franco-uz.vercel.app/usersByRole/profesional', {
                     method: 'GET',
                     headers: {
                     "Content-Type": "application/json",

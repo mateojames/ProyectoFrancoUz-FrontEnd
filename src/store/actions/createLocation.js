@@ -4,7 +4,7 @@ export const createLocation = (data , handleLoading) => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('http://localhost:8080/createLocation', {
+                fetch('https://backend-asociacion-franco-uz.vercel.app/createLocation', {
                     method: 'POST',
                     headers: {
                     "Content-Type": "application/json",

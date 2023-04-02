@@ -5,7 +5,7 @@ export const deleteTherapy = (data , handleLoading) => {
         const id = Object.keys(data)[0];
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch(`http://localhost:8080/deleteTherapy/${id}`, {
+                fetch(`https://backend-asociacion-franco-uz.vercel.app/deleteTherapy/${id}`, {
                     method: 'PUT',
                     headers: {
                     "Content-Type": "application/json",

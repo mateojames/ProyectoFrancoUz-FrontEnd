@@ -4,7 +4,7 @@ export const loadLocations = (handleLoading) => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('http://localhost:8080/locations', {
+                fetch('https://backend-asociacion-franco-uz.vercel.app/locations', {
                     method: 'GET',
                     headers: {
                     "Content-Type": "application/json",

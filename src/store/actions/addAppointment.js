@@ -6,7 +6,7 @@ export const addAppointment = (appointment) => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('http://localhost:8080/session', {
+                fetch('https://backend-asociacion-franco-uz.vercel.app/session', {
                     method: 'POST',
                     headers: {
                     "Content-Type": "application/json",

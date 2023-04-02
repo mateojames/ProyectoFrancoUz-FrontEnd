@@ -16,6 +16,7 @@ import ProductHowItWorks from "../views/ProductHowItWorks"
 import ProductCTA from "../views/ProductCTA"
 import ProductSmokingHero from "../views/ProductSmokingHero"
 import AppFooter from "../views/AppFooter"
+import ProductLocation from "../views/ProductLocation"
 
 
 export default function LandingHome() {
@@ -90,6 +91,7 @@ export default function LandingHome() {
       <ProductCategories />
       <ProductHowItWorks />
       <ProductCTA />
+      <ProductLocation/>
       <AppFooter />
       <Snackbar open={openSuccess} autoHideDuration={20000} onClose={handleCloseSuccess}>
         <Alert onClose={handleCloseSuccess} severity="success" sx={{ width: '100%' , fontSize: 20}}>

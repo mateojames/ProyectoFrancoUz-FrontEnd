@@ -24,10 +24,10 @@ const iconStyle = {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: 'warning.main',
+  backgroundColor: 'secondary.main',
   mr: 1,
   '&:hover': {
-    bgcolor: 'warning.dark',
+    bgcolor: 'secondary.dark',
   },
 };
 
@@ -50,86 +50,63 @@ export default function AppFooter() {
     >
       <Container sx={{ my: 8, display: 'flex' }}>
         <Grid container spacing={5}>
-          <Grid item xs={6} sm={4} md={3}>
-            <Grid
-              container
-              direction="column"
-              justifyContent="flex-end"
-              spacing={2}
-              sx={{ height: 120 }}
-            >
-              <Grid item sx={{ display: 'flex' }}>
-                <Box component="a" href="https://mui.com/" sx={iconStyle}>
-                  <img
-                    src="/appFooterFacebook.png"
-                    alt="Facebook"
-                  />
-                </Box>
-                <Box component="a" href="https://twitter.com/MUI_hq" sx={iconStyle}>
-                  <img
-                    src="/appFooterTwitter.png"
-                    alt="Twitter"
-                  />
-                </Box>
-              </Grid>
-              <Grid item>
-                <Copyright />
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid item xs={6} sm={4} md={2}>
+        <Grid item xs={6} sm={4} md={2}>
             <Typography variant="h6" marked="left" gutterBottom>
-              Legal
+              Redes Sociales
+            </Typography>
+            <Box component="ul" sx={{ m: 0, listStyle: 'none', p: 0, display:'flex', flexDirection:'row' }}>
+              <Box component="li" sx={{ py: 0.5 }}>
+                <Box component="a" href="https://www.facebook.com/asociacionfrancouz/" sx={iconStyle}>
+                    <img
+                        src="/appFooterFacebook.png"
+                        alt="Facebook"
+                    />
+                    </Box>
+                </Box>
+              <Box component="li" sx={{ py: 0.5 }}>
+                <Box component="a" href="https://twitter.com/ac_francouz" sx={iconStyle}>
+                    <img
+                        src="/appFooterTwitter.png"
+                        alt="Twitter"
+                    />
+                    </Box>
+                </Box>
+            </Box>
+            <Box component="ul" sx={{ m: 0, listStyle: 'none', p: 0, display:'flex', flexDirection:'row' }}>
+              <Box component="li" sx={{ py: 0.5 }}>
+                <Box component="a" href="https://www.youtube.com/watch?v=mlgdRd5nKgI" sx={iconStyle}>
+                    <img
+                        src="/youtube.png"
+                        alt="Facebook"
+                    />
+                    </Box>
+                </Box>
+              <Box component="li" sx={{ py: 0.5 }}>
+                <Box component="a" href="https://www.instagram.com/asociacionfrancouz/" sx={iconStyle}>
+                    <img
+                        src="/instagram.png"
+                        alt="Twitter"
+                    />
+                    </Box>
+                </Box>
+            </Box>
+          </Grid>
+          <Grid item xs={6} sm={6} md={6}>
+            <Typography variant="h6" marked="left" gutterBottom>
+              Contacto
             </Typography>
             <Box component="ul" sx={{ m: 0, listStyle: 'none', p: 0 }}>
               <Box component="li" sx={{ py: 0.5 }}>
-                <Link href="/premium-themes/onepirate/terms/">Terms</Link>
+                <Typography variant="h9" sx={{ my: 5 }}>
+                    Teléfono : ​011-4-686-0754  //  15-3102-2392 
+                </Typography>
               </Box>
               <Box component="li" sx={{ py: 0.5 }}>
-                <Link href="/premium-themes/onepirate/privacy/">Privacy</Link>
+                <Typography variant="h9" sx={{ my: 5 }}>
+                    Email : asociacionfrancouz@gmail.com
+                </Typography>
               </Box>
             </Box>
-          </Grid>
-          <Grid item xs={6} sm={8} md={4}>
-            <Typography variant="h6" marked="left" gutterBottom>
-              Language
-            </Typography>
-            <TextField
-              select
-              size="medium"
-              variant="standard"
-              SelectProps={{
-                native: true,
-              }}
-              sx={{ mt: 1, width: 150 }}
-            >
-              {LANGUAGES.map((language) => (
-                <option value={language.code} key={language.code}>
-                  {language.name}
-                </option>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid item>
-            <Typography variant="caption">
-              {'Icons made by '}
-              <Link href="https://www.freepik.com" rel="sponsored" title="Freepik">
-                Freepik
-              </Link>
-              {' from '}
-              <Link href="https://www.flaticon.com" rel="sponsored" title="Flaticon">
-                www.flaticon.com
-              </Link>
-              {' is licensed by '}
-              <Link
-                href="https://creativecommons.org/licenses/by/3.0/"
-                title="Creative Commons BY 3.0"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                CC 3.0 BY
-              </Link>
-            </Typography>
           </Grid>
         </Grid>
       </Container>

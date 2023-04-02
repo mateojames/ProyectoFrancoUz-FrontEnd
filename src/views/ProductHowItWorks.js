@@ -26,6 +26,10 @@ const image = {
 };
 
 function ProductHowItWorks() {
+    const openInNewTab = url => {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      };
+
   return (
     <Box
       component="section"
@@ -105,9 +109,8 @@ function ProductHowItWorks() {
           color="secondary"
           size="large"
           variant="contained"
-          component="a"
-          href="/premium-themes/onepirate/sign-up/"
           sx={{ mt: 8 }}
+          onClick={() => openInNewTab('https://wa.me/+5491131503259')}
         >
           Contactarme
         </Button>

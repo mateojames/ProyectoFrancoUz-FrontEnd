@@ -7,7 +7,9 @@ export const theme = createTheme({
       main: '#1D3461',
     },
     secondary: {
-      main: '#FB3640',
+      light: '#fff5f8',
+      main: '#ff3366',
+      dark: '#e62958',
     },
   },
   typography: {

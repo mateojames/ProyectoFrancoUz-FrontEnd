@@ -7,8 +7,9 @@ import UsersGrid from './Grid'
 import PatientCalendar from "./PatientCalendar"
 import ProfessionalCalendar from "./ProfessionalCalendar"
 import NotAsignedHome from "./NotAsignedHome"
-import LocationGrid from "./LocationGrid"
 import TherapyGrid from "./TherapyGrid"
+import Locations from "./Locations"
+import LandingHome from "./LandingHome"
 
 
 
@@ -19,7 +20,7 @@ function AuthSwitch(props) {
     const authAdminRoutes = (
         <Switch>
             <Route exact path="/Calendar" component={AdminCalendar} />
-            <Route exact path="/salas" component={LocationGrid}/>
+            <Route exact path="/salas" component={Locations}/>
             <Route exact path="/terapias" component={TherapyGrid}/>
             <Route exact path="/usuarios" component={UsersGrid}/>
             <Route path="/" component={Home} />
@@ -48,7 +49,7 @@ function AuthSwitch(props) {
 
     const externalRoutes = (
         <Switch>
-            <Route path="/" component={Home} />
+            <Route path="/" component={LandingHome} />
         </Switch>
     );
     

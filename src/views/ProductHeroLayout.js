@@ -10,7 +10,7 @@ const ProductHeroLayoutRoot = styled('section')(({ theme, size }) => ({
   position: 'relative',
   display: 'flex',
   alignItems: 'center',
-  height: size.innerHeight
+  height: size.innerHeight*0.8
 }));
 
 const Background = styled(Box)({
@@ -70,6 +70,14 @@ function ProductHeroLayout(props) {
           }}
         />
         <Background sx={sxBackground} />
+        <Box
+          component="img"
+          src="/productHeroArrowDown.png"
+          height="16"
+          width="12"
+          alt="arrow down"
+          sx={{ position: 'absolute', bottom: 32 }}
+        />
 
       </Container>
     </ProductHeroLayoutRoot>

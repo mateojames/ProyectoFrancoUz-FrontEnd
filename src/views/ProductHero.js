@@ -20,14 +20,25 @@ export default function ProductHero(props) {
         src={ImageFrancoUz}
         alt="increase priority"
       />
-      <Typography color="inherit" align="center" variant="h2" marked="center">
+      <Typography color="inherit" align="center" variant="h2" marked="center" sx={{display:{xs:'none', md:'block'}}}>
+        {props.title}
+      </Typography>
+      <Typography color="inherit" align="center" variant="h4" marked="center" sx={{display:{xs:'block', md:'none'}}}>
         {props.title}
       </Typography>
       <Typography
         color="inherit"
         align="center"
-        variant="h5"
-        sx={{ mb: 4, mt: { sx: 4, sm: 10 } }}
+        variant='h4'
+        sx={{ mb: 4, mt: { sx: 4, sm: 10 },display:{xs:'none', md:'block'} }}
+      >
+        {props.description}
+      </Typography>
+      <Typography
+        color="inherit"
+        align="center"
+        variant='h6'
+        sx={{ mb: 4, mt: { sx: 4, sm: 10 },display:{xs:'block', md:'none' }}}
       >
         {props.description}
       </Typography>

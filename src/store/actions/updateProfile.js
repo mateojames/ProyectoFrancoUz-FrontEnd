@@ -7,7 +7,7 @@ export const updateUserProfile = (data) => {
         const uid = data.id
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch(`https://backend-asociacion-franco-uz.vercel.app/updateProfile/${uid}`, {
+                fetch(`http://localhost:8080/updateProfile/${uid}`, {
                     method: 'PUT',
                     headers: {
                     "Content-Type": "application/json",

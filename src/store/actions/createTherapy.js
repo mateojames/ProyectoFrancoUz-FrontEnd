@@ -4,7 +4,7 @@ export const createTherapy = (data , handleLoading) => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('https://backend-asociacion-franco-uz.vercel.app/createTherapy', {
+                fetch('http://localhost:8080/createTherapy', {
                     method: 'POST',
                     headers: {
                     "Content-Type": "application/json",

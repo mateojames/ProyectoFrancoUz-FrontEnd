@@ -4,7 +4,7 @@ export const deleteLocation = (id, handleLoading) => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch(`https://backend-asociacion-franco-uz.vercel.app/deleteLocation/${id}`, {
+                fetch(`http://localhost:8080/deleteLocation/${id}`, {
                     method: 'PUT',
                     headers: {
                     "Content-Type": "application/json",

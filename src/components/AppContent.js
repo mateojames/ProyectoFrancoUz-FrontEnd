@@ -11,17 +11,20 @@ import {
     onAuthStateChanged
 } from "firebase/auth";
 import { useDispatch, useSelector } from 'react-redux';
+import { addNotificationToken } from "../store/actions/addNotificationToken";
 
 function AppContent() {
 
     const isLoading = useSelector(state => state.auth.isLoading);
     const user = useSelector(state => state.auth.currentUser);
     const [role, setRole] = useState(null)
+    const [notificationToken, setNotificationToken] = useState(null)
     const dispatch = useDispatch();
 
     async function obtainClaims() {
         const IdToken = user ? await user.getIdTokenResult() : null
         if(IdToken){
+            console.log('CLAIMS', IdToken.claims)
             setRole(IdToken.claims.role)
         }
     }
@@ -30,10 +33,13 @@ function AppContent() {
         console.log('vapid ',process.env)
         const token = await getToken(messaging,{
           vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY
-        }).catch(error => console.log("Tuviste un error al generar el token, papá"));
+        }).catch(error => console.log("Tuviste un error al generar el token, papá: ",error));
       
       
-        if(token) console.log("tu token:",token);
+        if(token){
+            setNotificationToken(token)
+            console.log("tu token:",token);
+        }
         if(!token) console.log("no tienes token, rey");
     }
     
@@ -48,10 +54,20 @@ function AppContent() {
         return () => unsubuscribe();
     }, []);
 
+    useEffect(() => {
+        if(notificationToken && user){
+            const data = {
+                user: user.uid,
+                notificationToken
+            }
+            dispatch(addNotificationToken(data));
+        }
+    }, [notificationToken, user]);
+
     useEffect(()=>{
         onMessage(messaging, message=>{
           console.log("tu mensaje:", message);
-          toast(message.notification.title);
+          toast(message.data.title);
      })}, []);
 
     useEffect (() => {

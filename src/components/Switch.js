@@ -54,8 +54,7 @@ function AuthSwitch(props) {
     );
     
     var routes = externalRoutes;
-    if(currentUser){
-        if(props.role){
+    if(currentUser && props.role && props.role != undefined){
             switch (props.role) {
                 case 'paciente':
                     routes = authPatientRoutes
@@ -69,7 +68,6 @@ function AuthSwitch(props) {
                 default:
                     routes = authUndefinedRoutes
               }
-        }
     }
 
     console.log('rolSwitch ', props.role)

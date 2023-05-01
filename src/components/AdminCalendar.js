@@ -17,7 +17,7 @@ import {
   TodayButton,
   ConfirmationDialog
 } from '@devexpress/dx-react-scheduler-material-ui';
-
+import Joi from "joi";
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -82,6 +82,7 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import FilterMenu from "./FilterMenu";
 import { connectProps } from '@devexpress/dx-react-core';
 import CloseIcon from '@mui/icons-material/Close';
+import { Alert, Snackbar } from "@mui/material";
 
 const PREFIX = 'FrancoUz';
 
@@ -171,7 +172,6 @@ const FlexibleSpace = (({
       <FilterAltIcon/>
     </IconButton>
     {filters.map((item) => {
-      console.log('CHIP ',item)
           return (<Chip
             avatar={<IconButton onClick={() => deleteFilter(item)} aria-label={item.name}>
                       <CloseIcon/>
@@ -324,11 +324,9 @@ const Header = (({
           setAnchorHeaderMenu(null);
       };
       const handleFinalizarClicked = () =>{
-          console.log('FINALIZAR')
           handleClickOpen()
       }
       const handleCancelarClicked = () =>{
-          console.log('CANCELAR')
           setOpenCancelar(true)
       }
       const handleSubmitAction = (appointment, action) => {
@@ -339,14 +337,13 @@ const Header = (({
               date: new Date().toLocaleDateString('en-GB').concat(' ', new Date().toLocaleTimeString()),
               action: action
           }
-          console.log('DATEEE ', appointment)
           let exDate = appointment.rRule ? appointment.startDate.toISOString().replaceAll('-', '').replaceAll(':', '').replace('.000', '') : null
           const commentActionData = {
               appointment: appointment,
               comment: comment,
               exDate: exDate
           }
-          console.log('object comment, ', commentActionData)
+
           if(commentActionData.exDate){
             dispatch(addCommentToRecurrent(commentActionData))
           }else{
@@ -359,9 +356,9 @@ const Header = (({
       useEffect(() => {
         if(locations.length > 0 && currentAppointment){
            const currentLocation = locations.find((location) => location.id === currentAppointment.location)
-           console.log('currentlocation1 ', currentLocation, locations)
+           
            if(currentLocation){
-            console.log('currentlocation2 ', currentLocation)
+           
             setBackground(currentLocation.url)
            }
         }
@@ -369,7 +366,7 @@ const Header = (({
 
 
       useEffect(() => {
-        console.log('BACKGROUND, ',backgorund)
+
       }, [backgorund]);
 
       useEffect(() => {
@@ -448,7 +445,6 @@ const Header = (({
 const Content = (({
   children, appointmentData, ...restProps
 }) => {
-  console.log('CONTENT, ',{children, appointmentData,restProps})
   const [expanded, setExpanded] = useState(false);
   const [windowSize, setWindowSize] = useState(getWindowSize());
   const commentRef = useRef()
@@ -459,7 +455,6 @@ const Content = (({
   
   let currentAppointment = addedAppointment ? addedAppointment : appointments.find(appointment => appointment.id === appointmentData.id)
   currentAppointment = currentAppointment ? currentAppointment : appointmentData
-  console.log('appointment ', currentAppointment)
 
   useEffect(() => {
       function handleWindowResize() {
@@ -488,9 +483,7 @@ const Content = (({
       }
       if(commentActionData.exDate){
         dispatch(addCommentToRecurrent(commentActionData))
-        console.log('RECURRENTCOMMENT')
       }else{
-        console.log('COMMENT')
         dispatch(addComment(commentActionData))
       }
      //console.log('exDate, ', commentActionData.appointment.startDate.toISOString().replaceAll('-', '').replaceAll(':', '').replaceAll('.', ''))
@@ -733,7 +726,7 @@ const BooleanEditor =(props) => {
     return <AppointmentForm.BooleanEditor {...props}/>
   }
 }
-
+/*
 const DateEditor=(props) => {
   return ( 
   <LocalizationProvider dateAdapter={AdapterMoment}>
@@ -747,6 +740,7 @@ const DateEditor=(props) => {
   />
   </LocalizationProvider>)
 }
+*/
 
 const TextEditor = (props) => {
   // eslint-disable-next-line react/destructuring-assignment
@@ -756,7 +750,6 @@ const TextEditor = (props) => {
 };
 
 const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
-  console.log('BASICLAYOUt ',restProps)
   const patients = useSelector(state => state.user.patients);
   const professionals = useSelector(state => state.user.professionals);
   const onPatientFieldChange = (event, newValue) => {
@@ -812,6 +805,87 @@ const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
 };
 
 
+const CommandLayout = ({appointmentChanges, action, setError, ...restProps}) => {
+    const handleButtonCLicked = (changes) => {
+      console.log(action, ' , ', appointmentChanges);
+      const mensajesDeError = {
+        'any.required': 'El campo {#label} es obligatorio.',
+        'boolean.base': 'El campo {#label} debe ser verdadero o falso.',
+        'string.empty': 'El campo {#label} es obligatorio.',
+        'string.alphanum': 'El campo {#label} solo debe contener letras y números.',
+        'string.min': 'El campo {#label} debe tener al menos {#limit} caracteres.',
+        'string.max': 'El campo {#label} no debe tener más de {#limit} caracteres.',
+        'string.pattern.base': 'El campo {#label} solo permite letras, números y espacios.',
+        'array.base': 'El campo {#label} debe ser una lista.',
+        'array.min': 'Debe seleccionar al menos {#limit} {#label}.',
+      };
+      const opcionesValidador = {
+        abortEarly: false,
+        messages: mensajesDeError,
+      };
+      let validation = {}
+      const addingAppointmentSchema = Joi.object({
+        allDay: Joi.boolean().optional().label('Todo el día'),
+        startDate: Joi.date().required().label('Fecha de inicio'),
+        endDate: Joi.date().required().label('Fecha de finalización'),
+        exDate: Joi.date().optional().label('Excepción'),
+        location: Joi.string().alphanum().min(1).max(50).required().label('Ubicación'),
+        rRule: Joi.string().min(1).max(400).optional().label('Regla de repetición'),
+        therapy: Joi.string().min(1).max(128).required().label('Terapia'),
+        title: Joi.string().pattern(/^[a-zA-Z0-9 ]+$/).min(1).max(30).required().label('Título'),
+        patients: Joi.array().required().label('Pacientes'),
+        professionals: Joi.array().required().label('Profesionales'),
+      });
+      const editingAppointmentSchema = Joi.object({
+        allDay: Joi.boolean().optional().label('Todo el día'),
+        startDate: Joi.date().optional().label('Fecha de inicio'),
+        endDate: Joi.date().optional().label('Fecha de finalización'),
+        exDate: Joi.date().optional().label('Excepción'),
+        location: Joi.string().alphanum().min(1).max(50).optional().label('Ubicación'),
+        rRule: Joi.string().min(1).max(400).optional().label('Regla de repetición'),
+        therapy: Joi.string().min(1).max(128).optional().label('Terapia'),
+        title: Joi.string().pattern(/^[a-zA-Z0-9 ]+$/).min(1).max(30).optional().label('Título'),
+        patients: Joi.array().optional().label('Pacientes'),
+        professionals: Joi.array().optional().label('Profesionales'),
+      });
+    if(action === 'editing'){
+      validation =  editingAppointmentSchema.validate(appointmentChanges, opcionesValidador)
+      console.log('editing validation, ',validation)
+    }
+    if(action === 'adding'){
+      validation =  addingAppointmentSchema.validate(appointmentChanges, opcionesValidador)
+      console.log('adding validation, ',validation)
+    }
+    if(action){
+      if(validation.error){
+        /*
+        const mensajeDeError = mensajesDeError[validation.error.details[0].type];
+        if(mensajeDeError){
+          mensajeDeError.replace('{#limit}', validation.error.details[0].context.limit || '');
+          setError(mensajeDeError)
+          console.log('error ', mensajeDeError)
+        }else{
+          setError(validation.error.message)
+          console.log('error ', validation.error.message)
+        }*/
+        setError(validation.error.message)
+        console.log('error ', validation.error.message)
+      }else{
+        restProps.onCommitButtonClick(changes)
+      }
+    }
+  }
+  return (
+    <AppointmentForm.CommandLayout
+      {...restProps}
+      disableSaveButton={false}
+      onCommitButtonClick={handleButtonCLicked}
+    >
+    </AppointmentForm.CommandLayout>
+  );
+};
+
+
 
 export default function AdminCalendar(){
   const [currentDate, setCurrentDate] = useState(new Date())
@@ -827,6 +901,9 @@ export default function AdminCalendar(){
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [formVisibility, setFormVisibility] = useState(false);
+  const [appointmentChanges, setAppointmentChanges] = useState({})
+  const [action, setAction] = useState(null)
+  const [error, setError] = useState('')
   const handleCurrentDateChange = (currentDate) => {
     setCurrentDate(currentDate)
   }
@@ -843,7 +920,7 @@ export default function AdminCalendar(){
 
   const handleCommitChanges = (action) => {
     console.log('commit ',action);
-    
+   
    if(action.added){
       dispatch(addAppointment(action));
       console.log(action)
@@ -852,6 +929,18 @@ export default function AdminCalendar(){
       dispatch(editAppointment(action));
     }
     if(action.deleted)dispatch(deleteAppointment(action));
+  }
+
+  const handleAddedAppointmentChange = (changes) => {
+    console.log('added changes: ', changes)
+    setAppointmentChanges(changes)
+    setAction('adding')
+  }
+
+  const handleChangesChange = (changes) =>{
+    console.log('changes change, ', changes)
+    setAppointmentChanges(changes)
+    setAction('editing')
   }
 
   const handleLoading = () => {
@@ -886,14 +975,12 @@ export default function AdminCalendar(){
   const handleSessionFocus = () => {
     if(dataSession != undefined && dataSession.state != undefined && dataSession.state.date != undefined){
       const date = dataSession.state.date;
-      console.log("Session info1 -->", date);
 
       const d = date.slice(0,2);
       const m = date.slice(3,5) - 1;
       const y = date.slice(6,10);
 
       const newDate = new Date(y, m, d);
-      console.log("Nueva fecha",newDate);
 
       handleCurrentDateChange(newDate);
     }
@@ -973,6 +1060,21 @@ export default function AdminCalendar(){
     flexibleSpace.update()
   })
 
+  const commandLayout = connectProps(CommandLayout, () => {
+
+    return {
+      appointmentChanges: appointmentChanges,
+      action: action,
+      setError: setError
+    };
+  });
+
+
+  useEffect(() => {
+    commandLayout.update()
+  })
+
+
 
 
   return (
@@ -988,6 +1090,8 @@ export default function AdminCalendar(){
           />
           <EditingState
             onCommitChanges={handleCommitChanges}
+            onAddedAppointmentChange={handleAddedAppointmentChange}
+            onAppointmentChangesChange={handleChangesChange}
           />
 
           <WeekView
@@ -1018,9 +1122,10 @@ export default function AdminCalendar(){
           />
           <AppointmentForm
             basicLayoutComponent={BasicLayout}
+            commandLayoutComponent={commandLayout}
             textEditorComponent={TextEditor}
             booleanEditorComponent={BooleanEditor}
-            dateEditorComponent={DateEditor}
+            
             messages={appointmentFormMessages}
             visible={formVisibility}
             onVisibilityChange={(e) => setFormVisibility(e)}
@@ -1037,6 +1142,15 @@ export default function AdminCalendar(){
         </Fab>
         </Box>
         {loading && <Loading />}
+        {error && <Snackbar
+          autoHideDuration={10000}
+          anchorOrigin={{ vertical:'bottom', horizontal:'center' }}
+          open={error ? true : false}
+          onClose={() => setError('')}
+          sx={{ width: '60%' }}
+        >
+            <Alert severity="error" sx={{ width: '100%' }}>{error}</Alert>
+          </Snackbar>}
       </Paper>
     )
 }

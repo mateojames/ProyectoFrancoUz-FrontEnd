@@ -4,7 +4,7 @@ export const loadTherapies = (handleLoading) => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch('https://backend-asociacion-franco-uz.vercel.app/therapies', {
+                fetch('http://localhost:8080/therapies', {
                     method: 'GET',
                     headers: {
                     "Content-Type": "application/json",

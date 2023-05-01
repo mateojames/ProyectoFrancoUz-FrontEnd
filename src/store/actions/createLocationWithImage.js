@@ -6,7 +6,7 @@ export const createLocationWithImage = (data , handleLoading) => {
     return (dispatch, getState) => {
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                axios.post("https://backend-asociacion-franco-uz.vercel.app/createLocationWithImage", data, { headers: {'Content-Type': 'multipart/form-data', "Authorization": idToken}})
+                axios.post("http://localhost:8080/createLocationWithImage", data, { headers: {'Content-Type': 'multipart/form-data', "Authorization": idToken}})
                 .then((response) => {
                     console.log('RESPONSE', response);
                     console.log(response.status);

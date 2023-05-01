@@ -6,7 +6,7 @@ export const updateTherapy = (data , handleLoading) => {
         const id = Object.keys(data)[0];
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch(`https://backend-asociacion-franco-uz.vercel.app/updateTherapy/${id}`, {
+                fetch(`http://localhost:8080/updateTherapy/${id}`, {
                     method: 'PUT',
                     headers: {
                     "Content-Type": "application/json",

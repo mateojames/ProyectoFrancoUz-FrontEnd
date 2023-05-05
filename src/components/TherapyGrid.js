@@ -196,9 +196,8 @@ export default function TherapyGrid(props) {
         setValidationStatus({ ...validationStatus, ...validation });
         const validationValue = Object.values(validation)[0]
         if( validationValue && validationValue.name && validationValue.name.isValid){
-          //setLoading(true)
-          //dispatch(updateTherapy(changed, handleLoading))
-          alert('siuu')
+          setLoading(true)
+          dispatch(updateTherapy(changed, handleLoading))
         }
     }
     else if (added) {
@@ -206,9 +205,8 @@ export default function TherapyGrid(props) {
       setValidationStatus({ ...validationStatus, ...validation });
       const validationValue = Object.values(validation)[0]
       if( validationValue && validationValue.name && validationValue.name.isValid){
-        //setLoading(true)
-        //dispatch(createTherapy(added[0], handleLoading))
-        alert('siuu')
+        setLoading(true)
+        dispatch(createTherapy(added[0], handleLoading))
       }
     }
     else if (deleted) {

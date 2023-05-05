@@ -91,7 +91,7 @@ function AppContent() {
 
     var content = null
 
-    if(!isLoading && ((user != null  && role != null) || user === null)){
+    if(!isLoading){
         content = authContent
     }
 

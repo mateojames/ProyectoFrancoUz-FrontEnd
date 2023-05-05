@@ -8,7 +8,7 @@ export const addNotificationToken = (data) => {
         console.log('usuario, ',data)
         getState().auth.currentUser.getIdToken(true)
             .then(idToken => {
-                fetch(`http://localhost:8080/updateMessageTarget/${uid}`, {
+                fetch(`https://backend-asociacion-franco-uz.vercel.app/updateMessageTarget/${uid}`, {
                     method: 'PUT',
                     headers: {
                     "Content-Type": "application/json",

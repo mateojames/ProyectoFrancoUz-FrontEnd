@@ -23,6 +23,7 @@ import {
     TableFilterRow,
     TableColumnResizing
 } from '@devexpress/dx-react-grid-material-ui';
+import { connectProps } from '@devexpress/dx-react-core';
 
 import { loadTherapies } from "../store/actions/loadTherapies.js"; 
 
@@ -60,11 +61,15 @@ const EditButton = ({ onExecute }) => (
   </IconButton>
 );
 
-const CommitButton = ({ onExecute }) => (
-  <IconButton onClick={onExecute} title="Guardar los cambios" size="large">
+const CommitButton = ({ onExecute }) => {
+  const handleCommitClicked = (e) => {
+    console.log('clicked')
+    onExecute()
+  }
+  return (<IconButton onClick={handleCommitClicked} title="Guardar los cambios" size="large">
     <SaveIcon />
-  </IconButton>
-);
+  </IconButton>)
+};
 
 const CancelButton = ({ onExecute }) => (
   <IconButton color="secondary" onClick={onExecute} title="Cancelar los cambios" size="large">
@@ -116,6 +121,52 @@ const FilterCell = (props) => {
   return <TableFilterRow.Cell {...props} />;
 };
 
+const requiredRule = {
+  isValid: value => value?.trim().length > 0,
+  errorText: 'Este campo no puede estar vacío',
+};
+const numberRule = {
+  isValid: value => value ? value.match(/^\d*[1-9]\d*$/) || value.match(/^\d+\.\d+$/) : false,
+  errorText: 'Este campo debe contener solo números positivos',
+};
+const validationRules = {
+  name: [requiredRule],
+};
+
+const validate = (changed, validationStatus) => Object.keys(changed).reduce((status, id) => {
+  let rowStatus = validationStatus[id] || {};
+  if (changed[id]) {
+    rowStatus = {
+      ...rowStatus,
+      ...Object.keys(changed[id]).reduce((acc, field) => {
+        const invalidRule = validationRules[field].find((rule) => !rule.isValid(changed[id][field]));
+        console.log(invalidRule)
+        let fieldStatus = {}
+        if(invalidRule){
+          fieldStatus = {
+              ...acc,
+              [field]: {
+                  isValid: false,
+                  error: invalidRule.errorText,
+              }
+          }
+        }else{
+          fieldStatus = {
+              ...acc,
+              [field]: {
+                  isValid: true,
+                  error: '',
+              }
+          }
+        }
+        return fieldStatus;
+      }, {}),
+    };
+  }
+
+  return { ...status, [id]: rowStatus };
+}, {});
+
 
 
 export default function TherapyGrid(props) {
@@ -141,12 +192,22 @@ export default function TherapyGrid(props) {
 
   const commitChanges = ({changed, added, deleted}) => {
     if (changed) {
-        setLoading(true)
-        dispatch(updateTherapy(changed, handleLoading))
+        const validation = validate(changed, validationStatus)
+        setValidationStatus({ ...validationStatus, ...validation });
+        const validationValue = Object.values(validation)[0]
+        if( validationValue && validationValue.name && validationValue.name.isValid){
+          setLoading(true)
+          dispatch(updateTherapy(changed, handleLoading))
+        }
     }
     else if (added) {
+      const validation = validate(added, validationStatus)
+      setValidationStatus({ ...validationStatus, ...validation });
+      const validationValue = Object.values(validation)[0]
+      if( validationValue && validationValue.name && validationValue.name.isValid){
         setLoading(true)
         dispatch(createTherapy(added[0], handleLoading))
+      }
     }
     else if (deleted) {
       const id = deleted[0]

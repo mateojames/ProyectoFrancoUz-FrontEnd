@@ -22,7 +22,7 @@ export const loadAppointments = (handleLoading) => {
                     return response.json();
                 })
                 .then((myJson) => {
-                    handleLoading();
+                    if(handleLoading){handleLoading()};
                     console.log(myJson);
                     dispatch({type:LOADAPPOINTMENTS, appointments: myJson.appointments});
                 })

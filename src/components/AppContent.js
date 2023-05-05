@@ -12,6 +12,8 @@ import {
 } from "firebase/auth";
 import { useDispatch, useSelector } from 'react-redux';
 import { addNotificationToken } from "../store/actions/addNotificationToken";
+import { loadAppointments } from "../store/actions/loadAppointments";
+import { loadNotifications } from "../store/actions/loadNotifications";
 
 function AppContent() {
 
@@ -68,6 +70,8 @@ function AppContent() {
         onMessage(messaging, message=>{
           console.log("tu mensaje:", message);
           toast(message.data.title);
+          dispatch(loadAppointments())
+          dispatch(loadNotifications())
      })}, []);
 
     useEffect (() => {

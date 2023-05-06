@@ -49,7 +49,7 @@ function ProductLocation() {
         <Grid container spacing={3} sx={{zIndex:1}}>
             <Grid item xs={12} md={12} sx={{display: 'flex', position: 'relative', justifyContent:'center', alignItems:'center'}}>
                 <Typography variant="h4" marked="center" component="h2" sx={{ mb: 2 }}>
-                ¿Donde econtrarnos?
+                ¿Donde encontrarnos?
                 </Typography>
             </Grid>
             <Grid item xs={12} md={12} sx={{display: 'flex', justifyContent:'center', alignItems:'center'}}>

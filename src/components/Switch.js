@@ -23,21 +23,21 @@ function AuthSwitch(props) {
             <Route exact path="/salas" component={Locations}/>
             <Route exact path="/terapias" component={TherapyGrid}/>
             <Route exact path="/usuarios" component={UsersGrid}/>
-            <Route path="/" component={Home} />
+            <Route path="/" component={LandingHome} />
         </Switch>
     );
 
     const authPatientRoutes = (
         <Switch>
             <Route exact path="/Calendar" component={PatientCalendar} />
-            <Route path="/" component={Home} />
+            <Route path="/" component={LandingHome} />
         </Switch>
     );
 
     const authProfessionalRoutes = (
         <Switch>
             <Route exact path="/Calendar" component={ProfessionalCalendar} />
-            <Route path="/" component={Home} />
+            <Route path="/" component={LandingHome} />
         </Switch>
     );
 
@@ -54,7 +54,7 @@ function AuthSwitch(props) {
     );
     
     var routes = externalRoutes;
-    if(currentUser && props.role && props.role != undefined){
+    if(currentUser){
             switch (props.role) {
                 case 'paciente':
                     routes = authPatientRoutes

@@ -26,7 +26,7 @@ function AppContent() {
     async function obtainClaims() {
         const IdToken = user ? await user.getIdTokenResult() : null
         if(IdToken){
-            console.log('CLAIMS', IdToken.claims)
+            console.log('CLAIMS', IdToken)
             setRole(IdToken.claims.role)
         }
     }
@@ -76,14 +76,11 @@ function AppContent() {
 
     useEffect (() => {
         obtainClaims()
-    }, [user])
-
-    useEffect (() => {
-        console.log('rol ',role)
-        if(role){
+        if(user){
             activarMensajes()
         }
-    }, [role])
+    }, [user])
+
 
     const authContent = (
         <>

@@ -15,21 +15,20 @@ const firebaseConfig = {
     measurementId: "G-L4HRS19C5Q"
   }
 
-const app = firebase.initializeApp(firebaseConfig);
-const messaging = firebase.messaging(app);
-
+firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage(payload => {
     console.log("Recibiste mensaje mientras estabas ausente");
 // previo a mostrar notificación
-    const notificationTitle= payload.notification.title;
+    const notificationTitle= payload.data.title;
     const notificationOptions = {
-        body: payload.notification.body,
+        body: payload.data.title,
         icon: "/logo192.png"
     }
 
 
-    return self.registration.showNotification(
+    self.registration.showNotification(
         notificationTitle, 
         notificationOptions
     )

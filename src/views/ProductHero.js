@@ -4,8 +4,20 @@ import Typography from '../components/Typography';
 import ProductHeroLayout from './ProductHeroLayout';
 
 import ImageFrancoUz from '../images/frente3.png';
+import ConozcanosDialog from '../components/ConozcanosDialog';
+import { useState } from 'react';
 
 export default function ProductHero(props) {
+  const [open, setOpen] = useState(false)
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
   return (
     <ProductHeroLayout
       sxBackground={{
@@ -49,9 +61,11 @@ export default function ProductHero(props) {
         size="large"
         component="a"
         sx={{ minWidth: 200 }}
+        onClick={handleClickOpen}
       >
         Conozcanos
       </Button>
+      <ConozcanosDialog open={open} handleClose={handleClose}></ConozcanosDialog>
     </ProductHeroLayout>
   );
 }

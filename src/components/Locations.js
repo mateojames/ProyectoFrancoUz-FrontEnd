@@ -30,6 +30,8 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 import { Loading } from "./Loading/Loading.js";
+import { Alert, Snackbar } from "@mui/material";
+import Joi from "joi";
 
 export default function Locations(props) {
   const locations = useSelector(state => state.resource.locations);
@@ -43,6 +45,7 @@ export default function Locations(props) {
   const [open, setOpen] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [deleting, setDeleting] = useState(null)
+  const [error, setError] = useState("")
 
   function getWindowSize() {
     const { innerWidth, innerHeight } = window;
@@ -58,20 +61,42 @@ const handleFileChange = (event) => {
 
 const handleSendCLicked = () => {
     setLoading(true)
-    var data = new FormData()
-    if(editing){
-        if(file){
-            data.append('file', file)
-        }
-        data.append('name', nameRef.current.value)
-        data.append('id', editing.id)
-        dispatch(updateLocation(data, handleLoading))
+    const mensajesDeError = {
+      'any.required': 'El campo {#label} es obligatorio.',
+      'string.empty': 'El campo {#label} es obligatorio.',
+      'string.min': 'El campo {#label} debe tener al menos {#limit} caracteres.',
+      'string.max': 'El campo {#label} no debe tener más de {#limit} caracteres.',
+      'string.pattern.base': 'El campo {#label} debe contener unicamente letras y/o espacios',
+      'string.empty': '{#label} no debe estar vacío.'
+    };
+    const opcionesValidador = {
+      abortEarly: false,
+      messages: mensajesDeError,
+    };
+    const loginSchema = Joi.object({
+      name: Joi.string().pattern(/^[a-zA-Z ]+$/).min(1).max(30).required().label('Nombre'),
+    });
+    const validation =  loginSchema.validate({name: nameRef.current.value}, opcionesValidador)
+    if(validation.error){
+      setError(validation.error.message)
+      console.log(validation.error.message)
+      setLoading(false)
     }else{
-        data.append('file', file)
-        data.append('name', nameRef.current.value)
-        dispatch(createLocationWithImage(data, handleLoading))
+      var data = new FormData()
+      if(editing){
+          if(file){
+              data.append('file', file)
+          }
+          data.append('name', nameRef.current.value)
+          data.append('id', editing.id)
+          dispatch(updateLocation(data, handleLoading))
+      }else{
+          data.append('file', file)
+          data.append('name', nameRef.current.value)
+          dispatch(createLocationWithImage(data, handleLoading))
+      }
+      handleClose()
     }
-    handleClose()
 }
 
 const handleDeleteClicked = () => {
@@ -232,6 +257,15 @@ const handleEditLocation = (location) => {
     </Fab>
     </Box>
     </Grid>
+    {error && <Snackbar
+      autoHideDuration={10000}
+        anchorOrigin={{ vertical:'bottom', horizontal:'center' }}
+        open={error ? true : false}
+        onClose={() => setError('')}
+        sx={{ width: '60%' }}
+      >
+         <Alert severity="error" sx={{ width: '100%' }}>{error}</Alert>
+        </Snackbar>}
     {loading && <Loading/>}
     </>
   );

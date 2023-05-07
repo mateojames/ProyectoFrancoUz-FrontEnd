@@ -12,6 +12,7 @@ import {
 } from "firebase/auth";
 import { useDispatch } from "react-redux"
 import { createUserProfile } from "../store/actions/createUser"
+import Joi from "joi"
 
 export default function Login(props) {
     const emailRef = useRef()
@@ -36,14 +37,38 @@ export default function Login(props) {
 
     async function handleSubmit(e) {
         e.preventDefault()
-    
+        
         try {
           setError("")
           setLoading(true)
-          await login(emailRef.current.value, passwordRef.current.value)
-          history.push("/calendar")
-        } catch {
+          const mensajesDeError = {
+            'any.required': 'El campo {#label} es obligatorio.',
+            'string.empty': 'El campo {#label} es obligatorio.',
+            'string.min': 'El campo {#label} debe tener al menos {#limit} caracteres.',
+            'string.max': 'El campo {#label} no debe tener más de {#limit} caracteres.',
+            'string.pattern.base': 'El campo {#label} debe ser un correo electronico',
+            'string.email': 'Ingrese un {#label} válido.',
+            'string.empty': '{#label} no debe estar vacío.'
+          };
+          const opcionesValidador = {
+            abortEarly: false,
+            messages: mensajesDeError,
+          };
+          const loginSchema = Joi.object({
+            email: Joi.string().email({ tlds: { allow: false } }).min(6).max(50).required().label('Email'),
+            password: Joi.string().required().label('Contraseña')
+          });
+          const validation =  loginSchema.validate({email:emailRef.current.value, password: passwordRef.current.value}, opcionesValidador)
+          if(validation.error){
+            setError(validation.error.message)
+            console.log(validation.error.message)
+          }else{
+            await login(emailRef.current.value, passwordRef.current.value)
+            history.push("/calendar")
+          }
+        } catch (error){
           setError("Error al ingresar")
+          console.log(error)
         }
     
         setLoading(false)

@@ -24,11 +24,15 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import BarMenu from "./BarMenu";
 import NotificationsMenu from "./Notifications";
 import { loadNotifications } from "../store/actions/loadNotifications";
+import ConozcanosDialog from "./ConozcanosDialog";
+import HistoriaDialog from "./HistoriaDialog";
 
 const drawerWidth = 240;
 
 const ResponsiveAppBar = (props) => {
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [openConozcanos, setOpenConozcanos] = useState(false);
+    const [openHistoria, setOpenHistoria] = useState(false);
     
     const currentUser = useSelector(state => state.auth.currentUser);
     const notifications = useSelector(state => state.notification.notifications);
@@ -58,6 +62,22 @@ const ResponsiveAppBar = (props) => {
         setAnchorMenu(null);
     };
 
+    const handleCloseConozcanos = () => {
+        setOpenConozcanos(false);
+    };
+
+    const handleOpenConozcanos = () => {
+        setOpenConozcanos(true);
+    };
+
+    const handleCloseHistoria = () => {
+        setOpenHistoria(false);
+    };
+
+    const handleOpenHistoria = () => {
+        setOpenHistoria(true);
+    };
+
     const [anchorNotificationsMenu, setAnchorNotificationsMenu] = useState(null);
     const openNotificationsMenu = Boolean(anchorNotificationsMenu);
     const handleNotificationsMenuClick = (event) => {
@@ -80,10 +100,10 @@ const ResponsiveAppBar = (props) => {
                         <Button sx={{ my: 2, color: 'white', display: { xs: 'block', md: 'block' } }} onClick={handleLoginClicked}>
                            Ingresar
                         </Button>
-                        <Button sx={{ my: 2, color: 'white', display: { xs: 'none', md: 'block' } }} >
+                        <Button sx={{ my: 2, color: 'white', display: { xs: 'none', md: 'block' } }} onClick={handleOpenConozcanos} >
                         Conozcanos
                         </Button>
-                        <Button sx={{ my: 2, color: 'white',display: { xs: 'none', md: 'block' } }}>
+                        <Button sx={{ my: 2, color: 'white',display: { xs: 'none', md: 'block' } }} onClick={handleOpenHistoria}>
                             Historia
                         </Button>
         </Box>
@@ -121,12 +141,12 @@ const ResponsiveAppBar = (props) => {
                 </ListItemButton>
         </ListItem>
         <ListItem key={2} disablePadding>
-            <ListItemButton sx={{ textAlign: 'center' }}>
+            <ListItemButton sx={{ textAlign: 'center' }} onClick={handleOpenConozcanos}>
             <ListItemText>Conozcanos</ListItemText>
             </ListItemButton>
         </ListItem>
         <ListItem key={3} disablePadding>
-            <ListItemButton sx={{ textAlign: 'center' }}>
+            <ListItemButton sx={{ textAlign: 'center' }} onClick={handleOpenHistoria}>
             <ListItemText>Historia</ListItemText>
             </ListItemButton>
         </ListItem>
@@ -222,6 +242,8 @@ const ResponsiveAppBar = (props) => {
             </Box>
             <BarMenu open={openMenu} handleClose={handleMenuClose} handleClick={handleMenuClick} anchorEl={anchorMenu} role={props.role}/>
             <NotificationsMenu open={openNotificationsMenu} handleClose={handleNotficationsMenuClose} handleClick={handleNotificationsMenuClick} anchorEl={anchorNotificationsMenu} role={props.role}/>
+            <ConozcanosDialog open={openConozcanos} handleClose={handleCloseConozcanos}></ConozcanosDialog>
+            <HistoriaDialog open={openHistoria} handleClose={handleCloseHistoria}></HistoriaDialog>
         </>
     );
 };

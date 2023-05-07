@@ -6,6 +6,7 @@ import { auth } from "../firebase"
 import {
   sendPasswordResetEmail
 } from "firebase/auth";
+import Joi from "joi"
 
 
 export default function ForgotPassword(props) {
@@ -23,12 +24,34 @@ export default function ForgotPassword(props) {
       setMessage("")
       setError("")
       setLoading(true)
-      await resetPassword(emailRef.current.value)
+      const mensajesDeError = {
+        'any.required': 'El campo {#label} es obligatorio.',
+        'string.empty': 'El campo {#label} es obligatorio.',
+        'string.min': 'El campo {#label} debe tener al menos {#limit} caracteres.',
+        'string.max': 'El campo {#label} no debe tener más de {#limit} caracteres.',
+        'string.pattern.base': 'El campo {#label} debe ser un correo electronico',
+        'string.email': 'Ingrese un {#label} válido.',
+        'string.empty': '{#label} no debe estar vacío.'
+      };
+      const opcionesValidador = {
+        abortEarly: false,
+        messages: mensajesDeError,
+      };
+      const loginSchema = Joi.object({
+        email: Joi.string().email({ tlds: { allow: false } }).min(6).max(50).required().label('Email'),
+      });
+      const validation =  loginSchema.validate({email:emailRef.current.value}, opcionesValidador)
+      if(validation.error){
+        setError(validation.error.message)
+        console.log(validation.error.message)
+      }else{
+        await resetPassword(emailRef.current.value)
+        setMessage("Revisá tu casilla para continuar")
+      }
+      setLoading(false)
     } catch {
-      //setError("Error al cambiar contraseña")
+      setError("Error")
     }
-    setMessage("Revisá tu casilla para continuar")
-    setLoading(false)
   }
 
   return (

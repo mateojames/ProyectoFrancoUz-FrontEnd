@@ -129,8 +129,12 @@ const numberRule = {
   isValid: value => value ? value.match(/^\d*[1-9]\d*$/) || value.match(/^\d+\.\d+$/) : false,
   errorText: 'Este campo debe contener solo números positivos',
 };
+const textRule = {
+  isValid: value => value ? value.match(/^[a-zA-Z ]+$/)  : false,
+  errorText: 'Este campo debe contener solo letras, numeros y/o espacios',
+};
 const validationRules = {
-  name: [requiredRule],
+  name: [requiredRule, textRule],
 };
 
 const validate = (changed, validationStatus) => Object.keys(changed).reduce((status, id) => {

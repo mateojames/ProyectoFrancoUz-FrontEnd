@@ -10,6 +10,7 @@ import {
 } from "firebase/auth";
 import { useDispatch } from "react-redux"
 import { createUserProfile } from "../store/actions/createUser"
+import Joi from "joi"
 
 export default function Signup(props) {
   const nameRef = useRef()
@@ -67,12 +68,35 @@ export default function Signup(props) {
     try {
       setError("")
       setLoading(true)
-      await signup(nameRef.current.value, emailRef.current.value, passwordRef.current.value)
-      await signOut(auth)
-      history.push({
-        pathname: "/",
-        state: {success: true}
-      })
+      const mensajesDeError = {
+        'any.required': 'El campo {#label} es obligatorio.',
+        'string.empty': 'El campo {#label} es obligatorio.',
+        'string.min': 'El campo {#label} debe tener al menos {#limit} caracteres.',
+        'string.max': 'El campo {#label} no debe tener más de {#limit} caracteres.',
+        'string.pattern.base': 'El campo {#label} debe ser solo letras y espacios',
+        'string.email': 'Ingrese un {#label} válido.',
+        'string.empty': '{#label} no debe estar vacío.'
+      };
+      const opcionesValidador = {
+        abortEarly: false,
+        messages: mensajesDeError,
+      };
+      const singUpSchema = Joi.object({
+        name: Joi.string().pattern(/^[a-zA-Z ]+$/).min(1).max(30).required().label('Nombre y Apellido'),
+        email: Joi.string().email({ tlds: { allow: false } }).min(6).max(50).required().label('Email')
+      });
+      const validation =  singUpSchema.validate({name: nameRef.current.value, email:emailRef.current.value}, opcionesValidador)
+      if(validation.error){
+        setError(validation.error.message)
+        console.log(validation.error.message)
+      }else{
+        await signup(nameRef.current.value, emailRef.current.value, passwordRef.current.value)
+        await signOut(auth)
+        history.push({
+          pathname: "/",
+          state: {success: true}
+        })
+      }
     } catch (e) {
       //if(e.message.includes("Firebase: Error (auth/email-already-in-use).")){setError("El email ya es utilizado por otra cuenta")}
       setError("Error al crear la cuenta");
